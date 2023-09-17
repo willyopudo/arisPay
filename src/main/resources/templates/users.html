@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
+      data-assets-path="/resources/templates/" data-template="vertical-menu-template-free"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6"
+>
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+<!-- / Layout wrapper -->
+<div class="layout-wrapper layout-content-navbar">
+	<!-- / Layout container -->
+	<div class="layout-container">
+		<aside th:replace="~{fragments/aside :: aside}"></aside>
+		<!-- / Layout page -->
+		<div class="layout-page">
+			<!--Insert navigation here-->
+			<nav th:replace="~{fragments/navigation :: nav}"></nav>
+			<!-- Content wrapper -->
+			<div class="content-wrapper">
+				<!-- Content -->
+				<div class="container-xxl flex-grow-1 container-p-y">
+					<div class="row">
+						<div class="col-lg-12 mb-4 order-0">
+							<div class="card">
+								<div class="col-lg-12">
+									<h5 class="card-header float-start">List of Users</h5>
+									<a class="btn btn-primary float-end m-3" href="/user/add">Create New</a>
+								</div>
+								<div th:if="${param.success}" class="alert alert-success alert-dismissible m-3"
+								     role="alert">
+									User was added successfully!
+									<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+								</div>
+								<div th:if="${param.success_edit}" class="alert alert-success alert-dismissible m-3"
+								     role="alert">
+									User was modified successfully!
+									<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+								</div>
+								<div th:if="${param.success_delete}" class="alert alert-success alert-dismissible m-3"
+								     role="alert">
+									User was deleted!
+									<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+								</div>
+								<!--								<span sec:authentication="name">Fullname</span>-->
+								<div class="table-responsive text-nowrap">
+									<table class="table">
+										<thead class="table-dark">
+										<tr>
+											<th>User Name</th>
+											<th>First Name</th>
+											<th>Last Name</th>
+											<th>Email</th>
+											<th>Status</th>
+											<th>Actions</th>
+										</tr>
+										</thead>
+										<tbody class="table-border-bottom-0">
+
+										<tr th:each="user : ${users}">
+											<td th:text="${user.userName}"></td>
+											<td th:text="${user.firstName}"></td>
+											<td th:text="${user.lastName}"></td>
+											<td th:text="${user.email}"></td>
+											<td><span class="badge me-1" th:class="${user.status == 1 ? 'badge me-1 bg-label-primary ' : 'badge me-1 bg-label-danger'}"
+											          th:text="${user.status == 1 ? 'Active' : 'Inactive'}"></span>
+											</td>
+											<td>
+												<div class="dropdown">
+													<button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+													        data-bs-toggle="dropdown">
+														<i class="bx bx-dots-vertical-rounded"></i>
+													</button>
+													<div class="dropdown-menu">
+														<a class="dropdown-item"
+														   th:href="@{/user/edit/{id}(id=${user.id})}"><i class="bx bx-edit-alt me-1"></i> Edit</a>
+
+														<a class="dropdown-item"
+														   th:href="@{/user/delete/{id}(id=${user.id})}"><i class="bx bx-trash me-1"></i> Delete</a>
+													</div>
+												</div>
+											</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<!-- / Content -->
+				<footer th:replace="~{fragments/footer :: footer}"></footer>
+			</div>
+		</div>
+	</div>
+</div>
+<div th:replace="~{fragments/footer_scripts :: footer_scripts}"></div>
+</body>
+</html>

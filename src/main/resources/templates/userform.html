@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
+      data-assets-path="/resources/templates/" data-template="vertical-menu-template-free"
+      xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+<!-- / Layout wrapper -->
+<div class="layout-wrapper layout-content-navbar">
+	<!-- / Layout container -->
+	<div class="layout-container">
+		<aside th:replace="~{fragments/aside :: aside}"></aside>
+		<!-- / Layout page -->
+		<div class="layout-page">
+			<!--Insert navigation here-->
+			<nav th:replace="~{fragments/navigation :: nav}"></nav>
+			<!-- Content wrapper -->
+			<div class="content-wrapper">
+				<!-- Content -->
+				<div class="container-xxl flex-grow-1 container-p-y">
+					<div class="col-xl">
+						<div class="card mb-4">
+							<div class="card-header d-flex justify-content-between align-items-center">
+
+								<h5 class="mb-0" th:text="${#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[1] == 'add' ? 'Add User' : 'Edit User'}"></h5>
+								<small class="text-muted float-end">New User</small>
+							</div>
+							<div class="card-body">
+								<form id="formAuthentication" class="mb-3" method="POST"
+								      th:action="${#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[1] == 'add' ? '/register/save' : '/user/modify'}"
+								      th:object="${user}">
+									<input type="text" class="form-control" id="Id" name="Id" value="2" th:field="*{Id}" hidden/>
+									<div class="mb-3">
+										<label for="userName" class="form-label">Username</label>
+										<input type="text" class="form-control" id="userName" name="userName"
+										       placeholder="Enter your username" th:field="*{userName}" autofocus th:readonly="${#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[1] == 'edit'}"/>
+										<p th:errors="*{userName}" class="text-danger"
+										   th:if="${#fields.hasErrors('userName')}"></p>
+									</div>
+									<div class="mb-3">
+										<label for="email" class="form-label">First Name</label>
+										<input type="text" class="form-control" id="firstName" name="firstName"
+										       placeholder="Enter first name" th:field="*{firstName}"/>
+										<p th:errors="*{firstName}" class="text-danger"
+										   th:if="${#fields.hasErrors('firstName')}"></p>
+									</div>
+									<div class="mb-3">
+										<label for="email" class="form-label">Last Name</label>
+										<input type="text" class="form-control" id="lastName" name="lastName"
+										       placeholder="Enter last name" th:field="*{lastName}"/>
+										<p th:errors="*{lastName}" class="text-danger"
+										   th:if="${#fields.hasErrors('lastName')}"></p>
+									</div>
+									<div class="mb-3">
+										<label for="email" class="form-label">Email</label>
+										<input type="email" class="form-control" id="email" name="email"
+										       placeholder="Enter your email" th:field="*{email}"/>
+										<p th:errors="*{email}" class="text-danger"
+										   th:if="${#fields.hasErrors('email')}"></p>
+									</div>
+									<div class="mb-3">
+										<label for="status" class="form-label">User Status</label>
+										<select class="form-select" id="status" name="status">
+											<option value="">Select Status</option>
+											<option value="1" th:selected="${user.status == 1 ? 'selected' : 'false'}">Active</option>
+											<option value="0" th:selected="${user.status == 0 ? 'selected' : 'false'}">Inactive</option>
+
+										</select>
+									</div>
+									<!--									<div class="form-check form-switch mb-2">-->
+									<!--										-->
+									<!--										<input class="form-check-input" name="status" type="checkbox" id="status" th:checked="${user.status == 1 ? 'checked' : 'false'}"/>-->
+									<!--										<label class="form-check-label" for="status">User Status</label>-->
+									<!--									</div>-->
+									<div th:if="${#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[1] == 'add'}" class="mb-3 form-password-toggle">
+										<label class="form-label" for="password">Password</label>
+										<div class="input-group input-group-merge">
+											<input type="password" id="password" class="form-control" name="password"
+											       placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+											       aria-describedby="password" th:field="*{password}"/>
+											<span class="input-group-text cursor-pointer"><i
+													class="bx bx-hide"></i></span>
+										</div>
+										<p th:errors="*{password}" class="text-danger"
+										   th:if="${#fields.hasErrors('password')}"></p>
+									</div>
+
+									<div class="mb-3">
+										<input type="text" class="form-control" id="addedOrEditedFrom" name="addedOrEditedFrom"
+										       value="2" hidden/>
+									</div>
+									<button class="btn btn-primary d-grid">Submit</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- / Content -->
+				<footer th:replace="~{fragments/footer :: footer}"></footer>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div th:replace="~{fragments/footer_scripts :: footer_scripts}"></div>
+<script src="../../resources/static/js/custom-global.js"></script>
+</body>
+</html>
