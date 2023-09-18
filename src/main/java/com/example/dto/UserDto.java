@@ -24,6 +24,16 @@ public class UserDto {
 	private String email;
 	//@NotEmpty(message = "Password should not be empty")
 	private String password;
+
+	@NotEmpty
+	private String phoneNumber;
+	@NotEmpty
+	private String idNumber;
+	@NotEmpty
+	private String address;
+	private String zipCode;
+	@NotEmpty
+	private String town;
 	private byte status;
 	private int addedOrEditedFrom;
 }

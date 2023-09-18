@@ -150,6 +150,18 @@ public class AuthController {
 		return model;
 	}
 
+	@RequestMapping(value = "/user/profile/{username}", method = RequestMethod.GET)
+	public ModelAndView userProfile(@PathVariable String username) {
+		ModelAndView model = new ModelAndView();
+
+		UserDto user = userService.findUserByUserName2(username);
+		model.addObject("user", user);
+		model.addObject("title", "User Profile");
+		model.setViewName("profile");
+
+		return model;
+	}
+
 	// handler method to handle list of users
 	@GetMapping("/users")
 	public String users(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {

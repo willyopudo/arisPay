@@ -64,6 +64,12 @@ public class UserServiceImpl implements UserService {
 		return userRepository.findByUsername(username);
 	}
 
+	@Override
+	public UserDto findUserByUserName2(String username) {
+
+		return mapToUserDto(userRepository.findByUsername(username));
+	}
+
 
 	public void deleteUserById(Long id) {
 		userRepository.deleteById(id);
@@ -86,6 +92,11 @@ public class UserServiceImpl implements UserService {
 		userDto.setLastName(str[1]);
 		userDto.setEmail(user.getEmail());
 		userDto.setStatus(user.getStatus());
+		userDto.setIdNumber(user.getIdNumber());
+		userDto.setPhoneNumber(user.getPhoneNumber());
+		userDto.setAddress(user.getAddress());
+		userDto.setZipCode(user.getZipCode());
+		userDto.setTown(user.getTown());
 		return userDto;
 	}
 

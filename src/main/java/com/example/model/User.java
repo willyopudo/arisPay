@@ -35,7 +35,21 @@ public class User {
 	private String password;
 
 	@Column(nullable = false)
+	private String phoneNumber;
+
+	@Column(nullable = false)
 	private byte status = 1;
+
+	@Column(nullable = false)
+	private String idNumber;
+
+	@Column(nullable = false)
+	private String address;
+
+	private String zipCode;
+
+	@Column(nullable = false)
+	private String town;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(
