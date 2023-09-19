@@ -62,7 +62,7 @@ public class AuthController {
 	public String registration(@Valid @ModelAttribute("user") UserDto userDto,
 	                           BindingResult result,
 	                           Model model) {
-		String redirectUrl = "register";
+		String redirectUrl = "login";
 		User existingUser = userService.findUserByEmail(userDto.getEmail());
 
 		if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
@@ -99,7 +99,10 @@ public class AuthController {
 	                       BindingResult result,
 	                       Model model) {
 		System.out.println("User status " + userDto.getStatus());
-
+		String redirectUrl = "users";
+		if (userDto.getAddedOrEditedFrom() == 3) {
+			redirectUrl = "user/profile/" + userDto.getUserName();
+		}
 		User existingUser = userService.findUserByUserName(userDto.getUserName());
 
 		if (result.hasErrors()) {
@@ -108,14 +111,25 @@ public class AuthController {
 				System.out.print(element.toString() + " ");
 			}
 			model.addAttribute("user", userDto);
+			if (userDto.getAddedOrEditedFrom() == 3)
+				return "profile";
+
 			return "userform";
 		}
 		existingUser.setName(userDto.getFirstName() + " " + userDto.getLastName());
 		existingUser.setEmail(userDto.getEmail());
-		existingUser.setStatus(userDto.getStatus());
+		existingUser.setAddress(userDto.getAddress());
+		existingUser.setTown(userDto.getTown());
+		existingUser.setZipCode(userDto.getZipCode());
+
+		if (userDto.getAddedOrEditedFrom() != 3) {
+			existingUser.setStatus(userDto.getStatus());
+			existingUser.setIdNumber(userDto.getIdNumber());
+			existingUser.setPhoneNumber(userDto.getPhoneNumber());
+		}
 		userRepository.save(existingUser);
 
-		return "redirect:/users?success_edit";
+		return "redirect:/" + redirectUrl + "?success_edit";
 	}
 
 	@RequestMapping(value = "/user/delete/{id}", method = RequestMethod.GET)

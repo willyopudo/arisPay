@@ -78,10 +78,7 @@
 					<!-- /Logo -->
 					<h4 class="mb-2">Adventure starts here 🚀</h4>
 					<p class="mb-4">Manage your Milkman account easily</p>
-					<div th:if="${param.success}" class="alert alert-success alert-dismissible" role="alert">
-						You have successfully registered
-						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>
+
 					<form id="formAuthentication" class="mb-3" method="POST" th:action="@{/register/save}"
 					      th:object="${user}">
 						<div class="mb-3">

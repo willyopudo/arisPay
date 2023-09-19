@@ -58,8 +58,8 @@
 								<div class="flex-grow-1">
 									<span class="fw-semibold d-block" sec:authentication="principal.fullName">Fullname</span>
 									<th:block th:each="authority : ${#authentication.authorities}">
-										<small class="text-muted" th:text="${authority}">Admin</small>
-										
+										<small class="text-muted" th:text="${#strings.substringAfter(authority,'ROLE_')}">Admin</small>
+
 									</th:block>
 
 								</div>

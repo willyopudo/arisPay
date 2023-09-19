@@ -76,7 +76,12 @@
 								</div>
 								<hr class="my-0"/>
 								<div class="card-body">
-									<form id="formAccountSettings" method="POST" onsubmit="return false" th:action="@{/user/modify}" th:object="${user}">
+									<div th:if="${param.success_edit}" class="alert alert-success alert-dismissible m-3"
+									     role="alert">
+										Profile was modified successfully!
+										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+									</div>
+									<form id="formAccountSettings" method="POST" th:action="@{/user/modify}" th:object="${user}">
 										<div class="row">
 											<div>
 												<label for="userName" class="form-label">Username</label>
@@ -169,6 +174,8 @@
 												</select>
 											</div>
 										</div>
+										<input type="text" class="form-control" id="addedOrEditedFrom" name="addedOrEditedFrom"
+										       value="3" hidden/>
 										<div class="mt-2">
 											<button type="submit" class="btn btn-primary me-2">Save changes</button>
 											<button type="reset" class="btn btn-outline-secondary">Cancel</button>

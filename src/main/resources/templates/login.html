@@ -83,6 +83,10 @@
 						Invalid Email or Password.
 						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 					</div>
+					<div th:if="${param.success}" class="alert alert-success alert-dismissible" role="alert">
+						You have successfully registered. Please login to your account!
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
 					<div th:if="${param.logout}" class="alert alert-success alert-dismissible" role="alert">
 						You have been logged out.
 						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
