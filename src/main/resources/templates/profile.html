@@ -52,21 +52,16 @@
 												id="uploadedAvatar"
 										/>
 										<div class="button-wrapper">
-											<form th:action="@{/user/uploadphoto}" method="post" id="uploadForm">
-												<label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
+											<form th:action="@{/media/upload}" method="post" id="uploadForm" enctype="multipart/form-data">
+												<input type="text" class="form-control" id="fileIdentifier" name="fileIdentifier" th:value="${'userphoto_' + user.userName}" hidden/>
+												<label for="mediafile" class="btn btn-primary me-2 mb-4" tabindex="0">
 													<span class="d-none d-sm-block">Upload new photo</span>
 													<i class="bx bx-upload d-block d-sm-none"></i>
-													<input
-															type="file"
-															id="upload"
-															class="account-file-input"
-															hidden
-															accept="image/png, image/jpeg"
-													/>
+													<input type="file" id="mediafile" , name="mediafile" class="account-file-input" accept="image/*"/>
 												</label>
-												<button type="button" class="btn btn-outline-secondary account-image-reset mb-4">
-													<i class="bx bx-reset d-block d-sm-none"></i>
-													<span class="d-none d-sm-block">Reset</span>
+												<button type="submit" class="btn btn-outline-primary  mb-4">
+													<i class="bx  d-block d-sm-none"></i>
+													<span class="d-none d-sm-block">Submit</span>
 												</button>
 
 												<p class="text-muted mb-0">Allowed JPG, GIF or PNG. Max size of 4MB</p>

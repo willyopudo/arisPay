@@ -32,6 +32,7 @@ public class SpringSecurity {
 				.authorizeHttpRequests((authorize) ->
 						authorize.requestMatchers(antMatcher("/register/**")).permitAll()
 								.requestMatchers(antMatcher("/index")).permitAll()
+								.requestMatchers(antMatcher("/media/*")).permitAll()
 								.requestMatchers(antMatcher("/resources/**")).permitAll()
 								.requestMatchers(antMatcher("/users**")).hasRole("ADMIN")
 								.requestMatchers(antMatcher("/user/**")).hasRole("ADMIN")
