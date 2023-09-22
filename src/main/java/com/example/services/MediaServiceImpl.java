@@ -40,7 +40,16 @@ public class MediaServiceImpl implements IMediaService {
 	@Override
 	public Long create(final MediaDTO mediaDTO) {
 		final Media media = new Media();
-		mapToEntity(mediaDTO, media);
+		MediaDTO isExist = findByName(mediaDTO.getName());
+		if (isExist != null) {
+			isExist.setUpdatedDate(mediaDTO.getCreatedDate());
+			isExist.setMediaType(mediaDTO.getMediaType());
+			isExist.setSize(mediaDTO.getSize());
+
+			mapToEntity(isExist, media);
+		} else {
+			mapToEntity(mediaDTO, media);
+		}
 		return mediaRepository.save(media).getId();
 	}
 
@@ -70,7 +79,9 @@ public class MediaServiceImpl implements IMediaService {
 	}
 
 	private MediaDTO mapToDTO(final Media media, final MediaDTO mediaDTO) {
-		mediaDTO.setId(media.getId());
+		if (media.getId() > 0)
+			mediaDTO.setId(media.getId());
+
 		mediaDTO.setName(media.getName());
 		mediaDTO.setMediaLocation(media.getMediaLocation());
 		mediaDTO.setMediaType(media.getMediaType());
@@ -80,6 +91,7 @@ public class MediaServiceImpl implements IMediaService {
 	}
 
 	private Media mapToEntity(final MediaDTO mediaDto, final Media media) {
+		media.setId(mediaDto.getId());
 		media.setName(mediaDto.getName());
 		media.setMediaLocation(mediaDto.getMediaLocation());
 		media.setMediaType(mediaDto.getMediaType());

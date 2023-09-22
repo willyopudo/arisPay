@@ -15,7 +15,7 @@ public interface IMediaService {
 
 	Long create(MediaDTO mediaDTO);
 
-	void update(Long id, MediaDTO mdiaDTO);
+	void update(Long id, MediaDTO mediaDTO);
 
 	void delete(Long id);
 

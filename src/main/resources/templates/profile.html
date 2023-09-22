@@ -44,7 +44,7 @@
 								<div class="card-body">
 									<div class="d-flex align-items-start align-items-sm-center gap-4">
 										<img
-												src="../../resources/static/img/avatars/1.png"
+												th:src="@{../../resources/static/uploads/userphoto_{uname}(uname=${user.userName})}"
 												alt="user-avatar"
 												class="d-block rounded"
 												height="100"
@@ -74,6 +74,11 @@
 									<div th:if="${param.success_edit}" class="alert alert-success alert-dismissible m-3"
 									     role="alert">
 										Profile was modified successfully!
+										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+									</div>
+									<div th:if="${fileError}" class="alert alert-danger alert-dismissible m-3"
+									     role="alert">
+										<span th:text="${fileError}">There was error uploading your file!</span>
 										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 									</div>
 									<form id="formAccountSettings" method="POST" th:action="@{/user/modify}" th:object="${user}">

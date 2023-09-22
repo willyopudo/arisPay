@@ -4,7 +4,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
+import com.example.dto.UserDto;
+import com.example.model.User;
+import com.example.repository.UserRepository;
 import com.example.services.IMediaService;
+import com.example.services.UserService;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -17,7 +22,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.ui.Model;
 
 import com.example.dto.MediaDTO;
 import com.example.services.IFileStorageService;
@@ -34,6 +41,10 @@ public class FileManagerController {
 	// a service to store file information in DB
 	@Autowired
 	private IMediaService mediaservice;
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private UserRepository userRepository;
 
 	// show all files list
 	@GetMapping
@@ -56,8 +67,20 @@ public class FileManagerController {
 	// upload file
 	@PostMapping("/upload")
 	public String uploadFile(Model model, @RequestParam("mediafile") MultipartFile file, @RequestParam("fileIdentifier") String fileIdentifier) throws IOException {
-		System.out.println(fileIdentifier);
-		final MediaDTO media = fileStorageService.saveMedia(file, fileIdentifier);
+		MediaDTO media = new MediaDTO();
+		String userName = fileIdentifier.substring(fileIdentifier.lastIndexOf('_') + 1);
+		try {
+			media = fileStorageService.saveMedia(file, fileIdentifier);
+		} catch (Exception ex) {
+			String fileError = ex.toString();
+			if (fileError.contains("FileAlreadyExistsException:"))
+				fileError = "File already exists!";
+			UserDto user = userService.findUserByUserName2(userName);
+			model.addAttribute("user", user);
+			model.addAttribute("fileError", fileError);
+			return "profile";
+
+		}
 
 		final Long mediaId = mediaservice.create(media);
 		final List<MediaDTO> mediaList = mediaservice.findAll();
