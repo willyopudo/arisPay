@@ -16,6 +16,7 @@ target/
 
 ### custom ####
 /media_uploads/
+/src/main/resources/static/uploads/
 ### IntelliJ IDEA ###
 .idea
 *.iws

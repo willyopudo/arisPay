@@ -10,7 +10,7 @@
 
 <div class="container-xxl">
 	<div class="authentication-wrapper authentication-basic container-p-y">
-		<div class="authentication-inner">
+		<div class="authentication-inner" style="max-width: 800px">
 			<!-- Register Card -->
 			<div class="card">
 				<div class="card-body">
@@ -72,12 +72,12 @@
                       </g>
                     </svg>
                   </span>
-							<span class="app-brand-text demo text-body fw-bolder">Milkman</span>
+							<span class="app-brand-text demo text-body fw-bolder" th:text="${appName}">arisPay</span>
 						</a>
 					</div>
 					<!-- /Logo -->
 					<h4 class="mb-2">Adventure starts here 🚀</h4>
-					<p class="mb-4">Manage your Milkman account easily</p>
+					<p class="mb-4" th:text="${'Manage your ' + appName + ' account easily'}">Manage your Milkman account easily</p>
 
 					<form id="formAuthentication" class="mb-3" method="POST" th:action="@{/register/save}"
 					      th:object="${user}">
@@ -108,6 +108,35 @@
 							<p th:errors="*{email}" class="text-danger"
 							   th:if="${#fields.hasErrors('email')}"></p>
 						</div>
+						<div class="mb-3 ">
+							<label for="idNumber" class="form-label">National Id Number</label>
+							<input type="number" class="form-control" id="idNumber" name="idNumber" value="3124567" maxlength="8" th:field="*{idNumber}"/>
+							<p th:errors="*{idNumber}" class="text-danger" th:if="${#fields.hasErrors('idNumber')}"></p>
+						</div>
+						<div class="mb-3 ">
+							<label class="form-label" for="phoneNumber">Phone Number</label>
+							<div class="input-group input-group-merge">
+								<span class="input-group-text">KE (+254)</span>
+								<input type="number" maxlength="9" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="712345678" th:field="*{phoneNumber}"/>
+								<p th:errors="*{phoneNumber}" class="text-danger" th:if="${#fields.hasErrors('phoneNumber')}"></p>
+							</div>
+						</div>
+						<div class="mb-3 ">
+							<label for="address" class="form-label">Address</label>
+							<input type="text" class="form-control" id="address" name="address" placeholder="Address" th:field="*{address}"/>
+							<p th:errors="*{address}" class="text-danger" th:if="${#fields.hasErrors('address')}"></p>
+						</div>
+
+						<div class="mb-3 ">
+							<label for="zipCode" class="form-label">Zip Code</label>
+							<input type="text" class="form-control" id="zipCode" name="zipCode" placeholder="Zip Code" th:field="*{zipCode}"/>
+							<p th:errors="*{zipCode}" class="text-danger" th:if="${#fields.hasErrors('zipCode')}"></p>
+						</div>
+						<div class="mb-3 ">
+							<label for="town" class="form-label">Town/City</label>
+							<input class="form-control" type="text" id="town" name="town" placeholder="Nairobi City" th:field="*{town}"/>
+							<p th:errors="*{town}" class="text-danger" th:if="${#fields.hasErrors('town')}"></p>
+						</div>
 						<div class="mb-3 form-password-toggle">
 							<label class="form-label" for="password">Password</label>
 							<div class="input-group input-group-merge">
@@ -127,9 +156,11 @@
 								</label>
 							</div>
 						</div>
+
 						<input type="text" class="form-control" id="addedOrEditedFrom" name="addedOrEditedFrom"
 						       value="2" hidden/>
-						<button class="btn btn-primary d-grid w-100">Sign up</button>
+						<button class="btn btn-primary d-grid ">Sign up</button>
+
 					</form>
 
 					<p class="text-center">
