@@ -1,8 +1,10 @@
 package com.arisweb.controller;
 
 import com.arisweb.dto.UserDto;
+import com.arisweb.model.Role;
 import com.arisweb.model.User;
 import com.arisweb.repository.UserRepository;
+import com.arisweb.security.ApplicationUserRole;
 import com.arisweb.security.CustomUserDetails;
 import com.arisweb.services.UserService;
 import jakarta.validation.Valid;
@@ -19,6 +21,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -26,6 +31,7 @@ public class AuthController {
 
 	private UserService userService;
 	private UserRepository userRepository;
+	ApplicationUserRole[] roles = ApplicationUserRole.class.getEnumConstants();
 	@Value("${app.name}")
 	private String appName;
 
@@ -35,18 +41,23 @@ public class AuthController {
 	}
 
 	// handler method to handle home page request
-	@RequestMapping(value = "/index", method = RequestMethod.GET)
-	public ModelAndView home() {
+	@RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
+	public ModelAndView home(Principal principal) {
 		ModelAndView model = new ModelAndView();
-		model.addObject("title", "MilkMan Home");
-		model.setViewName("index");
+		if (!(principal == null)) {
+			model.addObject("title", appName + " Dashboard");
+			model.setViewName("dashboard");
+		} else {
+			model.addObject("title", appName + " Home");
+			model.setViewName("index");
+		}
 		return model;
 	}
 
 	// handler method to handle login request
 	@GetMapping("/login")
 	public String login(Model model) {
-		model.addAttribute("title", "arisPay Login");
+		model.addAttribute("title", appName + " Login");
 		model.addAttribute("appName", appName);
 		return "login";
 	}
@@ -56,7 +67,7 @@ public class AuthController {
 	public String showRegistrationForm(Model model) {
 		// create model object to store form data
 		UserDto user = new UserDto();
-		model.addAttribute("title", "arisPay Register");
+		model.addAttribute("title", appName + " Register");
 		model.addAttribute("user", user);
 		model.addAttribute("appName", appName);
 		return "register";
@@ -85,6 +96,7 @@ public class AuthController {
 				System.out.print(element.toString() + " ");
 			}
 			model.addAttribute("user", userDto);
+			model.addAttribute("userRoles", roles);
 			if (userDto.getAddedOrEditedFrom() == 2)
 				return "userform";
 
@@ -103,7 +115,9 @@ public class AuthController {
 	public String editUser(@Valid @ModelAttribute("user") UserDto userDto,
 	                       BindingResult result,
 	                       Model model) {
-		System.out.println("User status " + userDto.getStatus());
+		model.addAttribute("user", userDto);
+		model.addAttribute("userRoles", roles);
+
 		String redirectUrl = "users";
 		if (userDto.getAddedOrEditedFrom() == 3) {
 			redirectUrl = "user/profile/" + userDto.getUserName();
@@ -115,24 +129,34 @@ public class AuthController {
 
 				System.out.print(element.toString() + " ");
 			}
-			model.addAttribute("user", userDto);
+
 			if (userDto.getAddedOrEditedFrom() == 3)
 				return "profile";
 
 			return "userform";
 		}
-		existingUser.setName(userDto.getFirstName() + " " + userDto.getLastName());
-		existingUser.setEmail(userDto.getEmail());
-		existingUser.setAddress(userDto.getAddress());
-		existingUser.setTown(userDto.getTown());
-		existingUser.setZipCode(userDto.getZipCode());
 
-		if (userDto.getAddedOrEditedFrom() != 3) {
-			existingUser.setStatus(userDto.getStatus());
-			existingUser.setIdNumber(userDto.getIdNumber());
-			existingUser.setPhoneNumber(userDto.getPhoneNumber());
+		userDto.setId(existingUser.getId());
+		userDto.setPassword(existingUser.getPassword());
+
+		System.out.println("User FirstName from DTO is" + userDto.getFirstName());
+		if (userDto.getAddedOrEditedFrom() == 3) {
+			userDto.setUserName(existingUser.getUsername());
+			userDto.setStatus(existingUser.getStatus());
+			userDto.setIdNumber(existingUser.getIdNumber());
+			userDto.setPhoneNumber(existingUser.getPhoneNumber());
+			userDto.setRole(existingUser.getRoles().get(0).getName().isEmpty() ? "ROLE_USER" : existingUser.getRoles().get(0).getName());
 		}
-		userRepository.save(existingUser);
+		try {
+			userService.saveUser(userDto);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			model.addAttribute("exception", ex.getMessage());
+			if (userDto.getAddedOrEditedFrom() == 3)
+				return "profile";
+
+			return "userform";
+		}
 
 		return "redirect:/" + redirectUrl + "?success_edit";
 	}
@@ -149,11 +173,13 @@ public class AuthController {
 	public ModelAndView addUser() {
 		ModelAndView model = new ModelAndView();
 
+
 		UserDto user = new UserDto();
 		model.addObject("user", user);
 		model.addObject("title", "Add User");
+		model.addObject("userRoles", roles);
 		model.setViewName("userform");
-
+		//System.out.println(Arrays.toString(roles));
 		return model;
 	}
 
@@ -162,8 +188,11 @@ public class AuthController {
 		ModelAndView model = new ModelAndView();
 
 		UserDto user = userService.findUserById(id);
+		System.out.println(user.getRole());
+		//System.out.println(Arrays.toString(roles));
 		model.addObject("user", user);
 		model.addObject("title", "Edit User");
+		model.addObject("userRoles", roles);
 		model.setViewName("userform");
 
 		return model;

@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
+      data-assets-path="/resources/templates/" data-template="vertical-menu-template-free"
+      xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+<!-- / Layout wrapper -->
+<div class="layout-wrapper layout-content-navbar">
+	<!-- / Layout container -->
+	<div class="layout-container">
+
+		<div class="layout-page" style="padding-left:0px">
+
+			<div class="container-xxl flex-grow-1 container-p-y">
+				<div class="col-xl">
+					<h1>:-(</h1>
+					<h2>Something went wrong and we couldn't complete your request.</h2>
+					<a href="/">Go back to home page</a>
+					<h2 style="color:red" th:text="${status + ' ' + error}"></h2>
+				</div>
+			</div>
+		</div>
+
+		<div th:replace="~{fragments/footer_scripts :: footer_scripts}"></div>
+		<script type="text/javascript" src="../../resources/static/js/custom-global.js"></script>
+</body>
+</html>

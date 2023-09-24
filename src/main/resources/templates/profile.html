@@ -76,6 +76,11 @@
 										Profile was modified successfully!
 										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 									</div>
+									<div th:if="${exception}" class="alert alert-warning alert-dismissible m-3"
+									     role="alert" th:text="${'An exception occurred :: ' + exception}">
+										An exception occurred!
+										<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+									</div>
 									<div th:if="${fileError}" class="alert alert-danger alert-dismissible m-3"
 									     role="alert">
 										<span th:text="${fileError}">There was error uploading your file!</span>

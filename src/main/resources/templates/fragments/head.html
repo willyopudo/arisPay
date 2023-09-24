@@ -37,7 +37,7 @@
 	<!-- Page CSS -->
 	<link rel="stylesheet" href=""
 	      th:href="@{../../../resources/static/vendor/css/pages/page-auth.css}"
-	      th:if="${#ctx.springRequestContext.requestUri == '/login' or #ctx.springRequestContext.requestUri == '/register' or #strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[0] == 'user'}"/>
+	      th:if="${#ctx.springRequestContext.requestUri == '/login' or #ctx.springRequestContext.requestUri == '/register' or (!#arrays.isEmpty(#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')) and #strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[0] == 'user')}"/>
 	<link href=" https://cdn.jsdelivr.net/npm/sweetalert2@11.7.28/dist/sweetalert2.min.css " rel="stylesheet">
 
 	<!-- Helpers -->

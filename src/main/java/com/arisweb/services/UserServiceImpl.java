@@ -35,12 +35,20 @@ public class UserServiceImpl implements UserService {
 		user.setName(userDto.getFirstName() + " " + userDto.getLastName());
 		user.setEmail(userDto.getEmail());
 		user.setStatus(userDto.getStatus());
+		user.setTown(userDto.getTown());
+		user.setAddress(userDto.getAddress());
+		user.setIdNumber(userDto.getIdNumber());
+		user.setPhoneNumber(userDto.getPhoneNumber());
+		user.setZipCode(userDto.getZipCode());
 		// encrypt the password using spring security
-		user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+		if (userDto.getAddedOrEditedFrom() == 3)
+			user.setPassword(userDto.getPassword());
+		else
+			user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-		Role role = roleRepository.findByName("ROLE_ADMIN");
+		Role role = roleRepository.findByName(userDto.getRole());
 		if (role == null) {
-			role = checkRoleExist();
+			role = checkRoleExist(userDto.getRole());
 		}
 		user.setRoles(Arrays.asList(role));
 		userRepository.save(user);
@@ -78,7 +86,7 @@ public class UserServiceImpl implements UserService {
 	public List<UserDto> findAllUsers() {
 		List<User> users = userRepository.findAll();
 		return users.stream()
-				.map((user) -> mapToUserDto(user))
+				.map(this::mapToUserDto)
 				.collect(Collectors.toList());
 	}
 
@@ -96,12 +104,14 @@ public class UserServiceImpl implements UserService {
 		userDto.setAddress(user.getAddress());
 		userDto.setZipCode(user.getZipCode());
 		userDto.setTown(user.getTown());
+		if (!user.getRoles().isEmpty())
+			userDto.setRole(user.getRoles().get(0).getName().substring(user.getRoles().get(0).getName().lastIndexOf("_") + 1));
 		return userDto;
 	}
 
-	private Role checkRoleExist() {
+	private Role checkRoleExist(String roleName) {
 		Role role = new Role();
-		role.setName("ROLE_ADMIN");
+		role.setName(roleName);
 		return roleRepository.save(role);
 	}
 }

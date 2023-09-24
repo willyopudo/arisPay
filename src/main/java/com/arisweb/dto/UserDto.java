@@ -1,11 +1,16 @@
 package com.arisweb.dto;
 
+import com.arisweb.model.Role;
+import com.arisweb.security.ApplicationUserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,4 +41,7 @@ public class UserDto {
 	private String town;
 	private byte status;
 	private int addedOrEditedFrom;
+
+	private String role;
+	
 }

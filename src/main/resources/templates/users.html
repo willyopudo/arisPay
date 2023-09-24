@@ -52,6 +52,7 @@
 											<th>Last Name</th>
 											<th>Email</th>
 											<th>Status</th>
+											<th>Role</th>
 											<th>Actions</th>
 										</tr>
 										</thead>
@@ -64,6 +65,9 @@
 											<td th:text="${user.email}"></td>
 											<td><span class="badge me-1" th:class="${user.status == 1 ? 'badge me-1 bg-label-primary ' : 'badge me-1 bg-label-danger'}"
 											          th:text="${user.status == 1 ? 'Active' : 'Inactive'}"></span>
+											</td>
+											<td><span class="badge me-1 bg-label-secondary"
+											          th:text="${user.role}"></span>
 											</td>
 											<td>
 												<div class="dropdown">

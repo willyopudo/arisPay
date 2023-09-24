@@ -1,5 +1,6 @@
 package com.arisweb.config;
 
+import com.arisweb.security.ApplicationUserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import static com.arisweb.security.ApplicationUserRole.*;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
@@ -31,13 +33,15 @@ public class SpringSecurity {
 		http.csrf().disable()
 				.authorizeHttpRequests((authorize) ->
 						authorize.requestMatchers(antMatcher("/register/**")).permitAll()
+								.requestMatchers(antMatcher("/error**")).permitAll()
+								.requestMatchers(antMatcher("/")).permitAll()
 								.requestMatchers(antMatcher("/index")).permitAll()
 								.requestMatchers(antMatcher("/media/*")).permitAll()
 								.requestMatchers(antMatcher("/resources/**")).permitAll()
-								.requestMatchers(antMatcher("/users**")).hasRole("ADMIN")
-								.requestMatchers(antMatcher("/user/**")).hasRole("ADMIN")
-								.requestMatchers(antMatcher("/listMachines")).hasRole("ADMIN")
-								.requestMatchers(antMatcher("/dashboard/**")).hasRole("ADMIN")
+								.requestMatchers(antMatcher("/users**")).hasRole(ADMIN.name())
+								.requestMatchers(antMatcher("/user/**")).hasRole(ADMIN.name())
+								.requestMatchers(antMatcher("/listMachines")).hasRole(ADMIN.name())
+								.requestMatchers(antMatcher("/dashboard/**")).hasRole(ADMIN.name())
 				).formLogin(
 						form -> form
 								.loginPage("/login")

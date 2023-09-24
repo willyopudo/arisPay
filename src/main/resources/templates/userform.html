@@ -95,11 +95,16 @@
 
 										</select>
 									</div>
-									<!--									<div class="form-check form-switch mb-2">-->
-									<!--										-->
-									<!--										<input class="form-check-input" name="status" type="checkbox" id="status" th:checked="${user.status == 1 ? 'checked' : 'false'}"/>-->
-									<!--										<label class="form-check-label" for="status">User Status</label>-->
-									<!--									</div>-->
+									<div class="mb-3">
+										<label for="role" class="form-label">User Role</label>
+										<select class="form-select" id="role" name="role">
+											<option th:if="${user.role == null}" value="">Select Role</option>
+											<option th:each="userRole : ${userRoles}" th:text="${userRole}" th:value="${'ROLE_' + userRole}"
+											        th:selected="${userRole==user.role}"></option>
+
+										</select>
+									</div>
+									
 									<div th:if="${#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[1] == 'add'}" class="mb-3 form-password-toggle">
 										<label class="form-label" for="password">Password</label>
 										<div class="input-group input-group-merge">
