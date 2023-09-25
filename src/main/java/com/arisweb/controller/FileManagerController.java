@@ -65,25 +65,28 @@ public class FileManagerController {
 	public String uploadFile(Model model, @RequestParam("mediafile") MultipartFile file, @RequestParam("fileIdentifier") String fileIdentifier) throws IOException {
 		MediaDTO media = new MediaDTO();
 		String userName = fileIdentifier.substring(fileIdentifier.lastIndexOf('_') + 1);
-		try {
-			media = fileStorageService.saveMedia(file, fileIdentifier);
-		} catch (Exception ex) {
-			String fileError = ex.toString();
-			if (fileError.contains("FileAlreadyExistsException:"))
-				fileError = "File already exists!";
-			UserDto user = userService.findUserByUserName2(userName);
-			model.addAttribute("user", user);
-			model.addAttribute("fileError", fileError);
-			return "profile";
+		if (!file.isEmpty()) {
+			try {
+				media = fileStorageService.saveMedia(file, fileIdentifier);
+			} catch (Exception ex) {
+				String fileError = ex.toString();
+				if (fileError.contains("FileAlreadyExistsException:"))
+					fileError = "File already exists!";
+				UserDto user = userService.findUserByUserName2(userName);
+				model.addAttribute("user", user);
+				model.addAttribute("fileError", fileError);
+				return "profile";
 
-		}
+			}
+		} else
+			return "redirect:/user/profile/" + userName + "?fileNull";
 
 		final Long mediaId = mediaservice.create(media);
 		final List<MediaDTO> mediaList = mediaservice.findAll();
 
 		model.addAttribute("mediaFiles", mediaList);
 
-		return "redirect:/user/profile/" + fileIdentifier.substring(fileIdentifier.lastIndexOf('_') + 1);
+		return "redirect:/user/profile/" + userName;
 	}
 
 	// delete file

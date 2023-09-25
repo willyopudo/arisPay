@@ -1,5 +1,19 @@
 'use strict';
+function validate(file) {
+    var ext = file.split(".");
+    ext = ext[ext.length-1].toLowerCase();
+    var arrayExtensions = ["jpg" , "jpeg", "png", "bmp", "gif"];
 
+    if (arrayExtensions.lastIndexOf(ext) == -1) {
+        Swal.fire({
+          title: 'Failure!',
+          text: 'Wrong file type selected',
+          icon: 'warning',
+          confirmButtonText: 'Cancel'
+        })
+        $("#mediafile").val("");
+    }
+}
 (function () {
 	$('#statustoggle').change(function() {
         if(this.checked) {
@@ -23,4 +37,5 @@
         }
         //$('#textbox1').val(this.checked);
     });
+
 })();

@@ -7,6 +7,7 @@ import com.arisweb.repository.UserRepository;
 import com.arisweb.security.ApplicationUserRole;
 import com.arisweb.security.CustomUserDetails;
 import com.arisweb.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -97,15 +98,14 @@ public class AuthController {
 			}
 			model.addAttribute("user", userDto);
 			model.addAttribute("userRoles", roles);
-			if (userDto.getAddedOrEditedFrom() == 2)
+			if (userDto.getAddedOrEditedFrom() == 34916)
 				return "userform";
 
 			return "register";
 		}
-		if (userDto.getAddedOrEditedFrom() == 2) {
+		if (userDto.getAddedOrEditedFrom() == 34916) {
 			redirectUrl = "users";
 		}
-		System.out.println("User channel " + userDto.getAddedOrEditedFrom());
 		userService.saveUser(userDto);
 
 		return "redirect:/" + redirectUrl + "?success";
@@ -119,7 +119,7 @@ public class AuthController {
 		model.addAttribute("userRoles", roles);
 
 		String redirectUrl = "users";
-		if (userDto.getAddedOrEditedFrom() == 3) {
+		if (userDto.getAddedOrEditedFrom() == 83659) {
 			redirectUrl = "user/profile/" + userDto.getUserName();
 		}
 		User existingUser = userService.findUserByUserName(userDto.getUserName());
@@ -130,7 +130,7 @@ public class AuthController {
 				System.out.print(element.toString() + " ");
 			}
 
-			if (userDto.getAddedOrEditedFrom() == 3)
+			if (userDto.getAddedOrEditedFrom() == 83659)
 				return "profile";
 
 			return "userform";
@@ -139,8 +139,7 @@ public class AuthController {
 		userDto.setId(existingUser.getId());
 		userDto.setPassword(existingUser.getPassword());
 
-		System.out.println("User FirstName from DTO is" + userDto.getFirstName());
-		if (userDto.getAddedOrEditedFrom() == 3) {
+		if (userDto.getAddedOrEditedFrom() == 83659) {
 			userDto.setUserName(existingUser.getUsername());
 			userDto.setStatus(existingUser.getStatus());
 			userDto.setIdNumber(existingUser.getIdNumber());
@@ -152,7 +151,7 @@ public class AuthController {
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 			model.addAttribute("exception", ex.getMessage());
-			if (userDto.getAddedOrEditedFrom() == 3)
+			if (userDto.getAddedOrEditedFrom() == 83659)
 				return "profile";
 
 			return "userform";
