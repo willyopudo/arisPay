@@ -1,4 +1,4 @@
-package com.arisweb.services;
+package com.arisweb.iservices;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

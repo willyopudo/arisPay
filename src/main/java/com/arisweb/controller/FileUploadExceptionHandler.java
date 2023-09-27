@@ -2,7 +2,7 @@ package com.arisweb.controller;
 
 import com.arisweb.dto.UserDto;
 import com.arisweb.repository.UserRepository;
-import com.arisweb.services.UserService;
+import com.arisweb.iservices.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

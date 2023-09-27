@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.arisweb.model.Machine;
-import com.arisweb.services.MachineService;
+import com.arisweb.iservices.MachineService;
 
 @Controller
 @RequestMapping(value = "/machine")

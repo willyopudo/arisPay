@@ -1,4 +1,4 @@
-package com.arisweb.services;
+package com.arisweb.iservices;
 
 import com.arisweb.dto.UserDto;
 import com.arisweb.model.User;

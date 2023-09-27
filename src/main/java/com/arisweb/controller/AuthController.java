@@ -1,13 +1,11 @@
 package com.arisweb.controller;
 
 import com.arisweb.dto.UserDto;
-import com.arisweb.model.Role;
 import com.arisweb.model.User;
 import com.arisweb.repository.UserRepository;
 import com.arisweb.security.ApplicationUserRole;
 import com.arisweb.security.CustomUserDetails;
-import com.arisweb.services.UserService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.arisweb.iservices.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller

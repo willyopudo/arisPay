@@ -2,6 +2,7 @@ package com.arisweb.services;
 
 import java.util.List;
 
+import com.arisweb.iservices.IMediaService;
 import com.arisweb.model.Media;
 import com.arisweb.repository.MediaRepository;
 import com.arisweb.util.NotFoundException;

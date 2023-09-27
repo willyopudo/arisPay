@@ -1,6 +1,7 @@
 package com.arisweb.services;
 
 import com.arisweb.dto.UserDto;
+import com.arisweb.iservices.UserService;
 import com.arisweb.model.Role;
 import com.arisweb.model.User;
 import com.arisweb.repository.RoleRepository;

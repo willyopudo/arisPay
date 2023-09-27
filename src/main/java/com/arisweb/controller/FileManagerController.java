@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.arisweb.dto.UserDto;
 import com.arisweb.repository.UserRepository;
-import com.arisweb.services.IMediaService;
-import com.arisweb.services.UserService;
+import com.arisweb.iservices.IMediaService;
+import com.arisweb.iservices.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.arisweb.dto.MediaDTO;
-import com.arisweb.services.IFileStorageService;
+import com.arisweb.iservices.IFileStorageService;
 
 
 @Controller

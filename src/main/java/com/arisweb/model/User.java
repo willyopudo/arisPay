@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -22,6 +23,9 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false, unique = true)
+	private Long companyId;
+
 	@Column(nullable = false)
 	private String username;
 
@@ -34,13 +38,13 @@ public class User {
 	@Column(nullable = false)
 	private String password;
 
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String phoneNumber;
 
 	@Column(nullable = false)
 	private byte status = 1;
 
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String idNumber;
 
 	@Column(nullable = false)
@@ -50,6 +54,19 @@ public class User {
 
 	@Column(nullable = false)
 	private String town;
+
+	@Column(nullable = false)
+	private byte recordStatus;
+
+	@Column(nullable = false)
+	private String createdBy;
+
+	@Column(nullable = false)
+	private Date createdDate = new java.util.Date();
+
+	private String modifiedBy;
+
+	private Date modifiedDate = new java.util.Date();
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(
