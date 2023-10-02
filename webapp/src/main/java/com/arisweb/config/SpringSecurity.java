@@ -23,6 +23,7 @@ public class SpringSecurity {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+
 	@Bean
 	public static PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -35,6 +36,11 @@ public class SpringSecurity {
 						authorize.requestMatchers(antMatcher("/register/**")).permitAll()
 								.requestMatchers(antMatcher("/error**")).permitAll()
 								.requestMatchers(antMatcher("/")).permitAll()
+								.requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
+								.requestMatchers(antMatcher("/v3/api-docs/**")).permitAll()
+								.requestMatchers(antMatcher("/v2/api-docs/**")).permitAll()
+								.requestMatchers(antMatcher("/swagger-resources/**")).permitAll()
+								.requestMatchers(antMatcher("/api/**")).permitAll()
 								.requestMatchers(antMatcher("/index")).permitAll()
 								.requestMatchers(antMatcher("/media/*")).permitAll()
 								.requestMatchers(antMatcher("/resources/**")).permitAll()
@@ -42,6 +48,7 @@ public class SpringSecurity {
 								.requestMatchers(antMatcher("/user/**")).hasRole(ADMIN.name())
 								.requestMatchers(antMatcher("/listMachines")).hasRole(ADMIN.name())
 								.requestMatchers(antMatcher("/dashboard/**")).hasRole(ADMIN.name())
+
 				).formLogin(
 						form -> form
 								.loginPage("/login")
