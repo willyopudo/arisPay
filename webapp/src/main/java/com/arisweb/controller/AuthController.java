@@ -29,7 +29,7 @@ public class AuthController {
 	private UserService userService;
 	private UserRepository userRepository;
 	ApplicationUserRole[] roles = ApplicationUserRole.class.getEnumConstants();
-	@Value("${app.name}")
+	@Value("${spring.application.name}")
 	private String appName;
 
 	public AuthController(UserService userService, UserRepository userRepository) {
