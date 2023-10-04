@@ -3,7 +3,7 @@ Consolidated bank transactions reconciliation and payment system for small and m
 
 #### by Wilfred O (https://spaces.co.ke/)
 
-<h5>Stay tuned for updated readme on deployment and test notes once stuff are ironed out for this public version.</h5>
+Stay tuned for updated readme on deployment and test notes once stuff are ironed out for this public version.
 
 
 
