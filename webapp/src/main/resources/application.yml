@@ -1,5 +1,41 @@
+#spring:
+#  application:
+#    name: arisPay
+#  config:
+#    import: optional:configserver:http://localhost:8888/
+server:
+  port: 8081
+  error:
+    whitelabel:
+      enabled: false
 spring:
   application:
     name: arisPay
-  config:
-    import: optional:configserver:http://localhost:8888/
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/milkman_db
+    username: wilfusr
+    password: Dailydose2014@
+  jpa:
+    hibernate:
+      ddl-auto: update
+      jdbc:
+        time_zone: UTC
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 4MB
+      max-request-size: 50MB
+  mvc:
+    view:
+      suffix: html
+    static-path-pattern: /resources/static/**
+management:
+  tracing:
+    sampling:
+      probability: 1.0

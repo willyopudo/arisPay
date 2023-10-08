@@ -23,9 +23,6 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true)
-	private Long companyId;
-
 	@Column(nullable = false)
 	private String username;
 
@@ -67,6 +64,10 @@ public class User {
 	private String modifiedBy;
 
 	private Date modifiedDate = new java.util.Date();
+
+	@ManyToOne
+	@JoinColumn(name = "company_id", nullable = false)
+	private Company company;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(

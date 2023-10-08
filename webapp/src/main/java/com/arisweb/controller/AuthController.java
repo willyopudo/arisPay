@@ -1,13 +1,21 @@
 package com.arisweb.controller;
 
 import com.arisweb.dto.UserDto;
+import com.arisweb.model.Company;
 import com.arisweb.model.User;
 import com.arisweb.repository.UserRepository;
 import com.arisweb.security.ApplicationUserRole;
 import com.arisweb.security.CustomUserDetails;
 import com.arisweb.iservices.UserService;
+import com.arisweb.services.CompanyService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.ObjectError;
@@ -27,14 +35,15 @@ import java.util.List;
 public class AuthController {
 
 	private UserService userService;
-	private UserRepository userRepository;
+	private CompanyService companyService;
 	ApplicationUserRole[] roles = ApplicationUserRole.class.getEnumConstants();
 	@Value("${spring.application.name}")
 	private String appName;
+	private static final Logger logger = LogManager.getLogger(AuthController.class);
 
-	public AuthController(UserService userService, UserRepository userRepository) {
+	public AuthController(UserService userService, CompanyService companyService) {
 		this.userService = userService;
-		this.userRepository = userRepository;
+		this.companyService = companyService;
 	}
 
 	// handler method to handle home page request
@@ -45,6 +54,7 @@ public class AuthController {
 			model.addObject("title", appName + " Dashboard");
 			model.setViewName("dashboard");
 		} else {
+			logger.debug("This is a test log for home page");
 			model.addObject("title", appName + " Home");
 			model.setViewName("index");
 		}
@@ -74,7 +84,7 @@ public class AuthController {
 	@PostMapping("/register/save")
 	public String registration(@Valid @ModelAttribute("user") UserDto userDto,
 	                           BindingResult result,
-	                           Model model) {
+	                           Model model, Principal principal) {
 		String redirectUrl = "login";
 		User existingUser = userService.findUserByEmail(userDto.getEmail());
 
@@ -102,6 +112,7 @@ public class AuthController {
 		if (userDto.getAddedOrEditedFrom() == 34916) {
 			redirectUrl = "users";
 		}
+		userDto.setCreatedBy(principal.getName());
 		userService.saveUser(userDto);
 
 		return "redirect:/" + redirectUrl + "?success";
@@ -110,7 +121,7 @@ public class AuthController {
 	@PostMapping("/user/modify")
 	public String editUser(@Valid @ModelAttribute("user") UserDto userDto,
 	                       BindingResult result,
-	                       Model model) {
+	                       Model model, Principal principal) {
 		model.addAttribute("user", userDto);
 		model.addAttribute("userRoles", roles);
 
@@ -131,8 +142,12 @@ public class AuthController {
 
 			return "userform";
 		}
-
+		userDto.setModifiedBy(principal.getName());
+		userDto.setModifiedDate(new java.util.Date());
 		userDto.setId(existingUser.getId());
+		userDto.setCreatedBy(existingUser.getCreatedBy());
+		userDto.setCreatedDate(existingUser.getCreatedDate());
+		userDto.setUserCompany(companyService.getById(userDto.getCompanyId()));
 		userDto.setPassword(existingUser.getPassword());
 
 		if (userDto.getAddedOrEditedFrom() == 83659) {
@@ -156,23 +171,17 @@ public class AuthController {
 		return "redirect:/" + redirectUrl + "?success_edit";
 	}
 
-	@RequestMapping(value = "/user/delete/{id}", method = RequestMethod.GET)
-	public String deleteUser(@PathVariable int id) {
-		UserDto user = userService.findUserById(id);
-		if (user != null)
-			userService.deleteUserById(user.getId());
-		return "redirect:/users?success_delete";
-	}
-
 	@RequestMapping(value = "/user/add", method = RequestMethod.GET)
 	public ModelAndView addUser() {
 		ModelAndView model = new ModelAndView();
 
 
 		UserDto user = new UserDto();
+		List<Company> companies = companyService.getAll();
 		model.addObject("user", user);
 		model.addObject("title", "Add User");
 		model.addObject("userRoles", roles);
+		model.addObject("companies", companies);
 		model.setViewName("userform");
 		//System.out.println(Arrays.toString(roles));
 		return model;
@@ -183,11 +192,15 @@ public class AuthController {
 		ModelAndView model = new ModelAndView();
 
 		UserDto user = userService.findUserById(id);
+		user.setCompanyId(user.getUserCompany().getId());
+
+		List<Company> companies = companyService.getAll();
 		System.out.println(user.getRole());
 		//System.out.println(Arrays.toString(roles));
 		model.addObject("user", user);
 		model.addObject("title", "Edit User");
 		model.addObject("userRoles", roles);
+		model.addObject("companies", companies);
 		model.setViewName("userform");
 
 		return model;
@@ -198,6 +211,8 @@ public class AuthController {
 		ModelAndView model = new ModelAndView();
 
 		UserDto user = userService.findUserByUserName2(username);
+		user.setCompanyId(user.getUserCompany().getId());
+
 		model.addObject("user", user);
 		model.addObject("title", "User Profile");
 		model.setViewName("profile");
@@ -217,5 +232,27 @@ public class AuthController {
 		model.addAttribute("users", users);
 		model.addAttribute("title", "List of Users");
 		return "users";
+	}
+
+	@RequestMapping(value = "/user/delete/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<JsonNode> deleteUser(@PathVariable int id) throws JsonProcessingException {
+
+		UserDto user = userService.findUserById(id);
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode json = mapper.readTree("{\"status\": \"OK\", \"message\": \"Record deleted successfully\"}");
+		if (user != null) {
+			logger.debug("User found for delete " + user.getUserName());
+			try {
+				userService.deleteUserById(user.getId());
+			} catch (Exception ex) {
+				logger.error(ex);
+			}
+
+		} else {
+			json = mapper.readTree("{\"status\": \"NOK\", \"message\": \"Record was not found\"}");
+		}
+		return ResponseEntity.ok(json);
+
+
 	}
 }

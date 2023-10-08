@@ -41,8 +41,13 @@ public class UserServiceImpl implements UserService {
 		user.setIdNumber(userDto.getIdNumber());
 		user.setPhoneNumber(userDto.getPhoneNumber());
 		user.setZipCode(userDto.getZipCode());
+		user.setModifiedBy(userDto.getModifiedBy());
+		user.setModifiedDate(userDto.getModifiedDate());
+		user.setCompany(userDto.getUserCompany());
+		user.setCreatedBy(userDto.getCreatedBy());
+		user.setCreatedDate(userDto.getCreatedDate());
 		// encrypt the password using spring security
-		if (userDto.getAddedOrEditedFrom() == 3)
+		if (userDto.getAddedOrEditedFrom() == 83659)
 			user.setPassword(userDto.getPassword());
 		else
 			user.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -107,6 +112,7 @@ public class UserServiceImpl implements UserService {
 		userDto.setTown(user.getTown());
 		if (!user.getRoles().isEmpty())
 			userDto.setRole(user.getRoles().get(0).getName().substring(user.getRoles().get(0).getName().lastIndexOf("_") + 1));
+		userDto.setUserCompany(user.getCompany());
 		return userDto;
 	}
 

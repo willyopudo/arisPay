@@ -16,6 +16,8 @@ target/
 
 ### custom ####
 /media_uploads/
+/student/
+/school/
 /src/main/resources/static/uploads/
 ### IntelliJ IDEA ###
 .idea
