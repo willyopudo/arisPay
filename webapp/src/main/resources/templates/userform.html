@@ -2,7 +2,7 @@
 
 <html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
       data-assets-path="/resources/templates/" data-template="vertical-menu-template-free"
-      xmlns:th="http://www.w3.org/1999/xhtml">
+      xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head}"></head>
 <body>
 <!-- / Layout wrapper -->
@@ -44,8 +44,7 @@
 										<p th:errors="*{firstName}" class="text-danger"
 										   th:if="${#fields.hasErrors('firstName')}"></p>
 									</div>
-									<!--									<div th:replace="~{fragments/form_input_text :: form-text-input (field='userName', label='Test Field' ,value='John Doe')}">-->
-									<!--									</div>-->
+
 									<div class="mb-3">
 										<label for="lastName" class="form-label">Last Name</label>
 										<input type="text" class="form-control" id="lastName" name="lastName"
@@ -60,7 +59,7 @@
 										<p th:errors="*{email}" class="text-danger" th:if="${#fields.hasErrors('email')}"></p>
 									</div>
 									<div class="mb-3 col-md-6">
-										<label for="idNumber" class="form-label">National Id Number</label>
+										<label for="idNumber" class="form-label">National ID Number</label>
 										<input type="number" class="form-control" id="idNumber" name="idNumber" value="3124567" maxlength="8" th:field="*{idNumber}"/>
 										<p th:errors="*{idNumber}" class="text-danger" th:if="${#fields.hasErrors('idNumber')}"></p>
 									</div>
@@ -97,23 +96,12 @@
 
 										</select>
 									</div>
-									<div class="mb-3">
-										<label for="companyId" class="form-label">Company</label>
-										<select class="form-select" id="companyId" name="companyId">
-											<option th:if="${user.companyId == null}" value="">Select Company</option>
-											<option th:each="company : ${companies}" th:text="${company.name}" th:value="${company.id}"
-											        th:selected="${companyId==company.id}"></option>
 
-										</select>
+									<div class="mb-3" th:include="~{fragments/form/form_input :: form-select-v2}"
+									     th:with="field='companyId', label='Company', items=${companies}, selectedItem=${user.companyId}">
 									</div>
-									<div class="mb-3">
-										<label for="role" class="form-label">User Role</label>
-										<select class="form-select" id="role" name="role">
-											<option th:if="${user.role == null}" value="">Select Role</option>
-											<option th:each="userRole : ${userRoles}" th:text="${userRole}" th:value="${'ROLE_' + userRole}"
-											        th:selected="${userRole==user.role}"></option>
-
-										</select>
+									<div class="mb-3" th:include="~{fragments/form/form_input :: form-select}"
+									     th:with="field='role', label='User Role', extra1='ROLE_', items=${userRoles}, selectedItem=${user.role}">
 									</div>
 
 									<div th:if="${#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[1] == 'add'}" class="mb-3 form-password-toggle">

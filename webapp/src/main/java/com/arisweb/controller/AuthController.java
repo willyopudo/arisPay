@@ -113,6 +113,8 @@ public class AuthController {
 			redirectUrl = "users";
 		}
 		userDto.setCreatedBy(principal.getName());
+		if (userDto.getRole().isEmpty())
+			userDto.setRole("ROLE_USER");
 		userService.saveUser(userDto);
 
 		return "redirect:/" + redirectUrl + "?success";
@@ -149,6 +151,8 @@ public class AuthController {
 		userDto.setCreatedDate(existingUser.getCreatedDate());
 		userDto.setUserCompany(companyService.getById(userDto.getCompanyId()));
 		userDto.setPassword(existingUser.getPassword());
+		if (userDto.getRole().isEmpty())
+			userDto.setRole("ROLE_USER");
 
 		if (userDto.getAddedOrEditedFrom() == 83659) {
 			userDto.setUserName(existingUser.getUsername());
