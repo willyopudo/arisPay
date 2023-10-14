@@ -54,7 +54,6 @@ public class AuthController {
 			model.addObject("title", appName + " Dashboard");
 			model.setViewName("dashboard");
 		} else {
-			logger.debug("This is a test log for home page");
 			model.addObject("title", appName + " Home");
 			model.setViewName("index");
 		}
