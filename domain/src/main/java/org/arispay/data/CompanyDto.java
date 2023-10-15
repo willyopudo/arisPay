@@ -17,7 +17,7 @@ public class CompanyDto {
 
 	private String name;
 
-	private String Code;
+	private String code;
 
 	private String shortCode;
 

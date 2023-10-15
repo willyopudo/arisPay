@@ -23,7 +23,7 @@ public class Company {
 	private String name;
 
 	@Column(nullable = false)
-	private String Code;
+	private String code;
 
 	private String shortCode;
 
