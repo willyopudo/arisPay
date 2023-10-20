@@ -15,15 +15,17 @@ import java.util.Optional;
 public class CompanyJpaAdapter implements CompanyPersistencePort {
 	@Autowired
 	private CompanyRepository companyRepository;
+	@Autowired
+	private CompanyMapper companyMapper;
 
 	@Override
 	public CompanyDto addCompany(CompanyDto companyDto) {
 
-		Company company = CompanyMapper.INSTANCE.companyDtoToCompany(companyDto);
+		Company company = companyMapper.companyDtoToCompany(companyDto);
 
 		Company companySaved = companyRepository.save(company);
 
-		return CompanyMapper.INSTANCE.companyToCompanyDto(companySaved);
+		return companyMapper.companyToCompanyDto(companySaved);
 	}
 
 	@Override
@@ -41,7 +43,7 @@ public class CompanyJpaAdapter implements CompanyPersistencePort {
 
 		List<Company> companyList = companyRepository.findAll();
 
-		return CompanyMapper.INSTANCE.companyListToCompanyDtoList(companyList);
+		return companyMapper.companyListToCompanyDtoList(companyList);
 	}
 
 	@Override
@@ -49,7 +51,7 @@ public class CompanyJpaAdapter implements CompanyPersistencePort {
 
 		Optional<Company> company = companyRepository.findById(companyId);
 
-		return company.map(CompanyMapper.INSTANCE::companyToCompanyDto).orElse(null);
+		return company.map(companyMapper::companyToCompanyDto).orElse(null);
 
 	}
 }
