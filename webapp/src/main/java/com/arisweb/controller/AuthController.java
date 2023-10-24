@@ -1,22 +1,23 @@
 package com.arisweb.controller;
 
-import com.arisweb.dto.UserDto;
-import com.arisweb.model.Company;
-import com.arisweb.model.User;
-import com.arisweb.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.arispay.data.CompanyDto;
+import org.arispay.data.UserDto;
+import org.arispay.ports.api.CompanyServicePort;
+import org.arispay.ports.api.UserServicePort;
 import com.arisweb.security.ApplicationUserRole;
 import com.arisweb.security.CustomUserDetails;
-import com.arisweb.iservices.UserService;
-import com.arisweb.services.CompanyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -32,19 +33,19 @@ import java.security.Principal;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class AuthController {
 
-	private UserService userService;
-	private CompanyService companyService;
+	@Autowired
+	private final UserServicePort userServicePort;
+	@Autowired
+	private final CompanyServicePort companyServicePort;
+
+	private PasswordEncoder passwordEncoder;
 	ApplicationUserRole[] roles = ApplicationUserRole.class.getEnumConstants();
 	@Value("${spring.application.name}")
 	private String appName;
 	private static final Logger logger = LogManager.getLogger(AuthController.class);
-
-	public AuthController(UserService userService, CompanyService companyService) {
-		this.userService = userService;
-		this.companyService = companyService;
-	}
 
 	// handler method to handle home page request
 	@RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
@@ -85,7 +86,7 @@ public class AuthController {
 	                           BindingResult result,
 	                           Model model, Principal principal) {
 		String redirectUrl = "login";
-		User existingUser = userService.findUserByEmail(userDto.getEmail());
+		UserDto existingUser = userServicePort.findUserByEmail(userDto.getEmail());
 
 		if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
 			result.rejectValue("email", null,
@@ -112,9 +113,10 @@ public class AuthController {
 			redirectUrl = "users";
 		}
 		userDto.setCreatedBy(principal.getName());
+		userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
 		if (userDto.getRole().isEmpty())
 			userDto.setRole("ROLE_USER");
-		userService.saveUser(userDto);
+		userServicePort.saveUser(userDto);
 
 		return "redirect:/" + redirectUrl + "?success";
 	}
@@ -128,14 +130,14 @@ public class AuthController {
 
 		String redirectUrl = "users";
 		if (userDto.getAddedOrEditedFrom() == 83659) {
-			redirectUrl = "user/profile/" + userDto.getUserName();
+			redirectUrl = "user/profile/" + userDto.getUsername();
 		}
-		User existingUser = userService.findUserByUserName(userDto.getUserName());
+		UserDto existingUser = userServicePort.findUserByUsername(userDto.getUsername());
 
 		if (result.hasErrors()) {
 			for (ObjectError element : result.getAllErrors()) {
 
-				System.out.print(element.toString() + " ");
+				logger.debug(element.toString() + "\n");
 			}
 
 			if (userDto.getAddedOrEditedFrom() == 83659)
@@ -148,20 +150,20 @@ public class AuthController {
 		userDto.setId(existingUser.getId());
 		userDto.setCreatedBy(existingUser.getCreatedBy());
 		userDto.setCreatedDate(existingUser.getCreatedDate());
-		userDto.setUserCompany(companyService.getById(userDto.getCompanyId()));
+		userDto.setCompany(companyServicePort.getCompanyById(userDto.getCompanyId()));
 		userDto.setPassword(existingUser.getPassword());
-		if (userDto.getRole().isEmpty())
+		if (userDto.getRole() == null)
 			userDto.setRole("ROLE_USER");
 
 		if (userDto.getAddedOrEditedFrom() == 83659) {
-			userDto.setUserName(existingUser.getUsername());
+			userDto.setUsername(existingUser.getUsername());
 			userDto.setStatus(existingUser.getStatus());
 			userDto.setIdNumber(existingUser.getIdNumber());
 			userDto.setPhoneNumber(existingUser.getPhoneNumber());
 			userDto.setRole(existingUser.getRoles().get(0).getName().isEmpty() ? "ROLE_USER" : existingUser.getRoles().get(0).getName());
 		}
 		try {
-			userService.saveUser(userDto);
+			userServicePort.saveUser(userDto);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 			model.addAttribute("exception", ex.getMessage());
@@ -180,7 +182,7 @@ public class AuthController {
 
 
 		UserDto user = new UserDto();
-		List<Company> companies = companyService.getAll();
+		List<CompanyDto> companies = companyServicePort.getCompanies();
 		model.addObject("user", user);
 		model.addObject("title", "Add User");
 		model.addObject("userRoles", roles);
@@ -194,11 +196,11 @@ public class AuthController {
 	public ModelAndView editUser(@PathVariable int id) {
 		ModelAndView model = new ModelAndView();
 
-		UserDto user = userService.findUserById(id);
-		user.setCompanyId(user.getUserCompany().getId());
+		UserDto user = userServicePort.findUserById(id);
+		user.setCompanyId(user.getCompany().getId());
 
-		List<Company> companies = companyService.getAll();
-		System.out.println(user.getRole());
+		List<CompanyDto> companies = companyServicePort.getCompanies();
+		logger.debug(user.getRoles().toString());
 		//System.out.println(Arrays.toString(roles));
 		model.addObject("user", user);
 		model.addObject("title", "Edit User");
@@ -213,8 +215,8 @@ public class AuthController {
 	public ModelAndView userProfile(@PathVariable String username) {
 		ModelAndView model = new ModelAndView();
 
-		UserDto user = userService.findUserByUserName2(username);
-		user.setCompanyId(user.getUserCompany().getId());
+		UserDto user = userServicePort.findUserByUsername(username);
+		user.setCompanyId(user.getCompany().getId());
 
 		model.addObject("user", user);
 		model.addObject("title", "User Profile");
@@ -228,8 +230,8 @@ public class AuthController {
 	public String users(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 		String userName = userDetails.getUsername();
 		System.out.println("User name active " + userName);
-		User user = userService.findUserByUserName(userName);
-		List<UserDto> users = userService.findAllUsers();
+		UserDto user = userServicePort.findUserByUsername(userName);
+		List<UserDto> users = userServicePort.findAllUsers();
 
 		model.addAttribute("activeUser", user);
 		model.addAttribute("users", users);
@@ -240,13 +242,13 @@ public class AuthController {
 	@RequestMapping(value = "/user/delete/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<JsonNode> deleteUser(@PathVariable int id) throws JsonProcessingException {
 
-		UserDto user = userService.findUserById(id);
+		UserDto user = userServicePort.findUserById(id);
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode json = mapper.readTree("{\"status\": \"OK\", \"message\": \"Record deleted successfully\"}");
 		if (user != null) {
-			logger.debug("User found for delete " + user.getUserName());
+			logger.debug("User found for delete " + user.getUsername());
 			try {
-				userService.deleteUserById(user.getId());
+				userServicePort.deleteUserById(user.getId());
 			} catch (Exception ex) {
 				logger.error(ex);
 			}
@@ -257,5 +259,9 @@ public class AuthController {
 		return ResponseEntity.ok(json);
 
 
+	}
+
+	private String[] extractFirstLastName(String name) {
+		return name.split(" ");
 	}
 }

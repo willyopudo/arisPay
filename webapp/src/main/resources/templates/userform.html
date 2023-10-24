@@ -31,11 +31,11 @@
 								      th:object="${user}">
 									<input type="text" class="form-control" id="Id" name="Id" value="2" th:field="*{Id}" hidden/>
 									<div class="mb-3">
-										<label for="userName" class="form-label">Username</label>
-										<input type="text" class="form-control" id="userName" name="userName"
-										       placeholder="Enter your username" th:field="*{userName}" autofocus th:readonly="${#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[1] == 'edit'}"/>
-										<p th:errors="*{userName}" class="text-danger"
-										   th:if="${#fields.hasErrors('userName')}"></p>
+										<label for="username" class="form-label">Username</label>
+										<input type="text" class="form-control" id="username" name="username"
+										       placeholder="Enter your username" th:field="*{username}" autofocus th:readonly="${#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[1] == 'edit'}"/>
+										<p th:errors="*{username}" class="text-danger"
+										   th:if="${#fields.hasErrors('username')}"></p>
 									</div>
 									<div class="mb-3">
 										<label for="firstName" class="form-label">First Name</label>
@@ -101,7 +101,7 @@
 									     th:with="field='companyId', label='Company', items=${companies}, selectedItem=${user.companyId}">
 									</div>
 									<div class="mb-3" th:include="~{fragments/form/form_input :: form-select}"
-									     th:with="field='role', label='User Role', extra1='ROLE_', items=${userRoles}, selectedItem=${user.role}">
+									     th:with="field='role', label='User Role', extra1='ROLE_', items=${userRoles}, selectedItem=${user.roles[0].name}">
 									</div>
 
 									<div th:if="${#strings.arraySplit(#ctx.springRequestContext.requestUri,'/')[1] == 'add'}" class="mb-3 form-password-toggle">

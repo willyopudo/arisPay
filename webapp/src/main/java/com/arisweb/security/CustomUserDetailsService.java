@@ -1,8 +1,11 @@
 package com.arisweb.security;
 
-import com.arisweb.model.Role;
-import com.arisweb.model.User;
-import com.arisweb.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.arispay.entity.Role;
+import org.arispay.entity.User;
+import org.arispay.mappers.UserMapper;
+import org.arispay.ports.api.UserServicePort;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,18 +18,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-	private UserRepository userRepository;
+	@Autowired
+	private final UserServicePort userServicePort;
+	@Autowired
+	private UserMapper userMapper;
 
-	public CustomUserDetailsService(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		System.out.println("Username is " + username);
-		User user = userRepository.findByUsername(username);
+		User user = userMapper.convert(userServicePort.findUserByUsername(username));
 
 		if (user != null) {
 			//return new org.springframework.security.core.userdetails.User(user.getUsername(),

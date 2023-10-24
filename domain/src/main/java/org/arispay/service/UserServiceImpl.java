@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserServicePort {
 	}
 
 	@Override
-	public UserDto findUserByUserName(String username) {
+	public UserDto findUserByUsername(String username) {
 		return userPersistencePort.findUserByUserName(username);
 	}
 

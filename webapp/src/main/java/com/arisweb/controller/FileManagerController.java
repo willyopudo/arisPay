@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
-import com.arisweb.dto.UserDto;
-import com.arisweb.repository.UserRepository;
 import com.arisweb.iservices.IMediaService;
-import com.arisweb.iservices.UserService;
+import lombok.RequiredArgsConstructor;
+import org.arispay.data.UserDto;
+import org.arispay.ports.api.UserServicePort;
+import org.arispay.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,7 @@ import com.arisweb.iservices.IFileStorageService;
 
 @Controller
 @RequestMapping("/media")
+@RequiredArgsConstructor
 public class FileManagerController {
 
 	// A service to handle files storing/deleting on disk
@@ -38,9 +40,7 @@ public class FileManagerController {
 	@Autowired
 	private IMediaService mediaservice;
 	@Autowired
-	private UserService userService;
-	@Autowired
-	private UserRepository userRepository;
+	private final UserServicePort userServicePort;
 
 	// show all files list
 	@GetMapping
@@ -72,7 +72,7 @@ public class FileManagerController {
 				String fileError = ex.toString();
 				if (fileError.contains("FileAlreadyExistsException:"))
 					fileError = "File already exists!";
-				UserDto user = userService.findUserByUserName2(userName);
+				UserDto user = userServicePort.findUserByUserName2(userName);
 				model.addAttribute("user", user);
 				model.addAttribute("fileError", fileError);
 				return "profile";

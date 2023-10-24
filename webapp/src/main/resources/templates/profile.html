@@ -44,7 +44,7 @@
 								<div class="card-body">
 									<div class="d-flex align-items-start align-items-sm-center gap-4">
 										<img
-												th:src="@{../../resources/static/uploads/userphoto_{uname}(uname=${user.userName})}"
+												th:src="@{../../resources/static/uploads/userphoto_{uname}(uname=${user.username})}"
 												alt="user-avatar"
 												class="d-block rounded"
 												height="100"
@@ -53,7 +53,7 @@
 										/>
 										<div class="button-wrapper">
 											<form th:action="@{/media/upload}" method="post" id="uploadForm" enctype="multipart/form-data">
-												<input type="text" class="form-control" id="fileIdentifier" name="fileIdentifier" th:value="${'userphoto_' + user.userName}" hidden/>
+												<input type="text" class="form-control" id="fileIdentifier" name="fileIdentifier" th:value="${'userphoto_' + user.username}" hidden/>
 												<label for="mediafile" class="btn btn-primary me-2 mb-4" tabindex="0">
 													<span class="d-none d-sm-block">Upload new photo</span>
 													<i class="bx bx-upload d-block d-sm-none"></i>
@@ -94,9 +94,9 @@
 									<form id="formAccountSettings" method="POST" th:action="@{/user/modify}" th:object="${user}">
 										<div class="row">
 											<div>
-												<label for="userName" class="form-label">Username</label>
-												<input type="text" class="form-control" id="userName" name="userName" placeholder="Enter your username" th:field="*{userName}" readonly/>
-												<p th:errors="*{userName}" class="text-danger" th:if="${#fields.hasErrors('userName')}"></p>
+												<label for="username" class="form-label">Username</label>
+												<input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" th:field="*{username}" readonly/>
+												<p th:errors="*{username}" class="text-danger" th:if="${#fields.hasErrors('username')}"></p>
 											</div>
 											<div class="mb-3 col-md-6">
 												<label for="email" class="form-label">First Name</label>
@@ -186,6 +186,8 @@
 										</div>
 										<input type="text" class="form-control" id="addedOrEditedFrom" name="addedOrEditedFrom"
 										       value="83659" hidden/>
+										<input type="text" class="form-control" id="companyId" name="companyId"
+										       th:field="*{companyId}" hidden/>
 										<div class="mt-2">
 											<button type="submit" class="btn btn-primary me-2">Save changes</button>
 											<button type="reset" class="btn btn-outline-secondary">Cancel</button>

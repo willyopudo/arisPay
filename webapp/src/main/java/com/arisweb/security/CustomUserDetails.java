@@ -1,7 +1,7 @@
 package com.arisweb.security;
 
-import com.arisweb.model.Role;
-import com.arisweb.model.User;
+import org.arispay.entity.User;
+import org.arispay.entity.Role;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

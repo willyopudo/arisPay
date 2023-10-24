@@ -8,7 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,11 +19,13 @@ import java.util.Date;
 public class UserDto {
 	private Long id;
 	@NotEmpty
-	private String userName;
+	private String username;
 	@NotEmpty
 	private String firstName;
 	@NotEmpty
 	private String lastName;
+
+	private String name;
 	@NotEmpty(message = "Email should not be empty")
 	@Email
 	private String email;
@@ -29,7 +33,7 @@ public class UserDto {
 	@NotNull(message = "Company can not be empty")
 	private Long companyId;
 
-	private CompanyDto userCompany;
+	private CompanyDto company;
 	//@NotEmpty(message = "Password should not be empty")
 	private String password;
 
@@ -49,5 +53,6 @@ public class UserDto {
 	private String modifiedBy;
 	private Date modifiedDate;
 	private String role;
+	private List<RoleDto> roles = new ArrayList<>();
 
 }

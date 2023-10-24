@@ -13,7 +13,7 @@ public interface UserServicePort {
 
 	UserDto findUserById(int id);
 
-	UserDto findUserByUserName(String username);
+	UserDto findUserByUsername(String username);
 
 	UserDto findUserByUserName2(String username);
 

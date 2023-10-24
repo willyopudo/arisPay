@@ -1,9 +1,8 @@
 package com.arisweb.controller;
 
-import com.arisweb.iservices.ICompanyService;
-import com.arisweb.model.Company;
-import com.arisweb.services.CompanyService;
 import lombok.RequiredArgsConstructor;
+import org.arispay.data.CompanyDto;
+import org.arispay.ports.api.CompanyServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,19 +16,19 @@ import java.util.List;
 public class CompanyController {
 
 	@Autowired
-	private final CompanyService service;
+	private final CompanyServicePort companyServicePort;
 
 	@PostMapping("/companies")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void save(
-			@RequestBody Company company
+			@RequestBody CompanyDto companyDto
 	) {
-		service.add(company);
+		companyServicePort.addCompany(companyDto);
 	}
 
 	@GetMapping("/companies")
-	public ResponseEntity<List<Company>> findAllCompanies() {
-		return ResponseEntity.ok(service.getAll());
+	public ResponseEntity<List<CompanyDto>> findAllCompanies() {
+		return ResponseEntity.ok(companyServicePort.getCompanies());
 	}
 
 	//	@GetMapping("/school/{school-id}")
@@ -39,10 +38,10 @@ public class CompanyController {
 //		return ResponseEntity.ok(service.findAllStudentsBySchool(schoolId));
 //	}
 	@GetMapping("/companies/{id}")
-	public ResponseEntity<Company> findAllStudents(
+	public ResponseEntity<CompanyDto> findAllStudents(
 			@PathVariable("id") Long companyId
 	) {
-		return ResponseEntity.ok(service.getById(companyId));
+		return ResponseEntity.ok(companyServicePort.getCompanyById(companyId));
 	}
 
 }

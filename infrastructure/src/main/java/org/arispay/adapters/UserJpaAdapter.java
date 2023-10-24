@@ -1,24 +1,37 @@
 package org.arispay.adapters;
 
 import org.arispay.data.UserDto;
+import org.arispay.entity.Role;
 import org.arispay.entity.User;
 import org.arispay.mappers.UserMapper;
 import org.arispay.ports.spi.UserPersistencePort;
+import org.arispay.repository.RoleRepository;
 import org.arispay.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
+@Service
 public class UserJpaAdapter implements UserPersistencePort {
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private UserMapper userMapper;
-
+	@Autowired
+	private RoleRepository roleRepository;
 
 	@Override
 	public UserDto saveUser(UserDto userDto) {
 		User user = userMapper.convert(userDto);
+		user.setName(userDto.getFirstName() + " " + userDto.getLastName());
+
+		Role role = roleRepository.findByName(userDto.getRole());
+		if (role == null) {
+			role = checkRoleExist(userDto.getRole());
+		}
+		user.setRoles(List.of(role));
 		User userSaved = userRepository.save(user);
 
 		return userMapper.convert(userSaved);
@@ -42,7 +55,8 @@ public class UserJpaAdapter implements UserPersistencePort {
 
 	@Override
 	public UserDto findUserByUserName(String username) {
-		return userMapper.convert(userRepository.findByUsername(username));
+		User user = userRepository.findByUsername(username);
+		return userMapper.convert(user);
 	}
 
 	@Override
@@ -55,4 +69,12 @@ public class UserJpaAdapter implements UserPersistencePort {
 		List<User> users = userRepository.findAll();
 		return userMapper.userListToUserDtoList(users);
 	}
+
+	private Role checkRoleExist(String roleName) {
+		Role role = new Role();
+		role.setName(roleName);
+		return roleRepository.save(role);
+	}
+
+
 }
