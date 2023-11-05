@@ -13,5 +13,5 @@ public interface CompanyServicePort {
 
 	List<CompanyDto> getCompanies();
 
-	CompanyDto getCompanyById(Long bookId);
+	CompanyDto getCompanyById(Long id);
 }

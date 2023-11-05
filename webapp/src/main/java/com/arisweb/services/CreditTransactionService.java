@@ -1,9 +1,7 @@
 package com.arisweb.services;
 
 import com.arisweb.iservices.ICreditTransactionService;
-import com.arisweb.model.CompanyAccount;
 import com.arisweb.model.CreditTransaction;
-import com.arisweb.repository.ICompanyAccountRepository;
 import com.arisweb.repository.ICreditTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
