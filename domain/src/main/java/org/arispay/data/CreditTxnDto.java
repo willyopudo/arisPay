@@ -1,37 +1,28 @@
-package com.arisweb.model;
+package org.arispay.data;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.arispay.utils.DtoEntity;
 
 import java.util.Date;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@Entity
-@Table(name = "credit_transactions")
-public class CreditTransaction {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+@NoArgsConstructor
+@Builder
+public class CreditTxnDto implements DtoEntity {
 	private Long id;
 
-	@Column(nullable = false)
 	private String banTxnRef;
 
-	@Column(nullable = false)
 	private String arisPayTxnRef;
 
-	@Column(nullable = false)
 	private Float amount;
 
-	@Column(nullable = false)
 	private String collectionAccount;
 
-	@Column(nullable = false)
 	private Long companyId;
 
 	private Long customerId;
@@ -46,6 +37,5 @@ public class CreditTransaction {
 
 	private String ApiChannel;
 
-	@Column(nullable = false)
 	private Date txnDate;
 }

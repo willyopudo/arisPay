@@ -1,4 +1,4 @@
-package com.arisweb.model;
+package org.arispay.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "company_customers")
-public class CompanyCustomer {
+public class CompanyCustomer extends AuditableEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,19 +29,4 @@ public class CompanyCustomer {
 	@Column(nullable = false)
 	private String description;
 
-	@Column(nullable = false)
-	private byte recordStatus;
-
-	@Column(nullable = false)
-	private byte isEnabled;
-
-	@Column(nullable = false)
-	private String createdBy;
-
-	@Column(nullable = false)
-	private Date createdDate = new java.util.Date();
-
-	private String modifiedBy;
-
-	private Date modifiedDate = new java.util.Date();
 }
