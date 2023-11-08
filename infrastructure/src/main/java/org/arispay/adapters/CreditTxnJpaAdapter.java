@@ -3,9 +3,10 @@ package org.arispay.adapters;
 import org.arispay.data.CreditTxnDto;
 import org.arispay.entity.CreditTxn;
 import org.arispay.ports.api.GenericServicePort;
+import org.arispay.repository.CompanyCustomerRepository;
+import org.arispay.repository.CreditTxnRepository;
 import org.arispay.utils.ObjMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Optional;
 @Service
 public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
 	@Autowired
-	JpaRepository<CreditTxn, Long> jpaRepository;
+	CreditTxnRepository creditTxnRepo;
 
 	@Autowired
 	ObjMapperUtils objMapperUtils;
@@ -23,14 +24,14 @@ public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
 	public CreditTxnDto add(CreditTxnDto obj) {
 		CreditTxn creditTxn = (CreditTxn) objMapperUtils.convertToEntity(new CreditTxn(), obj);
 
-		CreditTxn creditTxnSaved = jpaRepository.save(creditTxn);
+		CreditTxn creditTxnSaved = creditTxnRepo.save(creditTxn);
 
 		return (CreditTxnDto) objMapperUtils.convertToDto(creditTxnSaved, new CreditTxnDto());
 	}
 
 	@Override
 	public void deleteById(Long id) {
-		jpaRepository.deleteById(id);
+		creditTxnRepo.deleteById(id);
 	}
 
 	@Override
@@ -41,18 +42,23 @@ public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<CreditTxnDto> getAll() {
-		List<CreditTxn> creditTxnList = jpaRepository.findAll();
+		List<CreditTxn> creditTxnList = creditTxnRepo.findAll();
 
 		return (List<CreditTxnDto>) objMapperUtils.convertToDto(creditTxnList, new CreditTxnDto());
 	}
 
 	@Override
 	public CreditTxnDto getById(Long id) {
-		Optional<CreditTxn> creditTxn = jpaRepository.findById(id);
+		Optional<CreditTxn> creditTxn = creditTxnRepo.findById(id);
 		if (creditTxn.isPresent()) {
 			return (CreditTxnDto) objMapperUtils.convertToDto(creditTxn, new CreditTxnDto());
 		} else
 			return null;
 
+	}
+
+	@Override
+	public CreditTxnDto findByName(String name) {
+		return null;
 	}
 }

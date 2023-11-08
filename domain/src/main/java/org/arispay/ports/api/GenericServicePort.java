@@ -14,4 +14,6 @@ public interface GenericServicePort<T> {
 	List<T> getAll();
 
 	T getById(Long id);
+
+	T findByName(String name);
 }

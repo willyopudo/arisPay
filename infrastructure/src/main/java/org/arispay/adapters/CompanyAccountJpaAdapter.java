@@ -56,4 +56,9 @@ public class CompanyAccountJpaAdapter implements GenericServicePort<CompanyAccou
 			return null;
 
 	}
+
+	@Override
+	public CompanyAccountDto findByName(String name) {
+		return null;
+	}
 }

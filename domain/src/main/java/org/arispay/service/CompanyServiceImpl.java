@@ -15,8 +15,8 @@ public class CompanyServiceImpl implements CompanyServicePort {
 	}
 
 	@Override
-	public CompanyDto addCompany(CompanyDto bookDto) {
-		return companyPersistencePort.addCompany(bookDto);
+	public CompanyDto addCompany(CompanyDto companyDto) {
+		return companyPersistencePort.addCompany(companyDto);
 	}
 
 	@Override
@@ -25,8 +25,8 @@ public class CompanyServiceImpl implements CompanyServicePort {
 	}
 
 	@Override
-	public CompanyDto updateCompany(CompanyDto bookDto) {
-		return companyPersistencePort.updateCompany(bookDto);
+	public CompanyDto updateCompany(CompanyDto companyDto) {
+		return companyPersistencePort.updateCompany(companyDto);
 	}
 
 	@Override

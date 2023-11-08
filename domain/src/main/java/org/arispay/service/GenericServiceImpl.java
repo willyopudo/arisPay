@@ -35,4 +35,9 @@ public class GenericServiceImpl<T> implements GenericServicePort<T> {
 		return genericPersistencePort.getById(id);
 	}
 
+	@Override
+	public T findByName(String name) {
+		return null;
+	}
+
 }

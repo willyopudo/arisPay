@@ -1,4 +1,11 @@
-package com.arisweb.services;
+package org.arispay.adapters;
+
+import org.arispay.data.MediaDto;
+import org.arispay.ports.spi.FileStorageIOPort;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,26 +14,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
-
-import com.arisweb.iservices.IFileStorageService;
-import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.arisweb.dto.MediaDTO;
+import java.util.logging.Logger;
 
 @Service
-public class FileStorageServiceImpl implements IFileStorageService {
-
+public class FileStorageLocalDiskAdapter implements FileStorageIOPort {
 	public static String MEDIA_UPLOAD_PATH = System.getProperty("user.dir") + "/src/main/resources/static/uploads";
 
 	// Save file in disk (in project context root) and return file information in media object
 	@Override
-	public MediaDTO saveMedia(MultipartFile file, String fileName) throws IOException, FileSizeLimitExceededException {
+	public MediaDto saveMedia(MultipartFile file, String fileName) throws IOException {
 
-		final MediaDTO media = new MediaDTO();
+		final MediaDto media = new MediaDto();
 		//final String fileName = fileName;//file.getOriginalFilename();
 		media.setName(fileName);
 		media.setMediaType(file.getContentType() == null ? fileName.substring(fileName.lastIndexOf(".") + 1) : file.getContentType());
