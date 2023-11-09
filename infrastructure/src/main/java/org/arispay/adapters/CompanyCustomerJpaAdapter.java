@@ -4,7 +4,7 @@ import org.arispay.data.CompanyCustomerDto;
 import org.arispay.entity.CompanyCustomer;
 import org.arispay.ports.api.GenericServicePort;
 import org.arispay.repository.CompanyCustomerRepository;
-import org.arispay.utils.ObjMapperUtils;
+import org.arispay.utils.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +16,14 @@ public class CompanyCustomerJpaAdapter implements GenericServicePort<CompanyCust
 	@Autowired
 	CompanyCustomerRepository companyCustomerRepo;
 
-	@Autowired
-	ObjMapperUtils objMapperUtils;
 
 	@Override
 	public CompanyCustomerDto add(CompanyCustomerDto obj) {
-		CompanyCustomer companyCustomer = (CompanyCustomer) objMapperUtils.convertToEntity(new CompanyCustomer(), obj);
+		CompanyCustomer companyCustomer = ObjectMapperUtils.map(obj, CompanyCustomer.class);
 
 		CompanyCustomer companyCustomerSaved = companyCustomerRepo.save(companyCustomer);
 
-		return (CompanyCustomerDto) objMapperUtils.convertToDto(companyCustomerSaved, new CompanyCustomerDto());
+		return ObjectMapperUtils.map(companyCustomerSaved, CompanyCustomerDto.class);
 	}
 
 	@Override
@@ -43,14 +41,14 @@ public class CompanyCustomerJpaAdapter implements GenericServicePort<CompanyCust
 	public List<CompanyCustomerDto> getAll() {
 		List<CompanyCustomer> companyCustomerList = companyCustomerRepo.findAll();
 
-		return (List<CompanyCustomerDto>) objMapperUtils.convertToDto(companyCustomerList, new CompanyCustomerDto());
+		return ObjectMapperUtils.mapAll(companyCustomerList, CompanyCustomerDto.class);
 	}
 
 	@Override
 	public CompanyCustomerDto getById(Long id) {
 		Optional<CompanyCustomer> companyCustomer = companyCustomerRepo.findById(id);
 		if (companyCustomer.isPresent()) {
-			return (CompanyCustomerDto) objMapperUtils.convertToDto(companyCustomer, new CompanyCustomerDto());
+			return ObjectMapperUtils.map(companyCustomer, CompanyCustomerDto.class);
 		} else
 			return null;
 

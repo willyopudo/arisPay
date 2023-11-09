@@ -41,6 +41,7 @@ public class AuthController {
 	@Autowired
 	private final CompanyServicePort companyServicePort;
 
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 	ApplicationUserRole[] roles = ApplicationUserRole.class.getEnumConstants();
 	@Value("${spring.application.name}")
@@ -74,9 +75,11 @@ public class AuthController {
 	public String showRegistrationForm(Model model) {
 		// create model object to store form data
 		UserDto user = new UserDto();
+		List<CompanyDto> companies = companyServicePort.getCompanies();
 		model.addAttribute("title", appName + " Register");
 		model.addAttribute("user", user);
 		model.addAttribute("appName", appName);
+		model.addAttribute("companies", companies);
 		return "register";
 	}
 
@@ -87,6 +90,7 @@ public class AuthController {
 	                           Model model, Principal principal) {
 		String redirectUrl = "login";
 		UserDto existingUser = userServicePort.findUserByEmail(userDto.getEmail());
+		List<CompanyDto> companies = companyServicePort.getCompanies();
 
 		if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
 			result.rejectValue("email", null,
@@ -104,6 +108,7 @@ public class AuthController {
 			}
 			model.addAttribute("user", userDto);
 			model.addAttribute("userRoles", roles);
+			model.addAttribute("companies", companies);
 			if (userDto.getAddedOrEditedFrom() == 34916)
 				return "userform";
 
@@ -112,9 +117,11 @@ public class AuthController {
 		if (userDto.getAddedOrEditedFrom() == 34916) {
 			redirectUrl = "users";
 		}
-		userDto.setCreatedBy(principal.getName());
+		userDto.setCompany(companyServicePort.getCompanyById(userDto.getCompanyId()));
+		userDto.setCreatedBy(principal == null ? "system" : principal.getName());
+		userDto.setCreatedDate(new java.util.Date());
 		userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-		if (userDto.getRole().isEmpty())
+		if (userDto.getRole() == null)
 			userDto.setRole("ROLE_USER");
 		userServicePort.saveUser(userDto);
 

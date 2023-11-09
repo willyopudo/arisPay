@@ -3,9 +3,8 @@ package org.arispay.adapters;
 import org.arispay.data.CreditTxnDto;
 import org.arispay.entity.CreditTxn;
 import org.arispay.ports.api.GenericServicePort;
-import org.arispay.repository.CompanyCustomerRepository;
 import org.arispay.repository.CreditTxnRepository;
-import org.arispay.utils.ObjMapperUtils;
+import org.arispay.utils.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +16,14 @@ public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
 	@Autowired
 	CreditTxnRepository creditTxnRepo;
 
-	@Autowired
-	ObjMapperUtils objMapperUtils;
 
 	@Override
 	public CreditTxnDto add(CreditTxnDto obj) {
-		CreditTxn creditTxn = (CreditTxn) objMapperUtils.convertToEntity(new CreditTxn(), obj);
+		CreditTxn creditTxn = ObjectMapperUtils.map(obj, CreditTxn.class);
 
 		CreditTxn creditTxnSaved = creditTxnRepo.save(creditTxn);
 
-		return (CreditTxnDto) objMapperUtils.convertToDto(creditTxnSaved, new CreditTxnDto());
+		return ObjectMapperUtils.map(creditTxnSaved, CreditTxnDto.class);
 	}
 
 	@Override
@@ -44,14 +41,14 @@ public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
 	public List<CreditTxnDto> getAll() {
 		List<CreditTxn> creditTxnList = creditTxnRepo.findAll();
 
-		return (List<CreditTxnDto>) objMapperUtils.convertToDto(creditTxnList, new CreditTxnDto());
+		return ObjectMapperUtils.mapAll(creditTxnList, CreditTxnDto.class);
 	}
 
 	@Override
 	public CreditTxnDto getById(Long id) {
 		Optional<CreditTxn> creditTxn = creditTxnRepo.findById(id);
 		if (creditTxn.isPresent()) {
-			return (CreditTxnDto) objMapperUtils.convertToDto(creditTxn, new CreditTxnDto());
+			return ObjectMapperUtils.map(creditTxn, CreditTxnDto.class);
 		} else
 			return null;
 

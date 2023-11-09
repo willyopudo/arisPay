@@ -1,12 +1,10 @@
 package org.arispay.adapters;
 
-import org.arispay.data.CompanyCustomerDto;
 import org.arispay.data.MediaDto;
-import org.arispay.entity.CompanyCustomer;
 import org.arispay.entity.Media;
 import org.arispay.ports.api.GenericServicePort;
 import org.arispay.repository.MediaRepository;
-import org.arispay.utils.ObjMapperUtils;
+import org.arispay.utils.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.arispay.utils.NotFoundException;
@@ -19,8 +17,6 @@ public class MediaJpaAdapter implements GenericServicePort<MediaDto> {
 	@Autowired
 	MediaRepository mediaRepository;
 
-	@Autowired
-	ObjMapperUtils objMapperUtils;
 
 	@Override
 	public MediaDto add(MediaDto obj) {
@@ -30,11 +26,11 @@ public class MediaJpaAdapter implements GenericServicePort<MediaDto> {
 			isExist.setUpdatedDate(obj.getCreatedDate());
 			isExist.setMediaType(obj.getMediaType());
 			isExist.setSize(obj.getSize());
-			media = (Media) objMapperUtils.convertToEntity(new Media(), isExist);
+			media = ObjectMapperUtils.map(isExist, Media.class);
 		} else {
-			media = (Media) objMapperUtils.convertToEntity(new Media(), obj);
+			media = ObjectMapperUtils.map(obj, Media.class);
 		}
-		return (MediaDto) objMapperUtils.convertToDto(mediaRepository.save(media), new MediaDto());
+		return ObjectMapperUtils.map(mediaRepository.save(media), MediaDto.class);
 	}
 
 	@Override
@@ -46,8 +42,8 @@ public class MediaJpaAdapter implements GenericServicePort<MediaDto> {
 	public MediaDto update(MediaDto obj) {
 		final Media media = mediaRepository.findById(obj.getId())
 				.orElseThrow(NotFoundException::new);
-		objMapperUtils.convertToEntity(media, obj);
-		return (MediaDto) objMapperUtils.convertToDto(mediaRepository.save(media), new MediaDto());
+		ObjectMapperUtils.map(obj, media);
+		return ObjectMapperUtils.map(mediaRepository.save(media), MediaDto.class);
 	}
 
 	@Override
@@ -55,14 +51,14 @@ public class MediaJpaAdapter implements GenericServicePort<MediaDto> {
 	public List<MediaDto> getAll() {
 		List<Media> mediaList = mediaRepository.findAll();
 
-		return (List<MediaDto>) objMapperUtils.convertToDto(mediaList, new MediaDto());
+		return ObjectMapperUtils.mapAll(mediaList, MediaDto.class);
 	}
 
 	@Override
 	public MediaDto getById(Long id) {
 		Optional<Media> media = mediaRepository.findById(id);
 		if (media.isPresent()) {
-			return (MediaDto) objMapperUtils.convertToDto(media, new MediaDto());
+			return ObjectMapperUtils.map(media, MediaDto.class);
 		} else
 			return null;
 	}
@@ -75,7 +71,7 @@ public class MediaJpaAdapter implements GenericServicePort<MediaDto> {
 
 	public MediaDto findByName(String name) {
 		Media media = mediaRepository.findByName(name);
-		return (MediaDto) objMapperUtils.convertToDto(media, new MediaDto());
+		return ObjectMapperUtils.map(media, MediaDto.class);
 
 	}
 }

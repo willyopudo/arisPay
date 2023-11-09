@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.arispay.utils.DtoEntity;
 
 import java.util.Date;
 
@@ -12,7 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreditTxnDto implements DtoEntity {
+public class CreditTxnDto {
 	private Long id;
 
 	private String banTxnRef;

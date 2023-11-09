@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.arispay.utils.DtoEntity;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CompanyCustomerDto implements DtoEntity {
+public class CompanyCustomerDto {
 	private Long id;
 
 	private Long companyId;

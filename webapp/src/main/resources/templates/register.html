@@ -82,10 +82,10 @@
 					<form id="formAuthentication" class="mb-3" method="POST" th:action="@{/register/save}"
 					      th:object="${user}">
 						<div class="mb-3">
-							<label for="userName" class="form-label">Username</label>
-							<input type="text" class="form-control" id="userName" name="userName"
-							       placeholder="Enter your username" th:field="*{userName}" autofocus/>
-							<p th:errors="*{userName}" class="text-danger" th:if="${#fields.hasErrors('userName')}"></p>
+							<label for="username" class="form-label">Username</label>
+							<input type="text" class="form-control" id="username" name="username"
+							       placeholder="Enter your username" th:field="*{username}" autofocus/>
+							<p th:errors="*{username}" class="text-danger" th:if="${#fields.hasErrors('username')}"></p>
 						</div>
 						<div class="mb-3">
 							<label for="email" class="form-label">First Name</label>
@@ -118,8 +118,8 @@
 							<div class="input-group input-group-merge">
 								<span class="input-group-text">KE (+254)</span>
 								<input type="number" maxlength="9" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="712345678" th:field="*{phoneNumber}"/>
-								<p th:errors="*{phoneNumber}" class="text-danger" th:if="${#fields.hasErrors('phoneNumber')}"></p>
 							</div>
+							<p th:errors="*{phoneNumber}" class="text-danger" th:if="${#fields.hasErrors('phoneNumber')}"></p>
 						</div>
 						<div class="mb-3 ">
 							<label for="address" class="form-label">Address</label>
@@ -136,6 +136,9 @@
 							<label for="town" class="form-label">Town/City</label>
 							<input class="form-control" type="text" id="town" name="town" placeholder="Nairobi City" th:field="*{town}"/>
 							<p th:errors="*{town}" class="text-danger" th:if="${#fields.hasErrors('town')}"></p>
+						</div>
+						<div class="mb-3" th:include="~{fragments/form/form_input :: form-select-v2}"
+						     th:with="field='companyId', label='Company', items=${companies}, selectedItem=${user.companyId}">
 						</div>
 						<div class="mb-3 form-password-toggle">
 							<label class="form-label" for="password">Password</label>
