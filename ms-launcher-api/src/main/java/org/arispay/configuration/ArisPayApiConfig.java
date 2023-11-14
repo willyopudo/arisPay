@@ -19,4 +19,14 @@ public class ArisPayApiConfig {
 		return new CompanyServiceImpl(companyPersistence());
 	}
 
+	@Bean
+	public UserPersistencePort userPersistence() {
+		return new UserJpaAdapter();
+	}
+
+	@Bean
+	public UserServicePort userService() {
+		return new UserServiceImpl(userPersistence());
+	}
+
 }

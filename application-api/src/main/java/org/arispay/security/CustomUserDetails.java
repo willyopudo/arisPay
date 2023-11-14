@@ -1,12 +1,14 @@
-package com.arisweb.security;
+package org.arispay.security;
 
-import org.arispay.entity.User;
 import org.arispay.entity.Role;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.arispay.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
 	private final User user;
