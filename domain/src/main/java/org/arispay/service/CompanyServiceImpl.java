@@ -6,7 +6,7 @@ import org.arispay.ports.spi.CompanyPersistencePort;
 
 import java.util.List;
 
-public class CompanyServiceImpl implements CompanyServicePort {
+public class  CompanyServiceImpl implements CompanyServicePort {
 
 	private CompanyPersistencePort companyPersistencePort;
 
