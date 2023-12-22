@@ -1,5 +1,6 @@
 package org.arispay.data.dtoresponse;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class JwtLoginResp {
-	private String username;
-	private String token;
+
+	@JsonProperty("access_token")
+	private String accessToken;
+	@JsonProperty("expires_in")
+	private int expiresIn;
+	@JsonProperty("token_type")
+	private String tokenType;
 }

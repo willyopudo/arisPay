@@ -42,7 +42,7 @@ public class AuthController {
 			User user = new User();
 			user.setUsername(username);
 			String token = jwtUtil.createToken(user);
-			JwtLoginResp loginRes = new JwtLoginResp(username, token);
+			JwtLoginResp loginRes = new JwtLoginResp(token,3600, "Bearer");
 
 			return ResponseEntity.ok(loginRes);
 
