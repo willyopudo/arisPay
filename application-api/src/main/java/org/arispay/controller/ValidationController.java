@@ -2,6 +2,8 @@ package org.arispay.controller;
 
 import org.arispay.data.dtorequest.Validation.ValidationRequest;
 import org.arispay.data.dtoresponse.Validation.ValidationResponse;
+import org.arispay.ports.api.ClientServicePort;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,8 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/validation")
 public class ValidationController {
 
+
+    @Autowired
+    ClientServicePort clientServicePort;
+
     @PostMapping("/familybank")
     public ResponseEntity<ValidationResponse> validateClient(@RequestBody ValidationRequest validationRequest) {
+
+
+
         ValidationResponse validationResponse = new ValidationResponse();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(validationResponse);

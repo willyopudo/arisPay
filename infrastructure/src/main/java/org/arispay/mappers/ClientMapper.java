@@ -26,10 +26,10 @@ public interface ClientMapper {
     Client clientDtoToClient(ClientDto clientDto);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
-    List<ClientDto> companyListToCompanyDtoList(List<Client> clientList);
+    List<ClientDto> clientListToClientDtoList(List<Client> clientList);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
-    List<Client> CompanyDtoListTocompanyList(List<ClientDto> ClientDtoList);
+    List<Client> ClientDtoListToclientList(List<ClientDto> ClientDtoList);
 
     @Named("idToCompany")
     public static Company idToCompany (long id) {
