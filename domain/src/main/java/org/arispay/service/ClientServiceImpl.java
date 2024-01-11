@@ -35,7 +35,7 @@ public class ClientServiceImpl implements ClientServicePort {
 	}
 
 	@Override
-	public ClientDto getClientById(Long id) {
+	public ClientDto getClientById(String id) {
 		return clientPersistencePort.getClientById(id);
 	}
 }

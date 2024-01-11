@@ -13,5 +13,5 @@ public interface ClientServicePort {
 
     List<ClientDto> getClients();
 
-    ClientDto getClientById(Long id);
+    ClientDto getClientById(String id);
 }

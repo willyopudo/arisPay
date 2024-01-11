@@ -45,8 +45,8 @@ public class ClientJpaAdapter implements ClientPersistencePort {
     }
 
     @Override
-    public ClientDto getClientById(Long clientId) {
-        Optional<Client> client = clientRepository.findById(clientId);
+    public ClientDto getClientById(String clientId) {
+        Optional<Client> client = clientRepository.findClientByClientId(clientId);
 
 
         return client.map(clientMapper::clientToClientDto).orElse(null);

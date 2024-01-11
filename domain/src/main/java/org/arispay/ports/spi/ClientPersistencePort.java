@@ -13,5 +13,5 @@ public interface ClientPersistencePort {
 
     List<ClientDto> getClients();
 
-    ClientDto getClientById(Long clientId);
+    ClientDto getClientById(String clientId);
 }
