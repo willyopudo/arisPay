@@ -2,7 +2,7 @@ package org.arispay.adapters;
 
 import org.arispay.data.CompanyAccountDto;
 import org.arispay.entity.CompanyAccount;
-import org.arispay.ports.api.GenericServicePort;
+import org.arispay.ports.spi.GenericPersistencePort;
 import org.arispay.repository.CompanyAccountRepository;
 import org.arispay.utils.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CompanyAccountJpaAdapter implements GenericServicePort<CompanyAccountDto> {
+public class CompanyAccountJpaAdapter implements GenericPersistencePort<CompanyAccountDto> {
 	@Autowired
-	CompanyAccountRepository companyAccountRepository;
+	private CompanyAccountRepository companyAccountRepository;
 
 
 	@Override
@@ -55,7 +55,7 @@ public class CompanyAccountJpaAdapter implements GenericServicePort<CompanyAccou
 	}
 
 	@Override
-	public CompanyAccountDto findByName(String name) {
+	public CompanyAccountDto getByName(String name) {
 		return null;
 	}
 }

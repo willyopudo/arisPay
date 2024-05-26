@@ -14,7 +14,7 @@ import java.util.Optional;
 @Service
 public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
 	@Autowired
-	CreditTxnRepository creditTxnRepo;
+	private CreditTxnRepository creditTxnRepo;
 
 
 	@Override

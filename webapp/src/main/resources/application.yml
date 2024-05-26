@@ -10,15 +10,15 @@ server:
       enabled: false
 spring:
   application:
-    name: arisPay
+    name: arisPayWeb
   cloud:
     config:
       enabled: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/milkman_db
+    url: jdbc:mysql://localhost:3306/arispay_db
     username: wilfusr
-    password: Dailydose2014@
+    password: Dailydose2010@
   jpa:
     hibernate:
       ddl-auto: update

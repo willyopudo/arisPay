@@ -10,6 +10,9 @@ import java.util.List;
 public class GenericServiceImpl<T> implements GenericServicePort<T> {
 	private GenericPersistencePort<T> genericPersistencePort;
 
+	public GenericServiceImpl(GenericPersistencePort<T> genericPersistencePort) {
+		this.genericPersistencePort = genericPersistencePort;
+	}
 	@Override
 	public T add(T obj) {
 		return genericPersistencePort.add(obj);

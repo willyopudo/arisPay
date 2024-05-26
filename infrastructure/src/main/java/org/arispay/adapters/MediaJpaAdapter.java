@@ -15,7 +15,7 @@ import java.util.Optional;
 @Service
 public class MediaJpaAdapter implements GenericServicePort<MediaDto> {
 	@Autowired
-	MediaRepository mediaRepository;
+	private MediaRepository mediaRepository;
 
 
 	@Override

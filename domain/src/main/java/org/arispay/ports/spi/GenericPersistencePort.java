@@ -12,4 +12,5 @@ public interface GenericPersistencePort<T> {
 	List<T> getAll();
 
 	T getById(Long id);
+	T getByName(String name);
 }
