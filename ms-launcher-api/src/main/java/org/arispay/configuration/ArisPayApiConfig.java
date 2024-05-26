@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ArisPayApiConfig {
+
+	//Company Config
 	@Bean
 	public CompanyPersistencePort companyPersistence() {
 		return new CompanyJpaAdapter();
@@ -19,6 +21,14 @@ public class ArisPayApiConfig {
 		return new CompanyServiceImpl(companyPersistence());
 	}
 
+	//Client Config
+	@Bean
+	public ClientPersistencePort clientPersistence() { return new ClientJpaAdapter(); }
+
+	@Bean
+	public ClientServicePort clientService() {return new ClientServiceImpl(clientPersistence()); }
+
+	//User Config
 	@Bean
 	public UserPersistencePort userPersistence() {
 		return new UserJpaAdapter();

@@ -1,4 +1,4 @@
-package org.arispay.data.dtorequest.Validation;
+package org.arispay.data.dtorequest.validation;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

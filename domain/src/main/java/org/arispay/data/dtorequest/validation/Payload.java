@@ -1,4 +1,4 @@
-package org.arispay.data.dtoresponse.Validation;
+package org.arispay.data.dtorequest.validation;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Payload {
-
     private String identifier;
     private String identifier_type;
-    private String customer_id;
-    private String customer_name;
+    private String collection_account;
 }
