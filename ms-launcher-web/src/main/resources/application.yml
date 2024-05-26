@@ -16,9 +16,9 @@ spring:
       enabled: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/aris_pay_db
-    username: root
-    password:
+    url: jdbc:mysql://localhost:3306/arispay_db
+    username: wilfusr
+    password: Dailydose2010@
   jpa:
     hibernate:
       ddl-auto: update

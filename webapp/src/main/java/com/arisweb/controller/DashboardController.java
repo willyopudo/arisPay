@@ -13,7 +13,7 @@ public class DashboardController {
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public ModelAndView home() {
 		ModelAndView model = new ModelAndView("dashboard");
-		model.addObject("title", "MilkMan Dashboard");
+		model.addObject("title", "ArisPay Dashboard");
 		//model.setViewName("index");
 		return model;
 	}
