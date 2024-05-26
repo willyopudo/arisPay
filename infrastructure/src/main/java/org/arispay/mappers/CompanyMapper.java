@@ -3,7 +3,6 @@ package org.arispay.mappers;
 import org.arispay.data.CompanyDto;
 import org.arispay.entity.Company;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
