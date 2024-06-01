@@ -19,28 +19,28 @@ public class CompanyController {
 	@Autowired
 	private final CompanyServicePort companyServicePort;
 
-	@PostMapping("/add")
+	@PostMapping("")
 	@ResponseStatus(HttpStatus.CREATED)
 	public CompanyDto addCompany(@RequestBody CompanyDto companyDto) {
 		return companyServicePort.addCompany(companyDto);
 	}
 
-	@PutMapping("/update")
+	@PutMapping("")
 	public CompanyDto updateCompany(@RequestBody CompanyDto companyDto) {
 		return companyServicePort.updateCompany(companyDto);
 	}
 
-	@GetMapping("/get/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<CompanyDto> getCompanyByID(@PathVariable long id) {
 		return ResponseEntity.ok(companyServicePort.getCompanyById(id));
 	}
 
-	@GetMapping("/getAll")
+	@GetMapping("")
 	public ResponseEntity<List<CompanyDto>> getAllCompanies() {
 		return ResponseEntity.ok(companyServicePort.getCompanies());
 	}
 
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/{id}")
 	public void deleteCompanyByID(@PathVariable long id) {
 		companyServicePort.deleteCompanyById(id);
 	}

@@ -13,6 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Arrays;
+
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
@@ -21,6 +23,14 @@ public class SecurityConfig {
 
 	private final CustomUserDetailsService userDetailsService;
 	private final JwtAuthorizationFilter jwtAuthorizationFilter;
+
+	private static final String[] AUTH_WHITE_LIST = {
+			"/v3/api-docs/**",
+			"/swagger-ui/**",
+			"/v2/api-docs/**",
+			"/swagger-resources/**",
+			"/rest/auth/**"
+	};
 
 	public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthorizationFilter jwtAuthorizationFilter) {
 		this.userDetailsService = userDetailsService;
@@ -39,6 +49,10 @@ public class SecurityConfig {
 		http.csrf().disable()
 				.authorizeHttpRequests((authorize) ->
 						authorize.requestMatchers(antMatcher("/rest/auth/**")).permitAll()
+								.requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
+								.requestMatchers(antMatcher("/v2/api-docs/**")).permitAll()
+								.requestMatchers(antMatcher("/v3/api-docs/**")).permitAll()
+								.requestMatchers(antMatcher("/swagger-resources/**")).permitAll()
 								.anyRequest().authenticated())
 				.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
 				.sessionManagement()

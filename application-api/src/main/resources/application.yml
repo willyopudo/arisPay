@@ -39,3 +39,8 @@ management:
   tracing:
     sampling:
       probability: 1.0
+custom:
+  arispay:
+    openapi:
+      dev-url: http://localhost:8082
+      prod-url: https://arispay.com:8082
