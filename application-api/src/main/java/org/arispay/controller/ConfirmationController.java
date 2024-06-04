@@ -1,6 +1,6 @@
 package org.arispay.controller;
 
-import org.arispay.data.dtorequest.confirmation.ConfirmationRequest;
+import org.arispay.data.fbl.dtorequest.confirmation.ConfirmationRequest;
 import org.arispay.data.dtoresponse.confirmation.ConfirmationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

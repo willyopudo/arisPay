@@ -34,10 +34,10 @@ public class CompanyAccount extends AuditableEntity {
 	@Column(nullable = false)
 	private String bankName;
 
-	private String pesaLinkPhone;
+	//private String pesaLinkPhone;
 
-	@Column(nullable = false)
-	private byte isPesaLinkRegistered;
+//	@Column(nullable = false)
+//	private byte isPesaLinkRegistered;
 
 }
 

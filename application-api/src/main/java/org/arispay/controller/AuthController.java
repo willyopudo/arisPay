@@ -1,10 +1,10 @@
 package org.arispay.controller;
 
 import org.arispay.auth.JwtUtil;
+import org.arispay.data.GenericHttpResponse;
 import org.arispay.entity.User;
-import org.arispay.data.dtorequest.JwtLoginReq;
-import org.arispay.data.dtoresponse.ErrorResp;
-import org.arispay.data.dtoresponse.JwtLoginResp;
+import org.arispay.data.dtoauth.JwtLoginReq;
+import org.arispay.data.dtoauth.JwtLoginResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,11 +47,11 @@ public class AuthController {
 			return ResponseEntity.ok(loginRes);
 
 		} catch (BadCredentialsException e) {
-			ErrorResp errorResponse = new ErrorResp(HttpStatus.BAD_REQUEST, "Invalid username or password");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+			GenericHttpResponse genericHttpResponse = new GenericHttpResponse(HttpStatus.BAD_REQUEST, "Invalid username or password");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericHttpResponse);
 		} catch (Exception e) {
-			ErrorResp errorResponse = new ErrorResp(HttpStatus.BAD_REQUEST, e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+			GenericHttpResponse genericHttpResponse = new GenericHttpResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericHttpResponse);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package org.arispay.data.dtorequest.validation;
+package org.arispay.data.fbl.dtorequest.confirmation;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ValidationRequest {
-
+public class ConfirmationRequest {
     private String action;
     private Payload payload;
 }
