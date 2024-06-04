@@ -2,7 +2,7 @@ package org.arispay.controller;
 
 import org.arispay.data.ClientDto;
 import org.arispay.data.fbl.dtorequest.validation.ValidationRequest;
-import org.arispay.data.dtoresponse.validation.ValidationResponse;
+import org.arispay.data.fbl.dtoresponse.validation.ValidationResponse;
 import org.arispay.ports.api.ClientServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

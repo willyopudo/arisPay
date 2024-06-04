@@ -1,4 +1,4 @@
-package org.arispay.data.dtoresponse.validation;
+package org.arispay.data.fbl.dtoresponse.validation;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
