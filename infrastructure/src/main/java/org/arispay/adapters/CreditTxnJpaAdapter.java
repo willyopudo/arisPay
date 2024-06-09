@@ -1,7 +1,7 @@
 package org.arispay.adapters;
 
-import org.arispay.data.CreditTxnDto;
-import org.arispay.entity.CreditTxn;
+import org.arispay.data.TransactionDto;
+import org.arispay.entity.Transaction;
 import org.arispay.ports.api.GenericServicePort;
 import org.arispay.repository.CreditTxnRepository;
 import org.arispay.utils.ObjectMapperUtils;
@@ -12,18 +12,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
+public class CreditTxnJpaAdapter implements GenericServicePort<TransactionDto> {
 	@Autowired
 	private CreditTxnRepository creditTxnRepo;
 
 
 	@Override
-	public CreditTxnDto add(CreditTxnDto obj) {
-		CreditTxn creditTxn = ObjectMapperUtils.map(obj, CreditTxn.class);
+	public TransactionDto add(TransactionDto obj) {
+		Transaction transaction = ObjectMapperUtils.map(obj, Transaction.class);
 
-		CreditTxn creditTxnSaved = creditTxnRepo.save(creditTxn);
+		Transaction transactionSaved = creditTxnRepo.save(transaction);
 
-		return ObjectMapperUtils.map(creditTxnSaved, CreditTxnDto.class);
+		return ObjectMapperUtils.map(transactionSaved, TransactionDto.class);
 	}
 
 	@Override
@@ -32,30 +32,30 @@ public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
 	}
 
 	@Override
-	public CreditTxnDto update(CreditTxnDto obj) {
+	public TransactionDto update(TransactionDto obj) {
 		return add(obj);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<CreditTxnDto> getAll() {
-		List<CreditTxn> creditTxnList = creditTxnRepo.findAll();
+	public List<TransactionDto> getAll() {
+		List<Transaction> transactionList = creditTxnRepo.findAll();
 
-		return ObjectMapperUtils.mapAll(creditTxnList, CreditTxnDto.class);
+		return ObjectMapperUtils.mapAll(transactionList, TransactionDto.class);
 	}
 
 	@Override
-	public CreditTxnDto getById(Long id) {
-		Optional<CreditTxn> creditTxn = creditTxnRepo.findById(id);
+	public TransactionDto getById(Long id) {
+		Optional<Transaction> creditTxn = creditTxnRepo.findById(id);
 		if (creditTxn.isPresent()) {
-			return ObjectMapperUtils.map(creditTxn, CreditTxnDto.class);
+			return ObjectMapperUtils.map(creditTxn, TransactionDto.class);
 		} else
 			return null;
 
 	}
 
 	@Override
-	public CreditTxnDto findByName(String name) {
+	public TransactionDto findByName(String name) {
 		return null;
 	}
 }

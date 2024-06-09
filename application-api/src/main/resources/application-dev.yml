@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: arisPayApi
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/arispay_db
+    username: wilfusr
+    password: Dailydose2010@
+  jpa:
+    hibernate:
+      ddl-auto: update
+      jdbc:
+        time_zone: UTC
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+logging:
+  config: application-api/src/main/resources/log4j2-dev.xml
+  level:
+    #    "org.hibernate.orm.jdbc.bind": trace
+    "org.hibernate.SQL": DEBUG

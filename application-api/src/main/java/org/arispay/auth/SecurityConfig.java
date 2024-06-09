@@ -48,7 +48,7 @@ public class SecurityConfig {
 
 		http.csrf().disable()
 				.authorizeHttpRequests((authorize) ->
-						authorize.requestMatchers(antMatcher("/rest/auth/**")).permitAll()
+						authorize.requestMatchers(antMatcher("/api/v1/auth/**")).permitAll()
 								.requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
 								.requestMatchers(antMatcher("/v2/api-docs/**")).permitAll()
 								.requestMatchers(antMatcher("/v3/api-docs/**")).permitAll()

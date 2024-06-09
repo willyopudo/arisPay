@@ -11,7 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreditTxnDto {
+public class TransactionDto {
 	private Long id;
 
 	private String banTxnRef;
