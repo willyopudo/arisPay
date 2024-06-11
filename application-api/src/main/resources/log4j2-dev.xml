@@ -33,7 +33,9 @@
         <!--            <AppenderRef ref="ConsoleAppender"/>-->
         <!--            <AppenderRef ref="FileAppender"/>-->
         <!--        </Logger>-->
-
+        <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter">
+            <level value="DEBUG" />
+        </logger>
         <Root level="info">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>
