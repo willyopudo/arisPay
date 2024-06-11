@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -26,7 +26,7 @@ public class Transaction {
 	private String arisPayTxnRef;
 
 	@Column(nullable = false)
-	private Float amount;
+	private Double amount;
 
 	@Column(nullable = false)
 	private String collectionAccount;
@@ -47,5 +47,5 @@ public class Transaction {
 	private String ApiChannel;
 
 	@Column(nullable = false)
-	private Date txnDate;
+	private LocalDateTime txnDate;
 }
