@@ -1,7 +1,7 @@
 package org.arispay.adapters;
 
 import org.arispay.data.CreditTxnDto;
-import org.arispay.entity.CreditTxn;
+import org.arispay.entity.Transaction;
 import org.arispay.ports.api.GenericServicePort;
 import org.arispay.repository.CreditTxnRepository;
 import org.arispay.utils.ObjectMapperUtils;
@@ -16,12 +16,11 @@ public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
 	@Autowired
 	private CreditTxnRepository creditTxnRepo;
 
-
 	@Override
 	public CreditTxnDto add(CreditTxnDto obj) {
-		CreditTxn creditTxn = ObjectMapperUtils.map(obj, CreditTxn.class);
+		Transaction creditTxn = ObjectMapperUtils.map(obj, Transaction.class);
 
-		CreditTxn creditTxnSaved = creditTxnRepo.save(creditTxn);
+		Transaction creditTxnSaved = creditTxnRepo.save(creditTxn);
 
 		return ObjectMapperUtils.map(creditTxnSaved, CreditTxnDto.class);
 	}
@@ -39,14 +38,14 @@ public class CreditTxnJpaAdapter implements GenericServicePort<CreditTxnDto> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<CreditTxnDto> getAll() {
-		List<CreditTxn> creditTxnList = creditTxnRepo.findAll();
+		List<Transaction> creditTxnList = creditTxnRepo.findAll();
 
 		return ObjectMapperUtils.mapAll(creditTxnList, CreditTxnDto.class);
 	}
 
 	@Override
 	public CreditTxnDto getById(Long id) {
-		Optional<CreditTxn> creditTxn = creditTxnRepo.findById(id);
+		Optional<Transaction> creditTxn = creditTxnRepo.findById(id);
 		if (creditTxn.isPresent()) {
 			return ObjectMapperUtils.map(creditTxn, CreditTxnDto.class);
 		} else
