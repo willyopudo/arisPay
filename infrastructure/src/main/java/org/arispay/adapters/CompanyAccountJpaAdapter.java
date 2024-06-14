@@ -2,6 +2,7 @@ package org.arispay.adapters;
 
 import org.arispay.data.CompanyAccountDto;
 import org.arispay.entity.CompanyAccount;
+import org.arispay.ports.spi.CompanyAccountPersistencePort;
 import org.arispay.ports.spi.GenericPersistencePort;
 import org.arispay.repository.CompanyAccountRepository;
 import org.arispay.utils.ObjectMapperUtils;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CompanyAccountJpaAdapter implements GenericPersistencePort<CompanyAccountDto> {
+public class CompanyAccountJpaAdapter implements CompanyAccountPersistencePort<CompanyAccountDto> {
 	@Autowired
 	private CompanyAccountRepository companyAccountRepository;
 
@@ -47,6 +48,15 @@ public class CompanyAccountJpaAdapter implements GenericPersistencePort<CompanyA
 	@Override
 	public CompanyAccountDto getById(Long id) {
 		Optional<CompanyAccount> companyAccount = companyAccountRepository.findById(id);
+		if (companyAccount.isPresent()) {
+			return ObjectMapperUtils.map(companyAccount, CompanyAccountDto.class);
+		} else
+			return null;
+
+	}
+	@Override
+	public CompanyAccountDto getByAccountNumber(String accountNumber) {
+		Optional<CompanyAccount> companyAccount = companyAccountRepository.findByAccountNumber(accountNumber);
 		if (companyAccount.isPresent()) {
 			return ObjectMapperUtils.map(companyAccount, CompanyAccountDto.class);
 		} else

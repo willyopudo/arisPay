@@ -19,8 +19,9 @@ public class CompanyAccount extends AuditableEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true)
-	private Long companyId;
+	@ManyToOne
+	@JoinColumn(name = "company_id", nullable=false)
+	private Company company;
 
 	@Column(nullable = false)
 	private String accountNumber;

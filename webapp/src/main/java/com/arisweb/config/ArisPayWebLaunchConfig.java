@@ -53,6 +53,7 @@ public class ArisPayWebLaunchConfig {
 		return new FileStorageServiceImpl(fileStorageIO());
 	}
 
+	//Company Account Config
 	@Bean
 	public GenericPersistencePort genericPersistenceCompanyAccount() {
 		return new CompanyAccountJpaAdapter();

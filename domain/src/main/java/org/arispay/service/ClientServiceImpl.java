@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ClientServiceImpl implements ClientServicePort {
 
-	private ClientPersistencePort clientPersistencePort;
+	private final ClientPersistencePort clientPersistencePort;
 
 	public ClientServiceImpl(ClientPersistencePort clientPersistencePort) {
 		this.clientPersistencePort = clientPersistencePort;

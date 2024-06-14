@@ -8,7 +8,7 @@ import java.util.List;
 
 public class  CompanyServiceImpl implements CompanyServicePort {
 
-	private CompanyPersistencePort companyPersistencePort;
+	private final CompanyPersistencePort companyPersistencePort;
 
 	public CompanyServiceImpl(CompanyPersistencePort companyPersistencePort) {
 		this.companyPersistencePort = companyPersistencePort;

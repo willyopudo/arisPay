@@ -8,5 +8,5 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class FblIpnDto {
-    private String transRef;
+    public IPN IPN;
 }
