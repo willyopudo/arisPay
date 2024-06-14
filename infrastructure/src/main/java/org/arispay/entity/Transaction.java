@@ -8,6 +8,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,21 +23,18 @@ public class Transaction {
 	private Long id;
 
 	@Column(nullable = false)
-	private String banTxnRef;
+	private String bankTranRef;
 
 	@Column(nullable = false)
-	private String arisPayTxnRef;
+	private Double tranAmount;
 
 	@Column(nullable = false)
-	private Double amount;
+	private String bankAccount;
 
-	@Column(nullable = false)
-	private String collectionAccount;
-
-	@Column(nullable = false)
-	private Long companyId;
-
-	private Long customerId;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "client_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Client client;
 
 	private String payerName;
 
@@ -42,10 +42,12 @@ public class Transaction {
 
 	private String paymentMode;
 
-	private String txnNarration;
+	private String narration;
 
-	private String ApiChannel;
+	private String apiChannel;
 
 	@Column(nullable = false)
-	private LocalDateTime txnDate;
+	private LocalDateTime tranDate;
+
+	private String crDrInd;
 }

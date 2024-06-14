@@ -1,10 +1,10 @@
-package org.arispay.ports.api;
+package org.arispay.ports.spi;
 
 import java.util.List;
 
 import org.arispay.data.TransactionDto;
 
-public interface TransactionServicePort {
+public interface TransactionPersistencePort {
     TransactionDto addTransaction(TransactionDto clientDto);
 
     void deleteTransactionById(Long id);

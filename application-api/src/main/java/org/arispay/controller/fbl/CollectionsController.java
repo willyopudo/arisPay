@@ -9,6 +9,7 @@ import org.arispay.data.fbl.dtorequest.validation.ValidationRequest;
 import org.arispay.data.fbl.dtoresponse.confirmation.ConfirmationResponse;
 import org.arispay.data.fbl.dtoresponse.validation.ValidationResponse;
 import org.arispay.ports.api.ClientServicePort;
+import org.arispay.ports.api.TransactionServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,9 @@ public class CollectionsController {
     @Autowired
     private ClientServicePort clientServicePort;
 
+    @Autowired
+    private TransactionServicePort transactionServicePort;
+
     @PostMapping("/validation")
     public ResponseEntity<ValidationResponse> validateClient(@RequestBody ValidationRequest validationRequest) {
 
@@ -34,6 +38,9 @@ public class CollectionsController {
             validationResponse.setStatus_code("ACCOUNT_NOT_FOUND");
             validationResponse.setStatus_description("ACCOUNT IS NOT VALID");
             validationResponse.setDate_time(LocalDateTime.now().format(formatter));
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(validationResponse);
         } else {
             validationResponse.setStatus_code("ACCOUNT_FOUND");
             validationResponse.setStatus_description("ACCOUNT IS VALID");
@@ -42,10 +49,11 @@ public class CollectionsController {
             validationResponse.getPayload().setCustomer_id(fetchedClient.getClientId());
             validationResponse.getPayload().setIdentifier_type(validationRequest.getPayload().getIdentifier_type());
             validationResponse.getPayload().setCustomer_name(fetchedClient.getClientName());
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(validationResponse);
+
         }
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(validationResponse);
     }
 
     @PostMapping("/confirmation")

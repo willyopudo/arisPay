@@ -1,7 +1,5 @@
 package org.arispay.ports.api;
 
-import org.arispay.data.CompanyDto;
-
 import java.util.List;
 
 public interface GenericServicePort<T> {

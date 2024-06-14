@@ -7,13 +7,11 @@ import org.arispay.repository.CompanyRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ClientMapper {
-
 
     static CompanyRepository getCompanyRepository() {
         return null;
@@ -32,7 +30,7 @@ public interface ClientMapper {
     List<Client> ClientDtoListToclientList(List<ClientDto> ClientDtoList);
 
     @Named("idToCompany")
-    public static Company idToCompany (long id) {
+    public static Company idToCompany(long id) {
         return getCompanyRepository().getReferenceById(id);
     }
 
