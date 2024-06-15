@@ -1,6 +1,9 @@
 package org.arispay.controller.fbl;
 
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.arispay.controller.AuthController;
 import org.arispay.data.GenericHttpResponse;
 import org.arispay.data.fbl.dtorequest.ipn.FblIpnDto;
 import org.arispay.entity.CompanyAccount;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class IpnController {
     @Autowired
     private CompanyAccountServicePort<CompanyAccount> companyAccountServicePort;
+    private static final Logger logger = LogManager.getLogger(IpnController.class);
 
     @PostMapping("/ipn")
     public ResponseEntity<GenericHttpResponse> processIpnRequest(
@@ -28,10 +32,12 @@ public class IpnController {
             if(account != null) {
                 //Todo
                 //Call service function to save to db if company with passed account exists
+                logger.info("Account number was found {}", account.getAccountNumber());
             }
             else{
                 //Todo
                 //Save to rejected Transaction table
+                logger.info("Account number was not found {}", ipnRequest.getIPN().getTXN().getFirst().TXN_ACC);
             }
         }
 
