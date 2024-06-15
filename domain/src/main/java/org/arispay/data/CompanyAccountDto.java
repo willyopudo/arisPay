@@ -10,10 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CompanyAccountDto {
-	private Long id;
 
-
-	private Long companyId;
+	private Long company;
 
 	private String accountNumber;
 
@@ -22,8 +20,4 @@ public class CompanyAccountDto {
 	private String bankCode;
 
 	private String bankName;
-
-	private String pesaLinkPhone;
-
-	private byte isPesaLinkRegistered;
 }

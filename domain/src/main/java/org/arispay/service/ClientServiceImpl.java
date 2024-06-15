@@ -39,5 +39,3 @@ public class ClientServiceImpl implements ClientServicePort {
 		return clientPersistencePort.getClientById(id);
 	}
 }
-
-

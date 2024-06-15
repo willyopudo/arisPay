@@ -12,7 +12,6 @@ import org.arispay.ports.spi.CompanyPersistencePort;
 import org.arispay.ports.spi.FileStorageIOPort;
 import org.arispay.ports.spi.GenericPersistencePort;
 import org.arispay.ports.spi.UserPersistencePort;
-import org.arispay.repository.UserRepository;
 import org.arispay.service.CompanyServiceImpl;
 import org.arispay.service.FileStorageServiceImpl;
 import org.arispay.service.GenericServiceImpl;
@@ -55,12 +54,8 @@ public class ArisPayWebLaunchConfig {
 
 	//Company Account Config
 	@Bean
-	public GenericPersistencePort genericPersistenceCompanyAccount() {
+	public CompanyAccountJpaAdapter genericPersistenceCompanyAccount() {
 		return new CompanyAccountJpaAdapter();
 	}
 
-	@Bean
-	public GenericServicePort companyAccountService() {
-		return new GenericServiceImpl(genericPersistenceCompanyAccount());
-	}
 }

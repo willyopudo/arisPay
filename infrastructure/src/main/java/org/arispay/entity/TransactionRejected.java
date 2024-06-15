@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.UUID;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -16,37 +18,36 @@ import java.util.UUID;
 @Entity
 @Table(name = "transactions_rejected")
 public class TransactionRejected {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private String banTxnRef;
+	@Column(nullable = false)
+	private String bankTranRef;
 
-    @Column(nullable = false)
-    private String arisPayTxnRef;
+	@Column(nullable = false)
+	private Double tranAmount;
 
-    @Column(nullable = false)
-    private Float amount;
+	@Column(nullable = false)
+	private String bankAccount;
 
-    @Column(nullable = false)
-    private String collectionAccount;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "client_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Client client;
 
-    @Column(nullable = false)
-    private Long companyId;
+	private String payerName;
 
-    private Long customerId;
+	private String payerPhone;
 
-    private String payerName;
+	private String paymentMode;
 
-    private String payerPhone;
+	private String narration;
 
-    private String paymentMode;
+	private String apiChannel;
 
-    private String txnNarration;
+	@Column(nullable = false)
+	private LocalDateTime tranDate;
 
-    private String ApiChannel;
-
-    @Column(nullable = false)
-    private Date txnDate;
+	private String crDrInd;
 }

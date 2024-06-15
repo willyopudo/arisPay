@@ -12,19 +12,16 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class TransactionDto {
-	private Long id;
 
-	private String banTxnRef;
+	private String bankTranRef;
 
-	private String arisPayTxnRef;
+	private String arisTranRef;
 
-	private Float amount;
+	private Float tranAmount;
 
-	private String collectionAccount;
+	private String bankAccount;
 
-	private Long companyId;
-
-	private Long customerId;
+	private Long client;
 
 	private String payerName;
 
@@ -32,9 +29,11 @@ public class TransactionDto {
 
 	private String paymentMode;
 
-	private String txnNarration;
+	private String narration;
 
-	private String ApiChannel;
+	private String apiChannel;
 
-	private Date txnDate;
+	private Date tranDate;
+
+	private String crDrInd;
 }

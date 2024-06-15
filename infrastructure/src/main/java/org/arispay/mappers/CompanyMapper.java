@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface CompanyMapper {
-	//CompanyMapper INSTANCE = Mappers.getMapper(CompanyMapper.class);
+	// CompanyMapper INSTANCE = Mappers.getMapper(CompanyMapper.class);
 
 	CompanyDto companyToCompanyDto(Company company);
 

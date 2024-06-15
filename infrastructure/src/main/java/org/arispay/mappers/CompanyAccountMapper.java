@@ -1,33 +1,33 @@
 package org.arispay.mappers;
 
-import org.arispay.data.ClientDto;
-import org.arispay.entity.Client;
+import java.util.List;
+
+import org.arispay.data.CompanyAccountDto;
+import org.arispay.entity.CompanyAccount;
 import org.arispay.entity.Company;
 import org.arispay.repository.CompanyRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
-public interface ClientMapper {
+public interface CompanyAccountMapper {
 
     static CompanyRepository getCompanyRepository() {
         return null;
     }
 
     @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
-    ClientDto clientToClientDto(Client client);
+    CompanyAccountDto bankAccountToBankAccountDto(CompanyAccount bankAccount);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
-    Client clientDtoToClient(ClientDto clientDto);
+    CompanyAccount bankAccountDtoToBankAccount(CompanyAccountDto bankAccountDto);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
-    List<ClientDto> clientListToClientDtoList(List<Client> clientList);
+    List<CompanyAccountDto> bankAccountListToBankAccountDtoList(List<CompanyAccount> bankAccountList);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
-    List<Client> ClientDtoListToclientList(List<ClientDto> ClientDtoList);
+    List<CompanyAccount> bankAccountDtoListToBankAccountList(List<CompanyAccountDto> bankAccountDtoList);
 
     @Named("idToCompany")
     public static Company idToCompany(long id) {
