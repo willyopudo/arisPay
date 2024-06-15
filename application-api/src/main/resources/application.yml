@@ -9,6 +9,8 @@ server:
     whitelabel:
       enabled: false
 spring:
+  profiles:
+    active: "dev"
   application:
     name: arisPayApi
   cloud:

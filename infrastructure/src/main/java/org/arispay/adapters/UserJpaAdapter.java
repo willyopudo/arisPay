@@ -10,7 +10,6 @@ import org.arispay.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -75,6 +74,5 @@ public class UserJpaAdapter implements UserPersistencePort {
 		role.setName(roleName);
 		return roleRepository.save(role);
 	}
-
 
 }

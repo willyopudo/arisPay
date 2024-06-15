@@ -1,4 +1,4 @@
-package org.arispay.data.dtoresponse.confirmation;
+package org.arispay.data.fbl.dtoresponse.confirmation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

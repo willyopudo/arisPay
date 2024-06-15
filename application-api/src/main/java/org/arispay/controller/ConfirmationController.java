@@ -1,7 +1,7 @@
 package org.arispay.controller;
 
-import org.arispay.data.dtorequest.confirmation.ConfirmationRequest;
-import org.arispay.data.dtoresponse.confirmation.ConfirmationResponse;
+import org.arispay.data.fbl.dtorequest.confirmation.ConfirmationRequest;
+import org.arispay.data.fbl.dtoresponse.confirmation.ConfirmationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConfirmationController {
 
     @PostMapping("/familybank")
-    public ResponseEntity<ConfirmationResponse> postPaymentNotification(@RequestBody ConfirmationRequest confirmationRequest) {
+    public ResponseEntity<ConfirmationResponse> postPaymentNotification(
+            @RequestBody ConfirmationRequest confirmationRequest) {
 
         ConfirmationResponse confirmationResponse = new ConfirmationResponse();
 

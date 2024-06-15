@@ -1,10 +1,12 @@
 package org.arispay.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
+import org.arispay.data.GenericHttpResponse;
 import org.arispay.entity.User;
-import org.arispay.data.dtorequest.JwtLoginReq;
-import org.arispay.data.dtoresponse.ErrorResp;
-import org.arispay.data.dtoresponse.JwtLoginResp;
+import org.arispay.data.dtoauth.JwtLoginReq;
+import org.arispay.data.dtoauth.JwtLoginResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +17,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/rest/auth")
+@RestController
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
 	@Autowired
 	private final AuthenticationManager authenticationManager;
+	private static final Logger logger = LogManager.getLogger(AuthController.class);
 
 
 	private final JwtUtil jwtUtil;
@@ -44,14 +47,15 @@ public class AuthController {
 			String token = jwtUtil.createToken(user);
 			JwtLoginResp loginRes = new JwtLoginResp(token,3600, "Bearer");
 
+            logger.info("Token issued success for user: {} , Token : {}", username, token);
 			return ResponseEntity.ok(loginRes);
 
 		} catch (BadCredentialsException e) {
-			ErrorResp errorResponse = new ErrorResp(HttpStatus.BAD_REQUEST, "Invalid username or password");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+			GenericHttpResponse genericHttpResponse = new GenericHttpResponse(HttpStatus.BAD_REQUEST, "Invalid credentials");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericHttpResponse);
 		} catch (Exception e) {
-			ErrorResp errorResponse = new ErrorResp(HttpStatus.BAD_REQUEST, e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+			GenericHttpResponse genericHttpResponse = new GenericHttpResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericHttpResponse);
 		}
 	}
 }

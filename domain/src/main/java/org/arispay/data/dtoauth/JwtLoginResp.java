@@ -1,4 +1,4 @@
-package org.arispay.data.dtoresponse;
+package org.arispay.data.dtoauth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

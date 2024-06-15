@@ -1,17 +1,10 @@
 package org.arispay.configuration;
 
-import org.arispay.adapters.ClientJpaAdapter;
-import org.arispay.adapters.CompanyJpaAdapter;
-import org.arispay.adapters.UserJpaAdapter;
-import org.arispay.ports.api.ClientServicePort;
-import org.arispay.ports.api.CompanyServicePort;
-import org.arispay.ports.api.UserServicePort;
-import org.arispay.ports.spi.ClientPersistencePort;
-import org.arispay.ports.spi.CompanyPersistencePort;
-import org.arispay.ports.spi.UserPersistencePort;
-import org.arispay.service.ClientServiceImpl;
-import org.arispay.service.CompanyServiceImpl;
-import org.arispay.service.UserServiceImpl;
+import org.arispay.adapters.*;
+import org.arispay.data.CompanyAccountDto;
+import org.arispay.ports.api.*;
+import org.arispay.ports.spi.*;
+import org.arispay.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,6 +29,17 @@ public class ArisPayApiConfig {
 	@Bean
 	public ClientServicePort clientService() {return new ClientServiceImpl(clientPersistence()); }
 
+	//Company Account Config
+	@Bean
+	public CompanyAccountPersistencePort<CompanyAccountDto> companyAccountPersistence() {
+		return new CompanyAccountJpaAdapter();
+	}
+
+	@Bean
+	public CompanyAccountServicePort<CompanyAccountDto> companyAccountService() {
+		return new CompanyAccountServiceImpl<CompanyAccountDto>(companyAccountPersistence());
+	}
+
 	//User Config
 	@Bean
 	public UserPersistencePort userPersistence() {
@@ -45,6 +49,17 @@ public class ArisPayApiConfig {
 	@Bean
 	public UserServicePort userService() {
 		return new UserServiceImpl(userPersistence());
+	}
+
+	//Transaction Config
+	@Bean
+	public TransactionPersistencePort transactionPersistence() {
+		return new TransactionJpaAdapter();
+	}
+
+	@Bean
+	public TransactionServicePort transactionService() {
+		return new TransactionServiceImpl(transactionPersistence());
 	}
 
 }
