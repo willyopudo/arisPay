@@ -33,12 +33,12 @@ public class IpnController {
             if(account != null) {
                 //Todo
                 //Call service function to save to db if company with passed account exists
-                logger.info("Account number was found {}", account.getAccountNumber());
+                logger.info("Account number was found for  {}", account.getAccountNumber());
             }
             else{
                 //Todo
                 //Save to rejected Transaction table
-                logger.info("Account number was not found {}", ipnRequest.getIPN().getTXN().getFirst().TXN_ACC);
+                logger.info("Account number was not found for {}", ipnRequest.getIPN().getTXN().getFirst().TXN_ACC);
             }
         }
 
