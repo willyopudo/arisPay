@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 
 import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.ClientDto;
-import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.fbl.dtorequest.confirmation.ConfirmationRequest;
 import org.arispay.data.fbl.dtorequest.validation.ValidationRequest;
 import org.arispay.data.fbl.dtoresponse.confirmation.ConfirmationResponse;
