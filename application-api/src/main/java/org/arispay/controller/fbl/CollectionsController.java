@@ -3,7 +3,7 @@ package org.arispay.controller.fbl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.arispay.data.BankAccountDto;
+import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.ClientDto;
 import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.fbl.dtorequest.confirmation.ConfirmationRequest;
@@ -32,7 +32,7 @@ public class CollectionsController {
     private TransactionServicePort transactionServicePort;
 
     @Autowired
-    private CompanyAccountServicePort bankAccountServicePort;
+    private CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort;
 
     @PostMapping("/validation")
     public ResponseEntity<ValidationResponse> validateClient(@RequestBody ValidationRequest validationRequest) {
@@ -66,8 +66,8 @@ public class CollectionsController {
     public ResponseEntity<ConfirmationResponse> validateClient(@RequestBody ConfirmationRequest confirmationRequest) {
 
         ConfirmationResponse confirmationResponse = new ConfirmationResponse();
-        CompanyAccountDto fetchedAccount = bankAccountServicePort
-                .getBankAccountByAccountNumber(confirmationRequest.getPayload().getCollectionAccount());
+        CompanyAccountDto fetchedAccount = companyAccountServicePort
+                .getByAccountNumber(confirmationRequest.getPayload().getCollectionAccount());
         if (fetchedAccount == null) {
             confirmationResponse.setStatusCode("PAYMENT_ACK");
             confirmationResponse.setStatusDescription("Payment Transaction Received Successfully.");
@@ -75,6 +75,6 @@ public class CollectionsController {
             // TransactionDto transaction =
             // transactionServicePort.getTransactionByTransactionId(confirmationRequest.getPayload().getTransaction
         }
-
+        return null;
     }
 }
