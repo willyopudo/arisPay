@@ -4,31 +4,31 @@ import java.util.List;
 
 import org.arispay.data.TransactionDto;
 import org.arispay.entity.Client;
-import org.arispay.entity.Transaction;
+import org.arispay.entity.TransactionRejected;
 import org.arispay.repository.ClientRepository;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface TransactionMapper {
+public interface TransactionRejectedMapper {
     static ClientRepository getClientRepository() {
         return null;
     }
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
-    TransactionDto transactionToTransactionDto(Transaction transaction);
+    TransactionDto transactionRejectedToTransactionDto(TransactionRejected transaction);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
-    Transaction transactionDtoToTransaction(TransactionDto transactionDto);
+    TransactionRejected transactionDtoToTransactionRejected(TransactionDto transactionDto);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
-    List<TransactionDto> transactionListToTransactionDtoList(List<Transaction> clientList);
+    List<TransactionDto> transactionRejectedListToTransactionDtoList(List<TransactionRejected> transactionRejecteds);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
-    List<Transaction> transactionDtoListToTransactionList(List<TransactionDto> ClientDtoList);
+    List<TransactionRejected> transactionDtoListToTransactionRejectedList(List<TransactionDto> transactionDtos);
 
     @Named("idToClient")
     public static Client idToClient(long id) {

@@ -8,6 +8,7 @@ import org.arispay.data.fbl.dtorequest.confirmation.ConfirmationRequest;
 import org.arispay.data.fbl.dtorequest.validation.ValidationRequest;
 import org.arispay.data.fbl.dtoresponse.confirmation.ConfirmationResponse;
 import org.arispay.data.fbl.dtoresponse.validation.ValidationResponse;
+import org.arispay.ports.api.BankAccountServicePort;
 import org.arispay.ports.api.ClientServicePort;
 import org.arispay.ports.api.TransactionServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class CollectionsController {
 
     @Autowired
     private TransactionServicePort transactionServicePort;
+
+    @Autowired
+    private BankAccountServicePort bankAccountServicePort;
 
     @PostMapping("/validation")
     public ResponseEntity<ValidationResponse> validateClient(@RequestBody ValidationRequest validationRequest) {
