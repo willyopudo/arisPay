@@ -3,12 +3,14 @@ package org.arispay.controller.fbl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.arispay.data.BankAccountDto;
 import org.arispay.data.ClientDto;
+import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.fbl.dtorequest.confirmation.ConfirmationRequest;
 import org.arispay.data.fbl.dtorequest.validation.ValidationRequest;
 import org.arispay.data.fbl.dtoresponse.confirmation.ConfirmationResponse;
 import org.arispay.data.fbl.dtoresponse.validation.ValidationResponse;
-import org.arispay.ports.api.BankAccountServicePort;
+import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.ports.api.ClientServicePort;
 import org.arispay.ports.api.TransactionServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class CollectionsController {
     private TransactionServicePort transactionServicePort;
 
     @Autowired
-    private BankAccountServicePort bankAccountServicePort;
+    private CompanyAccountServicePort bankAccountServicePort;
 
     @PostMapping("/validation")
     public ResponseEntity<ValidationResponse> validateClient(@RequestBody ValidationRequest validationRequest) {
@@ -63,6 +65,16 @@ public class CollectionsController {
     @PostMapping("/confirmation")
     public ResponseEntity<ConfirmationResponse> validateClient(@RequestBody ConfirmationRequest confirmationRequest) {
 
-        return null;
+        ConfirmationResponse confirmationResponse = new ConfirmationResponse();
+        CompanyAccountDto fetchedAccount = bankAccountServicePort
+                .getBankAccountByAccountNumber(confirmationRequest.getPayload().getCollectionAccount());
+        if (fetchedAccount == null) {
+            confirmationResponse.setStatusCode("PAYMENT_ACK");
+            confirmationResponse.setStatusDescription("Payment Transaction Received Successfully.");
+        } else {
+            // TransactionDto transaction =
+            // transactionServicePort.getTransactionByTransactionId(confirmationRequest.getPayload().getTransaction
+        }
+
     }
 }

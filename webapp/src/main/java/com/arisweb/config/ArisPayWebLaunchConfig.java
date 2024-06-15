@@ -1,6 +1,6 @@
 package com.arisweb.config;
 
-import org.arispay.adapters.BankAccountJpaAdapter;
+import org.arispay.adapters.CompanyAccountJpaAdapter;
 import org.arispay.adapters.CompanyJpaAdapter;
 import org.arispay.adapters.FileStorageLocalDiskAdapter;
 import org.arispay.adapters.UserJpaAdapter;
@@ -53,12 +53,8 @@ public class ArisPayWebLaunchConfig {
 	}
 
 	@Bean
-	public GenericPersistencePort genericPersistenceCompanyAccount() {
-		return new BankAccountJpaAdapter();
+	public CompanyAccountJpaAdapter genericPersistenceCompanyAccount() {
+		return new CompanyAccountJpaAdapter();
 	}
 
-	@Bean
-	public GenericServicePort companyAccountService() {
-		return new GenericServiceImpl(genericPersistenceCompanyAccount());
-	}
 }

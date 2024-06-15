@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BankAccountDto {
+public class CompanyAccountDto {
 
 	private Long company;
 
