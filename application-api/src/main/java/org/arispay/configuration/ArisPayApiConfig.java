@@ -34,13 +34,13 @@ public class ArisPayApiConfig {
 
 	//Company Account Config
 	@Bean
-	public CompanyAccountPersistencePort companyAccountPersistence() {
+	public CompanyAccountPersistencePort<CompanyAccountDto> companyAccountPersistence() {
 		return new CompanyAccountJpaAdapter();
 	}
 
 	@Bean
-	public CompanyAccountServicePort companyAccountService() {
-		return new CompanyAccountServiceImpl(companyAccountPersistence());
+	public CompanyAccountServicePort<CompanyAccountDto> companyAccountService() {
+		return new CompanyAccountServiceImpl<CompanyAccountDto>(companyAccountPersistence());
 	}
 
 	//User Config

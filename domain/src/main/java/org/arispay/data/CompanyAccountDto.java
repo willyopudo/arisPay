@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CompanyAccountDto {
-
-	private Long company;
+	private Long companyId;
 
 	private String accountNumber;
 
@@ -20,4 +19,5 @@ public class CompanyAccountDto {
 	private String bankCode;
 
 	private String bankName;
+
 }
