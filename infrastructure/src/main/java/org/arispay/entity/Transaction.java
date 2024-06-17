@@ -34,8 +34,8 @@ public class Transaction {
 	@Column(nullable = false)
 	private Long companyId;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "client_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "client_id")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Client client;
 

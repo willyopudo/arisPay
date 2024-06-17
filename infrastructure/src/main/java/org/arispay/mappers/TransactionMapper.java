@@ -39,7 +39,7 @@ public abstract class TransactionMapper {
 
     @Named("clientToId")
     public static Long clientToId(Client client) {
-        return client.getId();
+        return client != null ?  client.getId() : 0;
     }
 
     @Named("tranIdToArisTransRef")

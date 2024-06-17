@@ -53,7 +53,7 @@ public class IpnController {
                         CompanyAccountDto account = companyAccountServicePort.getByAccountNumber(ipnRequest.getIPN().getTXN().getFirst().TXN_ACC);
 
                         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                        TransactionDto transactionDto = new TransactionDto(txn.getTXN_REF(), null, Float.parseFloat(txn.getTXN_DETAIL().getFirst().TXN_AMT), txn.getTXN_ACC(),1L, 1L, null, null, txn.getTXN_DETAIL().getFirst().TXN_CODE, txn.getTXN_DETAIL().getFirst().TXN_NARRATION, "IPN", formatter.parse(txn.getTXN_DETAIL().getFirst().TXN_DATE), txn.getTXN_DETAIL().getFirst().TXN_TYPE);
+                        TransactionDto transactionDto = new TransactionDto(txn.getTXN_REF(), null, Float.parseFloat(txn.getTXN_DETAIL().getFirst().TXN_AMT), txn.getTXN_ACC(),1L, null, null, null, txn.getTXN_DETAIL().getFirst().TXN_CODE, txn.getTXN_DETAIL().getFirst().TXN_NARRATION, "IPN", formatter.parse(txn.getTXN_DETAIL().getFirst().TXN_DATE), txn.getTXN_DETAIL().getFirst().TXN_TYPE);
 
                         if (account != null) {
                             logger.info("Account number was found {}", account.getAccountNumber());
