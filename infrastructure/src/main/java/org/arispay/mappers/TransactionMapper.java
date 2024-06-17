@@ -32,6 +32,7 @@ public interface TransactionMapper {
 
     @Named("idToClient")
     public static Client idToClient(long id) {
+        assert getClientRepository() != null;
         return getClientRepository().getReferenceById(id);
     }
 

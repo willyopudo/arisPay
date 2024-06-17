@@ -33,7 +33,7 @@ public class TransactionDto {
 
 	private String apiChannel;
 
-	private Date tranDate;
+	private Date transDate;
 
 	private String crDrInd;
 }

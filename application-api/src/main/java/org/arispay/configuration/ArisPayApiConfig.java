@@ -62,4 +62,15 @@ public class ArisPayApiConfig {
 		return new TransactionServiceImpl(transactionPersistence());
 	}
 
+	//Transaction Config
+	@Bean
+	public TransactionRejectedPersistencePort rejectedTransactionPersistence() {
+		return new TransactionRejectedJpaAdapter();
+	}
+
+	@Bean
+	public TransactionRejectedServicePort rejectedTransactionService() {
+		return new TransactionRejectedServiceImpl(rejectedTransactionPersistence());
+	}
+
 }
