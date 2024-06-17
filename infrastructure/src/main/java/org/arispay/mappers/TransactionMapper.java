@@ -16,21 +16,21 @@ import org.mapstruct.Mapper;
 public abstract class TransactionMapper {
 
     @Autowired
-    protected ClientRepository clientRepository;
+    private ClientRepository clientRepository;
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
-    abstract TransactionDto transactionToTransactionDto(Transaction transaction);
+    public abstract TransactionDto transactionToTransactionDto(Transaction transaction);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
-    abstract Transaction transactionDtoToTransaction(TransactionDto transactionDto);
+    public abstract Transaction transactionDtoToTransaction(TransactionDto transactionDto);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
-    abstract List<TransactionDto> transactionListToTransactionDtoList(List<Transaction> clientList);
+    public abstract List<TransactionDto> transactionListToTransactionDtoList(List<Transaction> clientList);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
-    abstract List<Transaction> transactionDtoListToTransactionList(List<TransactionDto> ClientDtoList);
+    public abstract List<Transaction> transactionDtoListToTransactionList(List<TransactionDto> ClientDtoList);
 
     @Named("idToClient")
     public Client idToClient(long id) {
