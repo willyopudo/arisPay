@@ -2,38 +2,39 @@ package org.arispay.mappers;
 
 import java.util.List;
 
+import org.arispay.adapters.ClientJpaAdapter;
 import org.arispay.data.TransactionDto;
 import org.arispay.entity.Client;
 import org.arispay.entity.Transaction;
 import org.arispay.repository.ClientRepository;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
-public interface TransactionMapper {
-    static ClientRepository getClientRepository() {
-        return null;
-    }
+@Mapper(componentModel = "spring", uses = ClientRepository.class)
+public abstract class TransactionMapper {
+
+    @Autowired
+    protected ClientRepository clientRepository;
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
-    TransactionDto transactionToTransactionDto(Transaction transaction);
+    abstract TransactionDto transactionToTransactionDto(Transaction transaction);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
-    Transaction transactionDtoToTransaction(TransactionDto transactionDto);
+    abstract Transaction transactionDtoToTransaction(TransactionDto transactionDto);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
-    List<TransactionDto> transactionListToTransactionDtoList(List<Transaction> clientList);
+    abstract List<TransactionDto> transactionListToTransactionDtoList(List<Transaction> clientList);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
-    List<Transaction> transactionDtoListToTransactionList(List<TransactionDto> ClientDtoList);
+    abstract List<Transaction> transactionDtoListToTransactionList(List<TransactionDto> ClientDtoList);
 
     @Named("idToClient")
-    public static Client idToClient(long id) {
-        assert getClientRepository() != null;
-        return getClientRepository().getReferenceById(id);
+    public Client idToClient(long id) {
+        return clientRepository.getReferenceById(id);
     }
 
     @Named("clientToId")
