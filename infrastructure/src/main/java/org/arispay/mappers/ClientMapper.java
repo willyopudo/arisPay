@@ -12,7 +12,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ClientMapper {
-
     static CompanyRepository getCompanyRepository() {
         return null;
     }

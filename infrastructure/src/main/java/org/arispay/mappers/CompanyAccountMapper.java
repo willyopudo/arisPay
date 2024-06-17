@@ -12,7 +12,6 @@ import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface CompanyAccountMapper {
-
     static CompanyRepository getCompanyRepository() {
         return null;
     }

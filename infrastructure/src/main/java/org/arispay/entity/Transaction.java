@@ -22,14 +22,17 @@ public class Transaction {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private String bankTranRef;
+	@Column(nullable = false, unique = true)
+	private String bankTransRef;
 
 	@Column(nullable = false)
-	private Double tranAmount;
+	private Double transAmount;
 
 	@Column(nullable = false)
 	private String bankAccount;
+
+	@Column(nullable = false)
+	private Long companyId;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "client_id", nullable = false)
