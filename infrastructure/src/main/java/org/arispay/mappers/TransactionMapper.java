@@ -19,14 +19,14 @@ public abstract class TransactionMapper {
     private ClientRepository clientRepository;
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
-    @Mapping(source = "id", target = "arisTransRef", qualifiedByName = "tranIdToArisTransRef")
+    @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
     public abstract TransactionDto transactionToTransactionDto(Transaction transaction);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
     public abstract Transaction transactionDtoToTransaction(TransactionDto transactionDto);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
-    @Mapping(source = "id", target = "arisTransRef", qualifiedByName = "tranIdToArisTransRef")
+    @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
     public abstract List<TransactionDto> transactionListToTransactionDtoList(List<Transaction> clientList);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
@@ -39,10 +39,10 @@ public abstract class TransactionMapper {
 
     @Named("clientToId")
     public static Long clientToId(Client client) {
-        return client != null ?  client.getId() : 0;
+        return client.getId();
     }
 
-    @Named("tranIdToArisTransRef")
+    @Named("tranIdToArisTranRef")
     public static String tranIdToArisTranRef(long id) {
         return "ARIS" + String.format("%0" + 9 + "d", id);
     }

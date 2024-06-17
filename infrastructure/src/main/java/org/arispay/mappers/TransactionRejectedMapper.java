@@ -17,14 +17,14 @@ public interface TransactionRejectedMapper {
     }
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
-    @Mapping(source = "id", target = "arisTransRef", qualifiedByName = "tranIdToArisTransRef")
+    @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
     TransactionDto transactionRejectedToTransactionDto(TransactionRejected transaction);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
     TransactionRejected transactionDtoToTransactionRejected(TransactionDto transactionDto);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
-    @Mapping(source = "id", target = "arisTransRef", qualifiedByName = "tranIdToArisTransRef")
+    @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
     List<TransactionDto> transactionRejectedListToTransactionDtoList(List<TransactionRejected> transactionRejecteds);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
@@ -40,7 +40,7 @@ public interface TransactionRejectedMapper {
         return client.getId();
     }
 
-    @Named("tranIdToArisTransRef")
+    @Named("tranIdToArisTranRef")
     public static String tranIdToArisTranRef(long id) {
         return "ARIS" + String.format("%0" + 9 + "d", id);
     }

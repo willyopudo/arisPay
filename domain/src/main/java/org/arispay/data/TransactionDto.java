@@ -13,15 +13,13 @@ import java.util.Date;
 @Builder
 public class TransactionDto {
 
-	private String bankTransRef;
+	private String bankTranRef;
 
-	private String arisTransRef;
+	private String arisTranRef;
 
-	private Float transAmount;
+	private Float tranAmount;
 
 	private String bankAccount;
-
-	private Long companyId;
 
 	private Long client;
 

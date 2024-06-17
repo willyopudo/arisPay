@@ -23,16 +23,13 @@ public class TransactionRejected {
 	private Long id;
 
 	@Column(nullable = false)
-	private String bankTransRef;
+	private String bankTranRef;
 
 	@Column(nullable = false)
-	private Double transAmount;
+	private Double tranAmount;
 
 	@Column(nullable = false)
 	private String bankAccount;
-
-	@Column
-	private Long companyId;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "client_id", nullable = false)
@@ -50,7 +47,7 @@ public class TransactionRejected {
 	private String apiChannel;
 
 	@Column(nullable = false)
-	private LocalDateTime transDate;
+	private LocalDateTime tranDate;
 
 	private String crDrInd;
 }
