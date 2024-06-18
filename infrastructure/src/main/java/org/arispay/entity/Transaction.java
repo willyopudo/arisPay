@@ -47,7 +47,7 @@ public class Transaction {
 	private String apiChannel;
 
 	@Column(nullable = false)
-	private LocalDateTime tranDate;
+	private LocalDateTime transDate;
 
 	private String crDrInd;
 }

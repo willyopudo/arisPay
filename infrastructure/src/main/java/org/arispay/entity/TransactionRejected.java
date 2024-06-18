@@ -32,7 +32,7 @@ public class TransactionRejected {
 	private String bankAccount;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "client_id", nullable = false)
+	@JoinColumn(name = "client_id", nullable = true)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Client client;
 

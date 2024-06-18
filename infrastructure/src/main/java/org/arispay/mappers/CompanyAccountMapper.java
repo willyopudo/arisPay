@@ -17,17 +17,17 @@ public interface CompanyAccountMapper {
         return null;
     }
 
-    @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
-    CompanyAccountDto bankAccountToBankAccountDto(CompanyAccount bankAccount);
+    @Mapping(source = "company", target = "companyId", qualifiedByName = "companyToId")
+    CompanyAccountDto companyAccountToCompanyAccountDto(CompanyAccount companyAccount);
 
-    @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
-    CompanyAccount bankAccountDtoToBankAccount(CompanyAccountDto bankAccountDto);
+    @Mapping(source = "companyId", target = "company", qualifiedByName = "idToCompany")
+    CompanyAccount companyAccountDtoToCompanyAccount(CompanyAccountDto companyAccountDto);
 
-    @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
-    List<CompanyAccountDto> bankAccountListToBankAccountDtoList(List<CompanyAccount> bankAccountList);
+    @Mapping(source = "company", target = "companyId", qualifiedByName = "companyToId")
+    List<CompanyAccountDto> companyAccountListToCompanyAccountDtoList(List<CompanyAccount> companyAccountList);
 
-    @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
-    List<CompanyAccount> bankAccountDtoListToBankAccountList(List<CompanyAccountDto> bankAccountDtoList);
+    @Mapping(source = "companyId", target = "company", qualifiedByName = "idToCompany")
+    List<CompanyAccount> companyAccountDtoListToCompanyAccountList(List<CompanyAccountDto> companyAccountDtoList);
 
     @Named("idToCompany")
     public static Company idToCompany(long id) {

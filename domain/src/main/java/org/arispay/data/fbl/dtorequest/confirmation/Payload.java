@@ -29,7 +29,4 @@ public class Payload {
     @JsonProperty("date_time")
     private String dateTime;
 
-
-
-
 }

@@ -1,0 +1,88 @@
+{
+	"info": {
+		"_postman_id": "2145e737-433e-4d19-abac-ccaae2a8f4c2",
+		"name": "ArisPay",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10298128"
+	},
+	"item": [
+		{
+			"name": "GetAll",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"client_id\" : \"wmokonzi\",\r\n    \"client_secret\" : \"dailydose\",\r\n    \"grant_type\" : \"client_credentails\",\r\n    \"scope\" : \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8082/api/v1/auth/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Account Family Bank",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ3b3VtYSIsImV4cCI6MTkyMTA4MzY4MX0.U_tK2X6I9fEJLPKVNfbd4P7QebIqIbtk8Qdz4VQUcIs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"VALIDATION\",\r\n    \"payload\": {\r\n        \"identifier\": \"2245156\",\r\n        \"identifier_type\": \"ID_NUMBER\",\r\n        \"collection_account\": \"xxxxxxxxxxxxxxx\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8082/api/v1/validation/familybank",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"v1",
+						"validation",
+						"familybank"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

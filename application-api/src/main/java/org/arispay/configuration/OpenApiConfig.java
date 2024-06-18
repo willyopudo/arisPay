@@ -1,5 +1,7 @@
 package org.arispay.configuration;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -12,6 +14,12 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
+@SecurityScheme(
+        name = "Bearer Authentication",
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "bearer"
+)
 public class OpenApiConfig {
 
     @Value("${custom.arispay.openapi.dev-url}")
@@ -20,8 +28,12 @@ public class OpenApiConfig {
     @Value("${custom.arispay.openapi.prod-url}")
     private String prodUrl;
 
+    @Value("${custom.arispay.api.version}")
+    private String apiVersion;
+
     @Bean
     public OpenAPI myOpenAPI() {
+        //final String securitySchemeName = "bearerAuth";
         Server devServer = new Server();
         devServer.setUrl(devUrl);
         devServer.setDescription("Server URL in Development environment");
@@ -39,7 +51,7 @@ public class OpenApiConfig {
 
         Info info = new Info()
                 .title("ArisPay All APIs")
-                .version("1.0")
+                .version(apiVersion)
                 .contact(contact)
                 .description("This API exposes endpoints to post payment notifications and manage customer payments data").termsOfService("https://www.arispay.com/terms")
                 .license(mitLicense);
