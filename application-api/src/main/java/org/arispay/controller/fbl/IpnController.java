@@ -92,6 +92,7 @@ public class IpnController {
                 httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
                 httpResponse.setMessage("An error occurred while processing IPN request");
                 return ResponseEntity.internalServerError().body(httpResponse);
+
             }
 
         }
