@@ -33,13 +33,13 @@ public abstract class TransactionMapper {
     public abstract List<Transaction> transactionDtoListToTransactionList(List<TransactionDto> ClientDtoList);
 
     @Named("idToClient")
-    public Client idToClient(long id) {
-        return clientRepository.getReferenceById(id);
+    public Client idToClient(String id) {
+        return clientRepository.findClientByClientId(id).orElse(null);
     }
 
     @Named("clientToId")
-    public static Long clientToId(Client client) {
-        return client.getId();
+    public static String clientToId(Client client) {
+        return client.getClientId();
     }
 
     @Named("tranIdToArisTranRef")

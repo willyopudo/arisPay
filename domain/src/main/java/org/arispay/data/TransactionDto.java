@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -17,11 +17,11 @@ public class TransactionDto {
 
 	private String arisTranRef;
 
-	private Float tranAmount;
+	private Double tranAmount;
 
 	private String bankAccount;
 
-	private Long client;
+	private String client;
 
 	private String payerName;
 
@@ -33,7 +33,7 @@ public class TransactionDto {
 
 	private String apiChannel;
 
-	private Date transDate;
+	private LocalDateTime transDate;
 
 	private String crDrInd;
 }

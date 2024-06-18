@@ -7,31 +7,31 @@ import org.arispay.repository.CompanyRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
-public interface ClientMapper {
+@Mapper(componentModel = "spring", uses = CompanyRepository.class)
+public abstract class ClientMapper {
 
-    static CompanyRepository getCompanyRepository() {
-        return null;
-    }
-
-    @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
-    ClientDto clientToClientDto(Client client);
-
-    @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
-    Client clientDtoToClient(ClientDto clientDto);
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
-    List<ClientDto> clientListToClientDtoList(List<Client> clientList);
+    public abstract ClientDto clientToClientDto(Client client);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
-    List<Client> ClientDtoListToclientList(List<ClientDto> ClientDtoList);
+    public abstract Client clientDtoToClient(ClientDto clientDto);
+
+    @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
+    public abstract List<ClientDto> clientListToClientDtoList(List<Client> clientList);
+
+    @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
+    public abstract List<Client> ClientDtoListToclientList(List<ClientDto> ClientDtoList);
 
     @Named("idToCompany")
-    public static Company idToCompany(long id) {
-        return getCompanyRepository().getReferenceById(id);
+    public Company idToCompany(long id) {
+        return companyRepository.getReferenceById(id);
     }
 
     @Named("companyToId")
