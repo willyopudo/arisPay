@@ -31,8 +31,13 @@ public class TransactionRejected {
 	@Column(nullable = false)
 	private String bankAccount;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "client_id", nullable = true)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "company_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Company company;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "client_id")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Client client;
 

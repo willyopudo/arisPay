@@ -2,6 +2,7 @@ package org.arispay.adapters;
 
 import org.arispay.data.CompanyAccountDto;
 import org.arispay.entity.CompanyAccount;
+import org.arispay.mappers.CompanyAccountMapper;
 import org.arispay.ports.spi.CompanyAccountPersistencePort;
 import org.arispay.ports.spi.GenericPersistencePort;
 import org.arispay.repository.CompanyAccountRepository;
@@ -16,6 +17,8 @@ import java.util.Optional;
 public class CompanyAccountJpaAdapter implements CompanyAccountPersistencePort<CompanyAccountDto> {
 	@Autowired
 	private CompanyAccountRepository companyAccountRepository;
+	@Autowired
+	CompanyAccountMapper companyAccountMapper;
 
 
 	@Override
@@ -24,7 +27,7 @@ public class CompanyAccountJpaAdapter implements CompanyAccountPersistencePort<C
 
 		CompanyAccount companyAccountSaved = companyAccountRepository.save(companyAccount);
 
-		return ObjectMapperUtils.map(companyAccountSaved, CompanyAccountDto.class);
+		return companyAccountMapper.companyAccountToCompanyAccountDto(companyAccountSaved);
 	}
 
 	@Override
@@ -42,14 +45,14 @@ public class CompanyAccountJpaAdapter implements CompanyAccountPersistencePort<C
 	public List<CompanyAccountDto> getAll() {
 		List<CompanyAccount> companyAccountList = companyAccountRepository.findAll();
 
-		return ObjectMapperUtils.mapAll(companyAccountList, CompanyAccountDto.class);
+		return companyAccountMapper.companyAccountListToCompanyAccountDtoList(companyAccountList);
 	}
 
 	@Override
 	public CompanyAccountDto getById(Long id) {
 		Optional<CompanyAccount> companyAccount = companyAccountRepository.findById(id);
 		if (companyAccount.isPresent()) {
-			return ObjectMapperUtils.map(companyAccount, CompanyAccountDto.class);
+			return companyAccountMapper.companyAccountToCompanyAccountDto(companyAccount.orElse(null));
 		} else
 			return null;
 
@@ -58,7 +61,7 @@ public class CompanyAccountJpaAdapter implements CompanyAccountPersistencePort<C
 	public CompanyAccountDto getByAccountNumber(String accountNumber) {
 		Optional<CompanyAccount> companyAccount = companyAccountRepository.findByAccountNumber(accountNumber);
 		if (companyAccount.isPresent()) {
-			return ObjectMapperUtils.map(companyAccount, CompanyAccountDto.class);
+			return companyAccountMapper.companyAccountToCompanyAccountDto(companyAccount.orElse(null));
 		} else
 			return null;
 
