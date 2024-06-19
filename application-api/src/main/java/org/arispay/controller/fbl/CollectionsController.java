@@ -1,8 +1,6 @@
 package org.arispay.controller.fbl;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
 import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.TransactionDto;
 import org.arispay.data.ClientDto;
