@@ -21,6 +21,8 @@ public class TransactionDto {
 
 	private String bankAccount;
 
+	private Long companyId;
+
 	private String client;
 
 	private String payerName;

@@ -9,29 +9,31 @@ import org.arispay.repository.CompanyRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(componentModel = "spring")
-public interface CompanyAccountMapper {
+@Mapper(componentModel = "spring", uses = CompanyRepository.class)
+public abstract class CompanyAccountMapper {
 
-    static CompanyRepository getCompanyRepository() {
-        return null;
-    }
-
-    @Mapping(source = "company", target = "companyId", qualifiedByName = "companyToId")
-    CompanyAccountDto companyAccountToCompanyAccountDto(CompanyAccount companyAccount);
-
-    @Mapping(source = "companyId", target = "company", qualifiedByName = "idToCompany")
-    CompanyAccount companyAccountDtoToCompanyAccount(CompanyAccountDto companyAccountDto);
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @Mapping(source = "company", target = "companyId", qualifiedByName = "companyToId")
-    List<CompanyAccountDto> companyAccountListToCompanyAccountDtoList(List<CompanyAccount> companyAccountList);
+    public abstract CompanyAccountDto companyAccountToCompanyAccountDto(CompanyAccount companyAccount);
 
     @Mapping(source = "companyId", target = "company", qualifiedByName = "idToCompany")
-    List<CompanyAccount> companyAccountDtoListToCompanyAccountList(List<CompanyAccountDto> companyAccountDtoList);
+    public abstract CompanyAccount companyAccountDtoToCompanyAccount(CompanyAccountDto companyAccountDto);
+
+    @Mapping(source = "company", target = "companyId", qualifiedByName = "companyToId")
+    public abstract List<CompanyAccountDto> companyAccountListToCompanyAccountDtoList(
+            List<CompanyAccount> companyAccountList);
+
+    @Mapping(source = "companyId", target = "company", qualifiedByName = "idToCompany")
+    public abstract List<CompanyAccount> companyAccountDtoListToCompanyAccountList(
+            List<CompanyAccountDto> companyAccountDtoList);
 
     @Named("idToCompany")
-    public static Company idToCompany(long id) {
-        return getCompanyRepository().getReferenceById(id);
+    public Company idToCompany(long id) {
+        return companyRepository.getReferenceById(id);
     }
 
     @Named("companyToId")

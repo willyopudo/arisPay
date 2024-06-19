@@ -87,6 +87,7 @@ public class CollectionsController {
                     confirmationRequest.getPayload().getTxnReference(), null,
                     confirmationRequest.getPayload().getTxnAmount(),
                     confirmationRequest.getPayload().getCollectionAccount(),
+                    null,
                     confirmationRequest.getPayload().getCustomerId(), confirmationRequest.getPayload().getPayerName(),
                     confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
                     confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
@@ -98,6 +99,7 @@ public class CollectionsController {
                     confirmationRequest.getPayload().getTxnReference(), null,
                     confirmationRequest.getPayload().getTxnAmount(),
                     confirmationRequest.getPayload().getCollectionAccount(),
+                    null,
                     confirmationRequest.getPayload().getCustomerId(), confirmationRequest.getPayload().getPayerName(),
                     confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
                     confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
@@ -109,6 +111,7 @@ public class CollectionsController {
                     confirmationRequest.getPayload().getTxnReference(), null,
                     confirmationRequest.getPayload().getTxnAmount(),
                     confirmationRequest.getPayload().getCollectionAccount(),
+                    null,
                     confirmationRequest.getPayload().getCustomerId(), confirmationRequest.getPayload().getPayerName(),
                     confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
                     confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");

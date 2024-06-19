@@ -32,7 +32,12 @@ public class Transaction {
 	private String bankAccount;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "client_id", nullable = false)
+	@JoinColumn(name = "company_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Company company;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "client_id")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Client client;
 

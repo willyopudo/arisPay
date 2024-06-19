@@ -35,7 +35,7 @@ public abstract class TransactionRejectedMapper {
 
     @Named("idToClient")
     public Client idToClient(String id) {
-        return clientRepository.findClientByClientId(id).orElse(null);
+        return clientRepository.findByClientId(id).orElse(null);
     }
 
     @Named("clientToId")
