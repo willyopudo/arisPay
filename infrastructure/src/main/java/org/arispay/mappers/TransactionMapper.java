@@ -47,7 +47,7 @@ public abstract class TransactionMapper {
 
     @Named("clientToId")
     public static String clientToId(Client client) {
-        return client.getClientId();
+        return client != null ? client.getClientId() : null;
     }
 
     @Named("idToCompany")
