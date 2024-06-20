@@ -37,3 +37,5 @@ build/
 
 ### VS Code ###
 .vscode/
+application-dev.yml
+log4j2-dev.xml

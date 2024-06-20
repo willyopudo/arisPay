@@ -10,8 +10,8 @@
             <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
         <!-- Rolling File Appender -->
-        <RollingFile name="FileAppender" fileName="/home/wouma/IdeaProjects/logs/ArisPay/arispay-api.log"
-                     filePattern="/home/wouma/IdeaProjects/logs/ArisPay/arispay-api-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="FileAppender" fileName="C:\Users\ken206312\IdeaProjects\logs\ArisPay\arispay-api.log"
+                     filePattern="C:\Users\ken206312\IdeaProjects\logs\ArisPay\arispay-api-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout>
                 <Pattern>${LOG_PATTERN}</Pattern>
             </PatternLayout>
