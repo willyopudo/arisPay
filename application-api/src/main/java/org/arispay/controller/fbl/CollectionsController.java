@@ -1,4 +1,5 @@
 package org.arispay.controller.fbl;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.arispay.data.CompanyAccountDto;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
-@RequestMapping("/api/v1/fbl")
+@RequestMapping("/api/v1/fbl/collections")
 public class CollectionsController {
 
     @Autowired
@@ -76,44 +77,25 @@ public class CollectionsController {
                 .getByAccountNumber(confirmationRequest.getPayload().getCollectionAccount());
 
         ClientDto fetchedClient = clientServicePort.getClientById(confirmationRequest.getPayload().getCustomerId());
-        TransactionDto savedTransaction = null;
+
+        confirmationResponse.setStatusCode("PAYMENT_ACK");
+        confirmationResponse.setStatusDescription("Payment Transaction Received Successfully.");
+
+        TransactionDto savedTransaction = new TransactionDto(
+                confirmationRequest.getPayload().getTxnReference(), null,
+                confirmationRequest.getPayload().getTxnAmount(),
+                confirmationRequest.getPayload().getCollectionAccount(),
+                null,
+                confirmationRequest.getPayload().getCustomerId(), confirmationRequest.getPayload().getPayerName(),
+                confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
+                confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
 
         if (fetchedAccount == null) {
-            confirmationResponse.setStatusCode("PAYMENT_ACK");
-            confirmationResponse.setStatusDescription("Payment Transaction Received Successfully.");
-            TransactionDto transactionDto = new TransactionDto(
-                    confirmationRequest.getPayload().getTxnReference(), null,
-                    confirmationRequest.getPayload().getTxnAmount(),
-                    confirmationRequest.getPayload().getCollectionAccount(),
-                    null,
-                    confirmationRequest.getPayload().getCustomerId(), confirmationRequest.getPayload().getPayerName(),
-                    confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
-                    confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
-            savedTransaction = transactionRejectedServicePort.addTransaction(transactionDto);
+            savedTransaction = transactionRejectedServicePort.addTransaction(savedTransaction);
         } else if (fetchedClient == null) {
-            confirmationResponse.setStatusCode("PAYMENT_ACK");
-            confirmationResponse.setStatusDescription("Payment Transaction Received Successfully.");
-            TransactionDto transactionDto = new TransactionDto(
-                    confirmationRequest.getPayload().getTxnReference(), null,
-                    confirmationRequest.getPayload().getTxnAmount(),
-                    confirmationRequest.getPayload().getCollectionAccount(),
-                    null,
-                    confirmationRequest.getPayload().getCustomerId(), confirmationRequest.getPayload().getPayerName(),
-                    confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
-                    confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
-            savedTransaction = transactionRejectedServicePort.addTransaction(transactionDto);
+            savedTransaction = transactionRejectedServicePort.addTransaction(savedTransaction);
         } else {
-            confirmationResponse.setStatusCode("PAYMENT_ACK");
-            confirmationResponse.setStatusDescription("Payment Transaction Received Successfully.");
-            TransactionDto transactionDto = new TransactionDto(
-                    confirmationRequest.getPayload().getTxnReference(), null,
-                    confirmationRequest.getPayload().getTxnAmount(),
-                    confirmationRequest.getPayload().getCollectionAccount(),
-                    null,
-                    confirmationRequest.getPayload().getCustomerId(), confirmationRequest.getPayload().getPayerName(),
-                    confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
-                    confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
-            savedTransaction = transactionServicePort.addTransaction(transactionDto);
+            savedTransaction = transactionServicePort.addTransaction(savedTransaction);
         }
 
         confirmationResponse.setPaymentRef(savedTransaction.getArisTranRef());
