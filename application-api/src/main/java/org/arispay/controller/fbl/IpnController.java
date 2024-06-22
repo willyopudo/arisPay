@@ -60,7 +60,7 @@ public class IpnController {
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
                         TransactionDto transactionDto = new TransactionDto(txn.getTXN_REF(), null,
                                 Double.valueOf(txn.getTXN_DETAIL().getFirst().getTXN_AMT()), txn.getTXN_ACC(),
-                                account.getCompanyId(),
+                                0L,
                                 null,
                                 null,
                                 null, txn.getTXN_DETAIL().getFirst().TXN_CODE,
@@ -69,6 +69,7 @@ public class IpnController {
                                 txn.getTXN_DETAIL().getFirst().TXN_TYPE);
 
                         if (account != null) {
+                            transactionDto.setCompanyId(account.getCompanyId());
                             logger.info("Account number was found {}", account.getAccountNumber());
                             // Todo
 
@@ -93,6 +94,12 @@ public class IpnController {
                 GenericHttpResponse httpResponse = new GenericHttpResponse();
                 httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
                 httpResponse.setMessage("An error occurred while processing IPN request");
+                if(e.getMessage().contains("Duplicate")){
+                    httpResponse.setHttpStatus(HttpStatus.CONFLICT);
+                    httpResponse.setMessage("Transaction record with TransRef " + ipnRequest.getIPN().getTXN().getFirst().TXN_REF + " already exists");
+                    return new ResponseEntity<>(httpResponse, HttpStatus.CONFLICT);
+                }
+
                 return ResponseEntity.internalServerError().body(httpResponse);
 
             }
