@@ -49,31 +49,27 @@ public class CollectionsController {
     @PostMapping("/validation")
     public ResponseEntity validateClient(@RequestBody ValidationRequest validationRequest) {
 
-        ClientDto fetchedClient;
         ValidationResponse validationResponse = new ValidationResponse();
         String collectionAccount = validationRequest.getPayload().getCollectionAccount();
         String customerId = validationRequest.getPayload().getIdentifier();
 
         try {
-            fetchedClient = clientServicePort.getClientById(customerId);
-
+            // First, fetch the client by customer ID
+            ClientDto fetchedClient = clientServicePort.getClientById(customerId);
             if (fetchedClient == null) {
-                validationResponse.setStatusCode("CLIENT_NOT_FOUND");
-                validationResponse.setStatusDescription("CLIENT ID IS NOT VALID");
-                validationResponse.setDateTime(LocalDateTime.now().format(formatter));
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationResponse);
+                return buildNotFoundResponse("CLIENT_NOT_FOUND", "CLIENT ID IS NOT VALID");
             }
 
+            // Finally, fetch the client by company ID and customer ID
             CompanyAccountDto fetchedAccount = companyAccountServicePort.getByAccountNumber(collectionAccount);
 
             fetchedClient = clientServicePort.getClientByIdAndCompany(fetchedAccount.getCompanyId(), customerId);
-
             if (fetchedClient == null) {
-                validationResponse.setStatusCode("ACCOUNT_NOT_FOUND");
-                validationResponse.setStatusDescription("COLLECTION ACCOUNT IS NOT VALID");
-                validationResponse.setDateTime(LocalDateTime.now().format(formatter));
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationResponse);
+                return buildNotFoundResponse("ACCOUNT_NOT_FOUND", "COLLECTION ACCOUNT IS NOT VALID");
             }
+
+            // If all checks pass, build a successful validation response
+            return buildSuccessResponse(validationRequest, fetchedClient);
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -82,7 +78,19 @@ public class CollectionsController {
             httpResponse.setMessage("An error occurred while processing Collections Validation request");
             return ResponseEntity.internalServerError().body(httpResponse);
         }
+    }
 
+    private ResponseEntity<ValidationResponse> buildNotFoundResponse(String statusCode, String statusDescription) {
+        ValidationResponse validationResponse = new ValidationResponse();
+        validationResponse.setStatusCode(statusCode);
+        validationResponse.setStatusDescription(statusDescription);
+        validationResponse.setDateTime(LocalDateTime.now().format(formatter));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationResponse);
+    }
+
+    private ResponseEntity<ValidationResponse> buildSuccessResponse(ValidationRequest validationRequest,
+            ClientDto fetchedClient) {
+        ValidationResponse validationResponse = new ValidationResponse();
         validationResponse.setStatusCode("ACCOUNT_FOUND");
         validationResponse.setStatusDescription("ACCOUNT IS VALID");
         validationResponse.setDateTime(LocalDateTime.now().format(formatter));
@@ -90,9 +98,7 @@ public class CollectionsController {
         validationResponse.getPayload().setCustomerId(fetchedClient.getClientId());
         validationResponse.getPayload().setIdentifierType(validationRequest.getPayload().getIdentifierType());
         validationResponse.getPayload().setCustomerName(fetchedClient.getClientName());
-
         return ResponseEntity.status(HttpStatus.OK).body(validationResponse);
-
     }
 
     @PostMapping("/confirmation")
