@@ -14,4 +14,6 @@ public interface ClientPersistencePort {
     List<ClientDto> getClients();
 
     ClientDto getClientById(String clientId);
+
+    ClientDto getClientByIdAndCompany(Long companyId, String clientId);
 }

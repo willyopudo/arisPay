@@ -5,13 +5,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.arispay.controller.AuthController;
 import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.GenericHttpResponse;
 import org.arispay.data.TransactionDto;
 import org.arispay.data.fbl.dtorequest.ipn.FblIpnDto;
 import org.arispay.data.fbl.dtorequest.ipn.TXN;
-import org.arispay.entity.CompanyAccount;
 import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.ports.api.TransactionRejectedServicePort;
 import org.arispay.ports.api.TransactionServicePort;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 

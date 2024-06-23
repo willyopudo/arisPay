@@ -3,7 +3,10 @@ package org.arispay.controller.fbl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.arispay.data.CompanyAccountDto;
+import org.arispay.data.GenericHttpResponse;
 import org.arispay.data.TransactionDto;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.arispay.data.ClientDto;
 import org.arispay.data.fbl.dtorequest.confirmation.ConfirmationRequest;
 import org.arispay.data.fbl.dtorequest.validation.ValidationRequest;
@@ -14,6 +17,7 @@ import org.arispay.ports.api.TransactionRejectedServicePort;
 import org.arispay.ports.api.ClientServicePort;
 import org.arispay.ports.api.TransactionServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +41,8 @@ public class CollectionsController {
 
     @Autowired
     private CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort;
+
+    private static final Logger logger = LogManager.getLogger(CollectionsController.class);
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -68,38 +74,67 @@ public class CollectionsController {
     }
 
     @PostMapping("/confirmation")
-    public ResponseEntity<ConfirmationResponse> validateClient(@RequestBody ConfirmationRequest confirmationRequest) {
-
-        LocalDateTime dateTime = LocalDateTime.parse(confirmationRequest.getPayload().getDateTime(), formatter);
-
+    public ResponseEntity validateClient(@RequestBody ConfirmationRequest confirmationRequest) {
         ConfirmationResponse confirmationResponse = new ConfirmationResponse();
-        CompanyAccountDto fetchedAccount = companyAccountServicePort
-                .getByAccountNumber(confirmationRequest.getPayload().getCollectionAccount());
+        try {
+            LocalDateTime dateTime = LocalDateTime.parse(confirmationRequest.getPayload().getDateTime(), formatter);
 
-        ClientDto fetchedClient = clientServicePort.getClientById(confirmationRequest.getPayload().getCustomerId());
+            String collectionAccount = confirmationRequest.getPayload().getCollectionAccount();
+            String customerId = confirmationRequest.getPayload().getCustomerId();
 
-        confirmationResponse.setStatusCode("PAYMENT_ACK");
-        confirmationResponse.setStatusDescription("Payment Transaction Received Successfully.");
+            CompanyAccountDto fetchedAccount = companyAccountServicePort.getByAccountNumber(collectionAccount);
+            if (fetchedAccount == null) {
+                confirmationResponse.setStatusDescription(
+                        "Payment Transaction Received Successfully. Note: collection_account is not correct");
+            }
 
-        TransactionDto savedTransaction = new TransactionDto(
-                confirmationRequest.getPayload().getTxnReference(), null,
-                confirmationRequest.getPayload().getTxnAmount(),
-                confirmationRequest.getPayload().getCollectionAccount(),
-                null,
-                confirmationRequest.getPayload().getCustomerId(), confirmationRequest.getPayload().getPayerName(),
-                confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
-                confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
+            ClientDto fetchedClient = null;
+            if (fetchedAccount != null) {
+                fetchedClient = clientServicePort.getClientByIdAndCompany(fetchedAccount.getCompanyId(), customerId);
+                if (fetchedClient == null) {
+                    confirmationResponse.setStatusDescription(
+                            "Payment Transaction Received Successfully. Note: customer_id is not correct");
+                }
+            }
 
-        if (fetchedAccount == null) {
-            savedTransaction = transactionRejectedServicePort.addTransaction(savedTransaction);
-        } else if (fetchedClient == null) {
-            savedTransaction = transactionRejectedServicePort.addTransaction(savedTransaction);
-        } else {
-            savedTransaction = transactionServicePort.addTransaction(savedTransaction);
+            confirmationResponse.setStatusCode("PAYMENT_ACK");
+            confirmationResponse.setStatusDescription(confirmationResponse.getStatusDescription() == null
+                    ? "Payment Transaction Received Successfully."
+                    : confirmationResponse.getStatusDescription());
+
+            TransactionDto transaction = new TransactionDto(
+                    confirmationRequest.getPayload().getTxnReference(), null,
+                    confirmationRequest.getPayload().getTxnAmount(),
+                    collectionAccount, fetchedAccount != null ? fetchedAccount.getCompanyId() : null,
+                    customerId, confirmationRequest.getPayload().getPayerName(),
+                    confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
+                    confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
+
+            if (fetchedAccount == null || fetchedClient == null) {
+                transaction = transactionRejectedServicePort.addTransaction(transaction);
+            } else {
+                transaction = transactionServicePort.addTransaction(transaction);
+            }
+
+            confirmationResponse.setPaymentRef(transaction.getArisTranRef());
+            confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
+        } catch (DataIntegrityViolationException ex) {
+            logger.error(ex.getMessage(), ex);
+            GenericHttpResponse httpResponse = new GenericHttpResponse();
+            httpResponse.setHttpStatus(HttpStatus.CONFLICT);
+            if (ex.getMessage().contains("Duplicate")) {
+                httpResponse.setMessage("Duplicate request for transaction reference: "
+                        + confirmationRequest.getPayload().getTxnReference());
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(httpResponse);
+            }
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            GenericHttpResponse httpResponse = new GenericHttpResponse();
+            httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            httpResponse.setMessage("An error occurred while processing IPN request");
+            return ResponseEntity.internalServerError().body(httpResponse);
         }
-
-        confirmationResponse.setPaymentRef(savedTransaction.getArisTranRef());
-        confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(confirmationResponse);
