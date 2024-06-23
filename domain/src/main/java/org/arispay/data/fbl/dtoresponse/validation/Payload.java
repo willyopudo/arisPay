@@ -1,5 +1,7 @@
 package org.arispay.data.fbl.dtoresponse.validation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +12,13 @@ import lombok.NoArgsConstructor;
 public class Payload {
 
     private String identifier;
-    private String identifier_type;
-    private String customer_id;
-    private String customer_name;
+
+    @JsonProperty("identifier_type")
+    private String identifierType;
+
+    @JsonProperty("customer_id")
+    private String customerId;
+
+    @JsonProperty("customer_name")
+    private String customerName;
 }

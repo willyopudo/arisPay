@@ -47,29 +47,51 @@ public class CollectionsController {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @PostMapping("/validation")
-    public ResponseEntity<ValidationResponse> validateClient(@RequestBody ValidationRequest validationRequest) {
+    public ResponseEntity validateClient(@RequestBody ValidationRequest validationRequest) {
 
-        ClientDto fetchedClient = clientServicePort.getClientById(validationRequest.getPayload().getIdentifier());
+        ClientDto fetchedClient;
         ValidationResponse validationResponse = new ValidationResponse();
-        if (fetchedClient == null) {
-            validationResponse.setStatus_code("ACCOUNT_NOT_FOUND");
-            validationResponse.setStatus_description("ACCOUNT IS NOT VALID");
-            validationResponse.setDate_time(LocalDateTime.now().format(formatter));
+        String collectionAccount = validationRequest.getPayload().getCollectionAccount();
+        String customerId = validationRequest.getPayload().getIdentifier();
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(validationResponse);
-        } else {
-            validationResponse.setStatus_code("ACCOUNT_FOUND");
-            validationResponse.setStatus_description("ACCOUNT IS VALID");
-            validationResponse.setDate_time(LocalDateTime.now().format(formatter));
-            validationResponse.getPayload().setIdentifier(fetchedClient.getClientId());
-            validationResponse.getPayload().setCustomer_id(fetchedClient.getClientId());
-            validationResponse.getPayload().setIdentifier_type(validationRequest.getPayload().getIdentifier_type());
-            validationResponse.getPayload().setCustomer_name(fetchedClient.getClientName());
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(validationResponse);
+        try {
+            fetchedClient = clientServicePort.getClientById(customerId);
 
+            if (fetchedClient == null) {
+                validationResponse.setStatusCode("CLIENT_NOT_FOUND");
+                validationResponse.setStatusDescription("CLIENT ID IS NOT VALID");
+                validationResponse.setDateTime(LocalDateTime.now().format(formatter));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationResponse);
+            }
+
+            CompanyAccountDto fetchedAccount = companyAccountServicePort.getByAccountNumber(collectionAccount);
+
+            fetchedClient = clientServicePort.getClientByIdAndCompany(fetchedAccount.getCompanyId(), customerId);
+
+            if (fetchedClient == null) {
+                validationResponse.setStatusCode("ACCOUNT_NOT_FOUND");
+                validationResponse.setStatusDescription("COLLECTION ACCOUNT IS NOT VALID");
+                validationResponse.setDateTime(LocalDateTime.now().format(formatter));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationResponse);
+            }
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            GenericHttpResponse httpResponse = new GenericHttpResponse();
+            httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            httpResponse.setMessage("An error occurred while processing Collections Validation request");
+            return ResponseEntity.internalServerError().body(httpResponse);
         }
+
+        validationResponse.setStatusCode("ACCOUNT_FOUND");
+        validationResponse.setStatusDescription("ACCOUNT IS VALID");
+        validationResponse.setDateTime(LocalDateTime.now().format(formatter));
+        validationResponse.getPayload().setIdentifier(fetchedClient.getClientId());
+        validationResponse.getPayload().setCustomerId(fetchedClient.getClientId());
+        validationResponse.getPayload().setIdentifierType(validationRequest.getPayload().getIdentifierType());
+        validationResponse.getPayload().setCustomerName(fetchedClient.getClientName());
+
+        return ResponseEntity.status(HttpStatus.OK).body(validationResponse);
 
     }
 
@@ -132,7 +154,7 @@ public class CollectionsController {
             logger.error(ex.getMessage(), ex);
             GenericHttpResponse httpResponse = new GenericHttpResponse();
             httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            httpResponse.setMessage("An error occurred while processing IPN request");
+            httpResponse.setMessage("An error occurred while processing Collections Confirmation request");
             return ResponseEntity.internalServerError().body(httpResponse);
         }
 
