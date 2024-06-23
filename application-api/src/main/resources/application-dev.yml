@@ -16,6 +16,11 @@ spring:
         time_zone: UTC
     database: mysql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
     show-sql: true
 logging:
   config: application-api/src/main/resources/log4j2-dev.xml

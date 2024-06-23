@@ -119,10 +119,10 @@ public class CollectionsController {
             confirmationResponse.setPaymentRef(transaction.getArisTranRef());
             confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
         } catch (DataIntegrityViolationException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), "Error Message: " + ex);
             GenericHttpResponse httpResponse = new GenericHttpResponse();
             httpResponse.setHttpStatus(HttpStatus.CONFLICT);
-            if (ex.getMessage().contains("Duplicate")) {
+            if (ex.getMessage().contains("duplicate")) {
                 httpResponse.setMessage("Duplicate request for transaction reference: "
                         + confirmationRequest.getPayload().getTxnReference());
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(httpResponse);
