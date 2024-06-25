@@ -1,5 +1,7 @@
 package org.arispay.data.fbl.dtorequest.validation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Payload {
     private String identifier;
-    private String identifier_type;
-    private String collection_account;
+    @JsonProperty("identifier_type")
+    private String identifierType;
+    @JsonProperty("collection_account")
+    private String collectionAccount;
 }

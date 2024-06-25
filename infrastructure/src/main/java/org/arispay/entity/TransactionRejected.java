@@ -17,12 +17,12 @@ import org.hibernate.annotations.OnDeleteAction;
 @AllArgsConstructor
 @Entity
 @Table(name = "transactions_rejected")
-public class TransactionRejected {
+public class TransactionRejected extends AuditableEntity{
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String bankTranRef;
 
 	@Column(nullable = false)
@@ -31,8 +31,13 @@ public class TransactionRejected {
 	@Column(nullable = false)
 	private String bankAccount;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "client_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "company_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Company company;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "client_id")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Client client;
 
@@ -47,7 +52,7 @@ public class TransactionRejected {
 	private String apiChannel;
 
 	@Column(nullable = false)
-	private LocalDateTime tranDate;
+	private LocalDateTime transDate;
 
 	private String crDrInd;
 }

@@ -3,6 +3,8 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+!**/src/**/resources/application-dev.yml
+!**/src/**/resources/log4j2-dev.xml
 
 ### STS ###
 .apt_generated
@@ -37,3 +39,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Dev Env ###
+log4j2-dev.xml
+application-dev.yml

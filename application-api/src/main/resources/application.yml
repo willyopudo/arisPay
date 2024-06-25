@@ -46,3 +46,5 @@ custom:
     openapi:
       dev-url: http://localhost:8082
       prod-url: https://arispay.com:8082
+    api:
+      version: 1

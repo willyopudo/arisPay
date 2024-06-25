@@ -1,5 +1,7 @@
 package org.arispay.data.fbl.dtoresponse.validation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,8 +11,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ValidationResponse {
 
-    private String status_code;
-    private String status_description;
-    private String date_time;
+    @JsonProperty("status_code")
+    private String statusCode;
+
+    @JsonProperty("status_description")
+    private String statusDescription;
+
+    @JsonProperty("date_time")
+    private String dateTime;
+
     private Payload payload;
 }

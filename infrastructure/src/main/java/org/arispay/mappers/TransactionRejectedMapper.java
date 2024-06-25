@@ -4,44 +4,66 @@ import java.util.List;
 
 import org.arispay.data.TransactionDto;
 import org.arispay.entity.Client;
+import org.arispay.entity.Company;
 import org.arispay.entity.TransactionRejected;
 import org.arispay.repository.ClientRepository;
+import org.arispay.repository.CompanyRepository;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
-public interface TransactionRejectedMapper {
-    static ClientRepository getClientRepository() {
-        return null;
-    }
+@Mapper(componentModel = "spring", uses = ClientRepository.class)
+public abstract class TransactionRejectedMapper {
 
+    @Autowired
+    private ClientRepository clientRepository;
+    @Autowired
+    private CompanyRepository companyRepository;
+    //mock comment
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
+    @Mapping(source = "company", target = "companyId", qualifiedByName = "companyToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
-    TransactionDto transactionRejectedToTransactionDto(TransactionRejected transaction);
+    public abstract TransactionDto transactionRejectedToTransactionDto(TransactionRejected transaction);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
-    TransactionRejected transactionDtoToTransactionRejected(TransactionDto transactionDto);
+    @Mapping(source = "companyId", target = "company", qualifiedByName = "idToCompany")
+    public abstract TransactionRejected transactionDtoToTransactionRejected(TransactionDto transactionDto);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "clientToId")
+    @Mapping(source = "company", target = "companyId", qualifiedByName = "companyToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
-    List<TransactionDto> transactionRejectedListToTransactionDtoList(List<TransactionRejected> transactionRejecteds);
+    public abstract List<TransactionDto> transactionRejectedListToTransactionDtoList(
+            List<TransactionRejected> transactionRejecteds);
 
     @Mapping(source = "client", target = "client", qualifiedByName = "idToClient")
-    List<TransactionRejected> transactionDtoListToTransactionRejectedList(List<TransactionDto> transactionDtos);
+    @Mapping(source = "companyId", target = "company", qualifiedByName = "idToCompany")
+    public abstract List<TransactionRejected> transactionDtoListToTransactionRejectedList(
+            List<TransactionDto> transactionDtos);
 
     @Named("idToClient")
-    public static Client idToClient(long id) {
-        return getClientRepository().getReferenceById(id);
+    public Client idToClient(String id) {
+        return clientRepository.findByClientId(id).orElse(null);
     }
 
     @Named("clientToId")
-    public static Long clientToId(Client client) {
-        return client.getId();
+    public static String clientToId(Client client) {
+        return client != null ? client.getClientId() : null;
     }
 
     @Named("tranIdToArisTranRef")
     public static String tranIdToArisTranRef(long id) {
-        return "ARIS" + String.format("%0" + 9 + "d", id);
+        return "ARISF" + String.format("%0" + 9 + "d", id);
     }
+
+    @Named("idToCompany")
+    public Company idToCompany(Long id) {
+        return companyRepository.findById(id).orElse(null);
+    }
+
+    @Named("companyToId")
+    public static Long companyToId(Company company) {
+        return company !=null ? company.getId() : null;
+    }
+
 }

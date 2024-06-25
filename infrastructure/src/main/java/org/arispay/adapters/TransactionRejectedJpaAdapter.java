@@ -4,6 +4,7 @@ import org.arispay.data.TransactionDto;
 import org.arispay.entity.TransactionRejected;
 import org.arispay.mappers.TransactionRejectedMapper;
 import org.arispay.ports.spi.TransactionPersistencePort;
+import org.arispay.ports.spi.TransactionRejectedPersistencePort;
 import org.arispay.repository.TransactionRejectedRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TransactionRejectedJpaAdapter implements TransactionPersistencePort {
+public class TransactionRejectedJpaAdapter implements TransactionRejectedPersistencePort {
 	@Autowired
 	private TransactionRejectedRepository transactionRejectedRepository;
 
