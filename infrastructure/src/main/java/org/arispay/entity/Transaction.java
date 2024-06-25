@@ -19,7 +19,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "transactions")
 public class Transaction extends AuditableEntity{
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 
 	@Column(nullable = false, unique = true)

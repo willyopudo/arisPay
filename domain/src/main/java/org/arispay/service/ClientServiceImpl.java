@@ -1,6 +1,7 @@
 package org.arispay.service;
 
 import org.arispay.data.ClientDto;
+import org.arispay.data.CompanyDto;
 import org.arispay.ports.api.ClientServicePort;
 import org.arispay.ports.spi.ClientPersistencePort;
 
@@ -37,5 +38,10 @@ public class ClientServiceImpl implements ClientServicePort {
 	@Override
 	public ClientDto getClientById(String id) {
 		return clientPersistencePort.getClientById(id);
+	}
+
+	@Override
+	public ClientDto getClientByIdAndCompany(Long companyId, String clientId) {
+		return clientPersistencePort.getClientByIdAndCompany(companyId, clientId);
 	}
 }

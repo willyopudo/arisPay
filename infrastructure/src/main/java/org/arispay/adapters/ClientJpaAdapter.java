@@ -5,7 +5,9 @@ import org.arispay.entity.Client;
 import org.arispay.mappers.ClientMapper;
 import org.arispay.ports.spi.ClientPersistencePort;
 import org.arispay.repository.ClientRepository;
+import org.arispay.specifications.ClientSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,7 +50,14 @@ public class ClientJpaAdapter implements ClientPersistencePort {
     public ClientDto getClientById(String clientId) {
         Optional<Client> client = clientRepository.findByClientId(clientId);
 
+        return client.map(clientMapper::clientToClientDto).orElse(null);
+    }
 
+    @Override
+    public ClientDto getClientByIdAndCompany(Long companyId, String clientId) {
+        Specification<Client> clientSpecification = ClientSpecification.hasClientId(clientId)
+                .and(ClientSpecification.hasCompanyWithId(companyId));
+        Optional<Client> client = clientRepository.findOne(clientSpecification);
         return client.map(clientMapper::clientToClientDto).orElse(null);
     }
 }
