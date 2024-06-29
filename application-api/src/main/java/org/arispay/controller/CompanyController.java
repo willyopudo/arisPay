@@ -21,13 +21,13 @@ public class CompanyController {
 	@Autowired
 	private final CompanyServicePort companyServicePort;
 
-	@PostMapping("")
+	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public CompanyDto addCompany(@RequestBody CompanyDto companyDto) {
 		return companyServicePort.addCompany(companyDto);
 	}
 
-	@PutMapping("")
+	@PutMapping
 	public CompanyDto updateCompany(@RequestBody CompanyDto companyDto) {
 		return companyServicePort.updateCompany(companyDto);
 	}

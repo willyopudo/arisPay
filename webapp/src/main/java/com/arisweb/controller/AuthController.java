@@ -117,9 +117,7 @@ public class AuthController {
 		if (userDto.getAddedOrEditedFrom() == 34916) {
 			redirectUrl = "users";
 		}
-		userDto.setCompany(companyServicePort.getCompanyById(userDto.getCompanyId()));
-		userDto.setCreatedBy(principal == null ? "system" : principal.getName());
-		userDto.setCreatedDate(new java.util.Date());
+
 		userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
 		if (userDto.getRole() == null)
 			userDto.setRole("ROLE_USER");
@@ -152,12 +150,8 @@ public class AuthController {
 
 			return "userform";
 		}
-		userDto.setModifiedBy(principal.getName());
-		userDto.setModifiedDate(new java.util.Date());
+
 		userDto.setId(existingUser.getId());
-		userDto.setCreatedBy(existingUser.getCreatedBy());
-		userDto.setCreatedDate(existingUser.getCreatedDate());
-		userDto.setCompany(companyServicePort.getCompanyById(userDto.getCompanyId()));
 		userDto.setPassword(existingUser.getPassword());
 		if (userDto.getRole() == null)
 			userDto.setRole("ROLE_USER");
@@ -167,7 +161,7 @@ public class AuthController {
 			userDto.setStatus(existingUser.getStatus());
 			userDto.setIdNumber(existingUser.getIdNumber());
 			userDto.setPhoneNumber(existingUser.getPhoneNumber());
-			userDto.setRole(existingUser.getRoles().get(0).getName().isEmpty() ? "ROLE_USER" : existingUser.getRoles().get(0).getName());
+			//userDto.setRole(existingUser.getRoles().get(0).getName().isEmpty() ? "ROLE_USER" : existingUser.getRoles().get(0).getName());
 		}
 		try {
 			userServicePort.saveUser(userDto);
@@ -204,10 +198,10 @@ public class AuthController {
 		ModelAndView model = new ModelAndView();
 
 		UserDto user = userServicePort.findUserById(id);
-		user.setCompanyId(user.getCompany().getId());
+		//user.setCompanyId(user.getCompany().getId());
 
 		List<CompanyDto> companies = companyServicePort.getCompanies();
-		logger.debug(user.getRoles().toString());
+		//logger.debug(user.getRoles().toString());
 		//System.out.println(Arrays.toString(roles));
 		model.addObject("user", user);
 		model.addObject("title", "Edit User");
@@ -223,7 +217,7 @@ public class AuthController {
 		ModelAndView model = new ModelAndView();
 
 		UserDto user = userServicePort.findUserByUsername(username);
-		user.setCompanyId(user.getCompany().getId());
+		//user.setCompanyId(user.getCompany().getId());
 
 		model.addObject("user", user);
 		model.addObject("title", "User Profile");

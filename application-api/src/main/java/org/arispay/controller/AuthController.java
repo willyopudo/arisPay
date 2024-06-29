@@ -36,7 +36,7 @@ public class AuthController {
 
 	@ResponseBody
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public ResponseEntity login(@RequestBody JwtLoginReq loginReq) {
+	public ResponseEntity<?> login(@RequestBody JwtLoginReq loginReq) {
 
 		try {
 			Authentication authentication =
@@ -51,10 +51,10 @@ public class AuthController {
 			return ResponseEntity.ok(loginRes);
 
 		} catch (BadCredentialsException e) {
-			GenericHttpResponse genericHttpResponse = new GenericHttpResponse(HttpStatus.BAD_REQUEST, "Invalid credentials");
+			GenericHttpResponse<?> genericHttpResponse = new GenericHttpResponse<String>(HttpStatus.BAD_REQUEST, "Invalid credentials",null);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericHttpResponse);
 		} catch (Exception e) {
-			GenericHttpResponse genericHttpResponse = new GenericHttpResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+			GenericHttpResponse<?> genericHttpResponse = new GenericHttpResponse<String>(HttpStatus.BAD_REQUEST, e.getMessage(), null);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericHttpResponse);
 		}
 	}

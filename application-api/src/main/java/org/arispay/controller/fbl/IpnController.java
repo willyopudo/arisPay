@@ -42,8 +42,9 @@ public class IpnController {
     GlobalHelpers globalHelpers;
 
     @PostMapping("/ipn")
-    public ResponseEntity<GenericHttpResponse> processIpnRequest(
+    public ResponseEntity<GenericHttpResponse<?>> processIpnRequest(
             @Valid @RequestBody FblIpnDto ipnRequest) throws ParseException {
+        GenericHttpResponse<?> httpResponse = new GenericHttpResponse<String>();
         // Request logging is handled by logging configuration bean
         if (globalHelpers.isNotBlank(ipnRequest)) {
             try {
@@ -88,7 +89,7 @@ public class IpnController {
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                GenericHttpResponse httpResponse = new GenericHttpResponse();
+
                 httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
                 httpResponse.setMessage("An error occurred while processing IPN request");
                 if(e.getMessage().contains("Duplicate")){
@@ -102,8 +103,6 @@ public class IpnController {
             }
 
         }
-
-        GenericHttpResponse httpResponse = new GenericHttpResponse();
         httpResponse.setHttpStatus(HttpStatus.OK);
         httpResponse.setMessage("Transaction received successfully");
 

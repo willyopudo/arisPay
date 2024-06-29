@@ -47,7 +47,7 @@ public class CollectionsController {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @PostMapping("/validation")
-    public ResponseEntity validateClient(@RequestBody ValidationRequest validationRequest) {
+    public ResponseEntity<?> validateClient(@RequestBody ValidationRequest validationRequest) {
 
         ValidationResponse validationResponse = new ValidationResponse();
         String collectionAccount = validationRequest.getPayload().getCollectionAccount();
@@ -73,7 +73,7 @@ public class CollectionsController {
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            GenericHttpResponse httpResponse = new GenericHttpResponse();
+            GenericHttpResponse<?> httpResponse = new GenericHttpResponse<String>();
             httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             httpResponse.setMessage("An error occurred while processing Collections Validation request");
             return ResponseEntity.internalServerError().body(httpResponse);
@@ -102,7 +102,7 @@ public class CollectionsController {
     }
 
     @PostMapping("/confirmation")
-    public ResponseEntity validateClient(@RequestBody ConfirmationRequest confirmationRequest) {
+    public ResponseEntity<?> validateClient(@RequestBody ConfirmationRequest confirmationRequest) {
         ConfirmationResponse confirmationResponse = new ConfirmationResponse();
         try {
             LocalDateTime dateTime = LocalDateTime.parse(confirmationRequest.getPayload().getDateTime(), formatter);
@@ -148,7 +148,7 @@ public class CollectionsController {
             confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
         } catch (DataIntegrityViolationException ex) {
             logger.error(ex.getMessage(), "Error Message: " + ex);
-            GenericHttpResponse httpResponse = new GenericHttpResponse();
+            GenericHttpResponse<?> httpResponse = new GenericHttpResponse<>();
             httpResponse.setHttpStatus(HttpStatus.CONFLICT);
             if (ex.getMessage().contains("duplicate")) {
                 httpResponse.setMessage("Duplicate request for transaction reference: "
@@ -158,7 +158,7 @@ public class CollectionsController {
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            GenericHttpResponse httpResponse = new GenericHttpResponse();
+            GenericHttpResponse<?> httpResponse = new GenericHttpResponse<>();
             httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             httpResponse.setMessage("An error occurred while processing Collections Confirmation request");
             return ResponseEntity.internalServerError().body(httpResponse);

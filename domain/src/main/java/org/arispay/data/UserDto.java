@@ -32,8 +32,6 @@ public class UserDto {
 
 	@NotNull(message = "Company can not be empty")
 	private Long companyId;
-
-	private CompanyDto company;
 	//@NotEmpty(message = "Password should not be empty")
 	private String password;
 
@@ -47,12 +45,6 @@ public class UserDto {
 	@NotEmpty
 	private String town;
 	private byte status;
-	private int addedOrEditedFrom;
-	private String createdBy;
-	private Date createdDate;
-	private String modifiedBy;
-	private Date modifiedDate;
+	@NotEmpty
 	private String role;
-	private List<RoleDto> roles = new ArrayList<>();
-
 }
