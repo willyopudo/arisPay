@@ -25,7 +25,6 @@ public class UserDto {
 	@NotEmpty
 	private String lastName;
 
-	private String name;
 	@NotEmpty(message = "Email should not be empty")
 	@Email
 	private String email;
@@ -37,14 +36,15 @@ public class UserDto {
 
 	@NotEmpty
 	private String phoneNumber;
-	@NotEmpty
-	private String idNumber;
+
 	@NotEmpty
 	private String address;
+
 	private String zipCode;
+
 	@NotEmpty
 	private String town;
-	private byte status;
+
 	@NotEmpty
 	private String role;
 }

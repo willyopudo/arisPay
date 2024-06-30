@@ -109,14 +109,11 @@ public class AuthController {
 			model.addAttribute("user", userDto);
 			model.addAttribute("userRoles", roles);
 			model.addAttribute("companies", companies);
-			if (userDto.getAddedOrEditedFrom() == 34916)
-				return "userform";
+
 
 			return "register";
 		}
-		if (userDto.getAddedOrEditedFrom() == 34916) {
-			redirectUrl = "users";
-		}
+
 
 		userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
 		if (userDto.getRole() == null)
@@ -134,9 +131,7 @@ public class AuthController {
 		model.addAttribute("userRoles", roles);
 
 		String redirectUrl = "users";
-		if (userDto.getAddedOrEditedFrom() == 83659) {
-			redirectUrl = "user/profile/" + userDto.getUsername();
-		}
+
 		UserDto existingUser = userServicePort.findUserByUsername(userDto.getUsername());
 
 		if (result.hasErrors()) {
@@ -145,8 +140,7 @@ public class AuthController {
 				logger.debug(element.toString() + "\n");
 			}
 
-			if (userDto.getAddedOrEditedFrom() == 83659)
-				return "profile";
+
 
 			return "userform";
 		}
@@ -156,20 +150,13 @@ public class AuthController {
 		if (userDto.getRole() == null)
 			userDto.setRole("ROLE_USER");
 
-		if (userDto.getAddedOrEditedFrom() == 83659) {
-			userDto.setUsername(existingUser.getUsername());
-			userDto.setStatus(existingUser.getStatus());
-			userDto.setIdNumber(existingUser.getIdNumber());
-			userDto.setPhoneNumber(existingUser.getPhoneNumber());
-			//userDto.setRole(existingUser.getRoles().get(0).getName().isEmpty() ? "ROLE_USER" : existingUser.getRoles().get(0).getName());
-		}
+
 		try {
 			userServicePort.saveUser(userDto);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 			model.addAttribute("exception", ex.getMessage());
-			if (userDto.getAddedOrEditedFrom() == 83659)
-				return "profile";
+
 
 			return "userform";
 		}
@@ -226,7 +213,7 @@ public class AuthController {
 		return model;
 	}
 
-	// handler method to handle list of users
+	// Fetch list of users
 	@GetMapping("/users")
 	public String users(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 		String userName = userDetails.getUsername();

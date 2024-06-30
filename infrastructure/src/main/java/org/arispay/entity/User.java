@@ -30,9 +30,6 @@ public class User extends AuditableEntity implements Serializable {
 	private String username;
 
 	@Column(nullable = false)
-	private String name;
-
-	@Column(nullable = false)
 	private String firstName;
 
 	@Column(nullable = false)
@@ -46,12 +43,6 @@ public class User extends AuditableEntity implements Serializable {
 
 	@Column(nullable = false, unique = true)
 	private String phoneNumber;
-
-	@Column(nullable = false)
-	private byte status = 1;
-
-	@Column(nullable = false, unique = true)
-	private String idNumber;
 
 	@Column(nullable = false)
 	private String address;

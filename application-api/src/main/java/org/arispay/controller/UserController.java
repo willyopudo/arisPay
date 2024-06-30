@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,9 +41,9 @@ public class UserController {
     private String appName;
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
-    // handler method to handle user registration form submit request
+    // Register new user
     @PostMapping
-    public ResponseEntity<GenericHttpResponse<?>> register(@Valid @ModelAttribute("user") UserDto userDto,
+    public ResponseEntity<GenericHttpResponse<?>> register(@Valid @RequestBody UserDto userDto,
                                                             BindingResult result,
                                                             Model model, Principal principal) {
         GenericHttpResponse<UserDto> response = new GenericHttpResponse<>();
@@ -96,7 +95,7 @@ public class UserController {
         UserDto user = userServicePort.findUserById(Math.toIntExact(id));
         if (user != null)
             return ResponseEntity.ok(user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
 
     //Modify User

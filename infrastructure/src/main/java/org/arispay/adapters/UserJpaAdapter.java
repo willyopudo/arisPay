@@ -24,13 +24,6 @@ public class UserJpaAdapter implements UserPersistencePort {
 	@Override
 	public UserDto saveUser(UserDto userDto) {
 		User user = userMapper.convert(userDto);
-		user.setName(userDto.getFirstName() + " " + userDto.getLastName());
-
-		Role role = roleRepository.findByName(userDto.getRole());
-		if (role == null) {
-			role = checkRoleExist(userDto.getRole());
-		}
-		user.setRoles(List.of(role));
 		User userSaved = userRepository.save(user);
 
 		return userMapper.convert(userSaved);

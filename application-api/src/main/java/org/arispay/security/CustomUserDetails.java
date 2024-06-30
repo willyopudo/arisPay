@@ -38,10 +38,6 @@ public class CustomUserDetails implements UserDetails {
 		return user.getUsername();
 	}
 
-	public String getFullName() {
-		return this.user.getName();
-	}
-
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
@@ -59,6 +55,6 @@ public class CustomUserDetails implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return user.getStatus() == 1;
+		return user.getIsEnabled() == 1;
 	}
 }
