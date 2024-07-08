@@ -42,7 +42,9 @@ public class UserJpaAdapter implements UserPersistencePort {
 
 	@Override
 	public UserDto findUserById(int id) {
-		return userMapper.convert(userRepository.findById(id));
+		User user = userRepository.findById(id);
+		user.setPassword(null);
+		return userMapper.convert(user);
 	}
 
 	@Override
