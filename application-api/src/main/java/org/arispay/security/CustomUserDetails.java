@@ -27,6 +27,15 @@ public class CustomUserDetails implements UserDetails {
 		}
 		return authorities;
 	}
+	public List<String> getAuthoritiesList() {
+		List<Role> roles = user.getRoles();
+		List<String> authorities = new ArrayList<>();
+
+		for (Role role : roles) {
+			authorities.add(role.getName());
+		}
+		return authorities;
+	}
 
 	@Override
 	public String getPassword() {
@@ -38,6 +47,12 @@ public class CustomUserDetails implements UserDetails {
 		return user.getUsername();
 	}
 
+	public String getEmail() {
+		return user.getEmail();
+	}
+	public Long getId() {
+		return user.getId();
+	}
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;

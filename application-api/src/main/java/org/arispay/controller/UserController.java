@@ -28,6 +28,7 @@ import java.util.List;
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
+@CrossOrigin(origins = "http://localhost:8081")
 public class UserController {
     @Autowired
     private final UserServicePort userServicePort;
@@ -87,6 +88,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDto>> users() {
         List<UserDto> users = userServicePort.findAllUsers();
+        users.forEach(e -> e.setPassword(null));
         return ResponseEntity.ok(users);
     }
     //Fetch single user

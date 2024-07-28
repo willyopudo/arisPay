@@ -4,9 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
 import org.arispay.data.GenericHttpResponse;
+import org.arispay.data.dtoauth.WebLoginResponse;
 import org.arispay.entity.User;
 import org.arispay.data.dtoauth.JwtLoginReq;
 import org.arispay.data.dtoauth.JwtLoginResp;
+import org.arispay.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +16,17 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/auth")
+@CrossOrigin(origins = "http://localhost:8081")
 public class AuthController {
 
 	@Autowired
@@ -42,12 +50,18 @@ public class AuthController {
 			Authentication authentication =
 					authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReq.getUsername(), loginReq.getPassword()));
 			String username = authentication.getName();
+			CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
 			User user = new User();
 			user.setUsername(username);
 			String token = jwtUtil.createToken(user);
+			WebLoginResponse webLoginResp = new WebLoginResponse(token, 3600, "Bearer", userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), userDetails.getAuthoritiesList());
 			JwtLoginResp loginRes = new JwtLoginResp(token,3600, "Bearer");
 
             logger.info("Token issued success for user: {} , Token : {}", username, token);
+			if(loginReq.getScope() != null && loginReq.getScope().equals("web")) {
+				return ResponseEntity.ok(webLoginResp);
+			}
 			return ResponseEntity.ok(loginRes);
 
 		} catch (BadCredentialsException e) {
