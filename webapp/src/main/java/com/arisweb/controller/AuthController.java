@@ -109,17 +109,12 @@ public class AuthController {
 			model.addAttribute("user", userDto);
 			model.addAttribute("userRoles", roles);
 			model.addAttribute("companies", companies);
-			if (userDto.getAddedOrEditedFrom() == 34916)
-				return "userform";
+
 
 			return "register";
 		}
-		if (userDto.getAddedOrEditedFrom() == 34916) {
-			redirectUrl = "users";
-		}
-		userDto.setCompany(companyServicePort.getCompanyById(userDto.getCompanyId()));
-		userDto.setCreatedBy(principal == null ? "system" : principal.getName());
-		userDto.setCreatedDate(new java.util.Date());
+
+
 		userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
 		if (userDto.getRole() == null)
 			userDto.setRole("ROLE_USER");
@@ -136,9 +131,7 @@ public class AuthController {
 		model.addAttribute("userRoles", roles);
 
 		String redirectUrl = "users";
-		if (userDto.getAddedOrEditedFrom() == 83659) {
-			redirectUrl = "user/profile/" + userDto.getUsername();
-		}
+
 		UserDto existingUser = userServicePort.findUserByUsername(userDto.getUsername());
 
 		if (result.hasErrors()) {
@@ -147,35 +140,23 @@ public class AuthController {
 				logger.debug(element.toString() + "\n");
 			}
 
-			if (userDto.getAddedOrEditedFrom() == 83659)
-				return "profile";
+
 
 			return "userform";
 		}
-		userDto.setModifiedBy(principal.getName());
-		userDto.setModifiedDate(new java.util.Date());
+
 		userDto.setId(existingUser.getId());
-		userDto.setCreatedBy(existingUser.getCreatedBy());
-		userDto.setCreatedDate(existingUser.getCreatedDate());
-		userDto.setCompany(companyServicePort.getCompanyById(userDto.getCompanyId()));
 		userDto.setPassword(existingUser.getPassword());
 		if (userDto.getRole() == null)
 			userDto.setRole("ROLE_USER");
 
-		if (userDto.getAddedOrEditedFrom() == 83659) {
-			userDto.setUsername(existingUser.getUsername());
-			userDto.setStatus(existingUser.getStatus());
-			userDto.setIdNumber(existingUser.getIdNumber());
-			userDto.setPhoneNumber(existingUser.getPhoneNumber());
-			userDto.setRole(existingUser.getRoles().get(0).getName().isEmpty() ? "ROLE_USER" : existingUser.getRoles().get(0).getName());
-		}
+
 		try {
 			userServicePort.saveUser(userDto);
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 			model.addAttribute("exception", ex.getMessage());
-			if (userDto.getAddedOrEditedFrom() == 83659)
-				return "profile";
+
 
 			return "userform";
 		}
@@ -204,10 +185,10 @@ public class AuthController {
 		ModelAndView model = new ModelAndView();
 
 		UserDto user = userServicePort.findUserById(id);
-		user.setCompanyId(user.getCompany().getId());
+		//user.setCompanyId(user.getCompany().getId());
 
 		List<CompanyDto> companies = companyServicePort.getCompanies();
-		logger.debug(user.getRoles().toString());
+		//logger.debug(user.getRoles().toString());
 		//System.out.println(Arrays.toString(roles));
 		model.addObject("user", user);
 		model.addObject("title", "Edit User");
@@ -223,7 +204,7 @@ public class AuthController {
 		ModelAndView model = new ModelAndView();
 
 		UserDto user = userServicePort.findUserByUsername(username);
-		user.setCompanyId(user.getCompany().getId());
+		//user.setCompanyId(user.getCompany().getId());
 
 		model.addObject("user", user);
 		model.addObject("title", "User Profile");
@@ -232,7 +213,7 @@ public class AuthController {
 		return model;
 	}
 
-	// handler method to handle list of users
+	// Fetch list of users
 	@GetMapping("/users")
 	public String users(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 		String userName = userDetails.getUsername();

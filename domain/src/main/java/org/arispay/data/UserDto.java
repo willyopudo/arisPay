@@ -1,5 +1,6 @@
 package org.arispay.data;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 	private Long id;
 	@NotEmpty
@@ -25,34 +27,26 @@ public class UserDto {
 	@NotEmpty
 	private String lastName;
 
-	private String name;
 	@NotEmpty(message = "Email should not be empty")
 	@Email
 	private String email;
 
 	@NotNull(message = "Company can not be empty")
 	private Long companyId;
-
-	private CompanyDto company;
 	//@NotEmpty(message = "Password should not be empty")
 	private String password;
 
 	@NotEmpty
 	private String phoneNumber;
-	@NotEmpty
-	private String idNumber;
+
 	@NotEmpty
 	private String address;
+
 	private String zipCode;
+
 	@NotEmpty
 	private String town;
-	private byte status;
-	private int addedOrEditedFrom;
-	private String createdBy;
-	private Date createdDate;
-	private String modifiedBy;
-	private Date modifiedDate;
-	private String role;
-	private List<RoleDto> roles = new ArrayList<>();
 
+	@NotEmpty
+	private String role;
 }
