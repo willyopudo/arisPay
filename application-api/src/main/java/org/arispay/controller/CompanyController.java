@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.arispay.data.CompanyDto;
 import org.arispay.ports.api.CompanyServicePort;
-import org.arispay.ports.spi.CompanyPersistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +20,13 @@ public class CompanyController {
 	@Autowired
 	private final CompanyServicePort companyServicePort;
 
-	@PostMapping("")
+	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public CompanyDto addCompany(@RequestBody CompanyDto companyDto) {
 		return companyServicePort.addCompany(companyDto);
 	}
 
-	@PutMapping("")
+	@PutMapping
 	public CompanyDto updateCompany(@RequestBody CompanyDto companyDto) {
 		return companyServicePort.updateCompany(companyDto);
 	}
@@ -37,7 +36,7 @@ public class CompanyController {
 		return ResponseEntity.ok(companyServicePort.getCompanyById(id));
 	}
 
-	@GetMapping("")
+	@GetMapping
 	public ResponseEntity<List<CompanyDto>> getAllCompanies() {
 		return ResponseEntity.ok(companyServicePort.getCompanies());
 	}
