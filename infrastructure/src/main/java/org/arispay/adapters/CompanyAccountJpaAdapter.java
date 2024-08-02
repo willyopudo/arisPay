@@ -60,11 +60,7 @@ public class CompanyAccountJpaAdapter implements CompanyAccountPersistencePort<C
 	@Override
 	public CompanyAccountDto getByAccountNumber(String accountNumber) {
 		Optional<CompanyAccount> companyAccount = companyAccountRepository.findByAccountNumber(accountNumber);
-		if (companyAccount.isPresent()) {
-			return companyAccountMapper.companyAccountToCompanyAccountDto(companyAccount.orElse(null));
-		} else
-			return null;
-
+		return companyAccountMapper.companyAccountToCompanyAccountDto(companyAccount.orElse(null));
 	}
 
 	@Override
