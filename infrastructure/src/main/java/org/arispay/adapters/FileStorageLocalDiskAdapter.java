@@ -14,20 +14,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
-import java.util.logging.Logger;
 
 @Service
 public class FileStorageLocalDiskAdapter implements FileStorageIOPort {
 	public static String MEDIA_UPLOAD_PATH = System.getProperty("user.dir") + "/src/main/resources/static/uploads";
 
-	// Save file in disk (in project context root) and return file information in media object
+	// Save file in disk (in project context root) and return file information in
+	// media object
 	@Override
 	public MediaDto saveMedia(MultipartFile file, String fileName) throws IOException {
 
 		final MediaDto media = new MediaDto();
-		//final String fileName = fileName;//file.getOriginalFilename();
+		// final String fileName = fileName;//file.getOriginalFilename();
 		media.setName(fileName);
-		media.setMediaType(file.getContentType() == null ? fileName.substring(fileName.lastIndexOf(".") + 1) : file.getContentType());
+		media.setMediaType(file.getContentType() == null ? fileName.substring(fileName.lastIndexOf(".") + 1)
+				: file.getContentType());
 		Path fileNameAndPath = Paths.get(MEDIA_UPLOAD_PATH);
 		media.setMediaLocation(fileNameAndPath.resolve(fileName).toString());
 		this.deleteMedia(fileNameAndPath.resolve(fileName).toString());

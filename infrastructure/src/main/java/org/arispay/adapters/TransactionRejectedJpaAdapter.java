@@ -3,7 +3,6 @@ package org.arispay.adapters;
 import org.arispay.data.TransactionDto;
 import org.arispay.entity.TransactionRejected;
 import org.arispay.mappers.TransactionRejectedMapper;
-import org.arispay.ports.spi.TransactionPersistencePort;
 import org.arispay.ports.spi.TransactionRejectedPersistencePort;
 import org.arispay.repository.TransactionRejectedRepository;
 import org.springframework.beans.factory.annotation.Autowired;
