@@ -14,7 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @Entity
 @Table(name = "client")
-public class Client {
+public class Client extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class Client {
     private String clientId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="identifier_type")
+    @Column(name = "identifier_type")
     private IdentifierType identifierType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

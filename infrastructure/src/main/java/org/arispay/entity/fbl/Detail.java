@@ -1,67 +1,77 @@
 package org.arispay.entity.fbl;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.sql.Date;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "fbl_bulk_detail")
 public class Detail {
-    @JsonProperty("batchref")
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
+    private Date tranDate;
+
     private String batchRef;
 
-    @JsonProperty("paymentref")
     private String paymentRef;
 
-    @JsonProperty("externalref")
     private String externalRef;
 
-    @JsonProperty("cbsref")
     private String cbsRef;
 
-    @JsonProperty("paymenttype")
     private String paymentType;
 
-    @JsonProperty("senderaccount")
     private String senderAccount;
 
-    @JsonProperty("senderbank")
     private String senderBank;
 
-    @JsonProperty("senderbankbranch")
     private String senderBankBranch;
 
-    @JsonProperty("senderdetails")
     private String senderDetails;
 
-    @JsonProperty("beneficiaryaccount")
     private String beneficiaryAccount;
 
-    @JsonProperty("beneficiarybank")
     private String beneficiaryBank;
 
-    @JsonProperty("beneficiarybankbranch")
     private String beneficiaryBankBranch;
 
-    @JsonProperty("beneficiarydetails")
     private String beneficiaryDetails;
 
-    @JsonProperty("remarks")
     private String remarks;
 
-    @JsonProperty("purpose")
     private String purpose;
 
-    @JsonProperty("currency")
     private String currency;
 
-    @JsonProperty("paymentamount")
     private double paymentAmount;
 
-    @JsonProperty("xrate")
     private String xRate;
 
-    @JsonProperty("status")
     private String status;
 
-    @JsonProperty("statusdescription")
     private double statusDescription;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bulk_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private BulkTransaction transaction;
 }

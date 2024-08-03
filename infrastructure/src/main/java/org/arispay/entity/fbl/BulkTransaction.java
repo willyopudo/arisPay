@@ -1,39 +1,54 @@
 package org.arispay.entity.fbl;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "fbl_bulk_transaction")
 public class BulkTransaction {
-    @JsonProperty("batchref")
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
     private String batchRef;
 
-    @JsonProperty("cbsref")
     private String cbsRef;
 
-    @JsonProperty("accountdr")
     private String accountDr;
 
-    @JsonProperty("narration")
     private String narration;
 
-    @JsonProperty("valuedate")
-    private String valueDate;
+    private Date valueDate;
 
-    @JsonProperty("currency")
     private String currency;
 
-    @JsonProperty("totalamount")
     private double totalAmount;
 
-    @JsonProperty("status")
     private String status;
 
-    @JsonProperty("statusdescription")
     private double statusDescription;
 
-    @JsonProperty("dtl")
+    @OneToMany(mappedBy = "transaction")
     private List<Detail> dtl;
+
+    private Timestamp processTime;
+
+    private String processFlg;
+
+    private int noOfTries;
 }
