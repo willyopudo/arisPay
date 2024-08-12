@@ -31,8 +31,6 @@ public class BulkPaymentService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String FBL_ACCESS_TOKEN = "FBL_ACCESS_TOKEN";
-
     public BulkTransactionResponse initiateBulkTransactionRequest(BulkTransactionRequest bulkTransactionRequest) {
         try {
             URI uri = new URI("https://sandbox.familybank.co.ke:1044/api/v1/Transaction");
@@ -59,6 +57,7 @@ public class BulkPaymentService {
     }
 
     public String getAccessToken() {
+        String FBL_ACCESS_TOKEN = "FBL_ACCESS_TOKEN";
         JwtLoginResp tokenBody = (JwtLoginResp) redisTemplate.opsForValue().get(FBL_ACCESS_TOKEN);
         String token = tokenBody == null ? null : tokenBody.getAccessToken();
         if (token == null || isTokenExpired(token)) {
