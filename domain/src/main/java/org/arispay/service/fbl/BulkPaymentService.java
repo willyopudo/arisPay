@@ -8,6 +8,7 @@ import org.arispay.data.dtoauth.JwtLoginReq;
 import org.arispay.data.dtoauth.JwtLoginResp;
 import org.arispay.data.fbl.dtorequest.masspayments.BulkTransactionRequest;
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
+import org.arispay.ports.spi.fbl.BulkTransactionPersistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -31,13 +32,20 @@ public class BulkPaymentService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private BulkTransactionPersistencePort bulkTransactionPersistencePort;
+
     public BulkTransactionResponse initiateBulkTransactionRequest(BulkTransactionRequest bulkTransactionRequest) {
         try {
+            bulkTransactionRequest = bulkTransactionPersistencePort.addBulkTransaction(bulkTransactionRequest);
+
             URI uri = new URI("https://sandbox.familybank.co.ke:1044/api/v1/Transaction");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Accept", "*/*");
             headers.add("Authorization", "Bearer " + getAccessToken());
             headers.setContentType(MediaType.APPLICATION_JSON);
+
+
 
             HttpEntity<BulkTransactionRequest> httpEntity = new HttpEntity<>(bulkTransactionRequest, headers);
             ResponseEntity<BulkTransactionResponse> responseEntity = restTemplate.exchange(uri, HttpMethod.POST,
@@ -45,7 +53,7 @@ public class BulkPaymentService {
                     BulkTransactionResponse.class);
 
             BulkTransactionResponse response = responseEntity.getBody();
-
+            bulkTransactionPersistencePort.updateBulkTransaction(response);
             return response;
 
         } catch (URISyntaxException e) {

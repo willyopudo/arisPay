@@ -8,6 +8,7 @@ import org.arispay.ports.spi.fbl.BulkTransactionPersistencePort;
 import org.arispay.repository.fbl.BulkTransactionRepository;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -32,16 +33,20 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
 
     @Override
     public void deleteBulkTransactionById(Long id) {
-
+        bulkTransactionRepository.deleteById(id);
     }
 
     @Override
     public BulkTransactionResponse updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse) {
-        return null;
+        BulkTransaction bulkTransaction = bulkTransactionMapper.bulkTransResponseToBulkTrans(bulkTransactionResponse);
+        bulkTransaction.setProcessTime(new Timestamp(System.currentTimeMillis()));
+        bulkTransaction.setNoOfTries(bulkTransaction.getNoOfTries() + 1);
+        bulkTransaction = bulkTransactionRepository.save(bulkTransaction);
+        return bulkTransactionMapper.bulkTransToBulkTransResponse(bulkTransaction);
     }
 
     @Override
     public List<BulkTransactionResponse> getBulkTransactions() {
-        return null;
+        return bulkTransactionMapper.bulkTransListToBulkTransResponseList(bulkTransactionRepository.findAll());
     }
 }
