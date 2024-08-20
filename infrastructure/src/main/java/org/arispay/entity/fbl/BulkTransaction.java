@@ -41,7 +41,7 @@ public class BulkTransaction {
 
     private String status;
 
-    private double statusDescription;
+    private String statusDescription;
 
     @OneToMany(mappedBy = "transaction")
     private List<Detail> dtl;
