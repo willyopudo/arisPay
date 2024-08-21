@@ -10,7 +10,7 @@ public interface BulkTransactionPersistencePort {
 
     void deleteBulkTransactionById(Long id);
 
-    BulkTransactionResponse updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse);
+    BulkTransactionResponse updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse, String processFlg);
 
     List<BulkTransactionResponse> getBulkTransactions();
 }

@@ -53,7 +53,7 @@ public class BulkPaymentService {
                     BulkTransactionResponse.class);
 
             BulkTransactionResponse response = responseEntity.getBody();
-            bulkTransactionPersistencePort.updateBulkTransaction(response);
+            bulkTransactionPersistencePort.updateBulkTransaction(response, "A");
             return response;
 
         } catch (URISyntaxException e) {

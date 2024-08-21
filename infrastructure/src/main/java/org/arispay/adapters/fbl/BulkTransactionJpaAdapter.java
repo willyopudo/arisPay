@@ -53,15 +53,17 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
     }
 
     @Override
-    public BulkTransactionResponse updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse) {
+    public BulkTransactionResponse updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse, String processFlg) {
         BulkTransaction bulkTransaction = bulkTransactionMapper.bulkTransResponseToBulkTrans(bulkTransactionResponse);
         bulkTransaction.setId(Long.parseLong(bulkTransaction.getBatchRef().replace("BULK70", "")));
+        bulkTransaction.setProcessFlg(processFlg);
+        bulkTransaction.setProcessTime( new Timestamp(System.currentTimeMillis()));
         bulkTransactionRepository.updateStatus(bulkTransaction.getId(),
                 bulkTransaction.getStatus(),
                 bulkTransaction.getStatusDescription(),
                 bulkTransaction.getCbsRef(),
-                "A",
-                new Timestamp(System.currentTimeMillis()));
+                bulkTransaction.getProcessFlg(),
+                bulkTransaction.getProcessTime());
         for (Detail detail: bulkTransaction.getDtl()) {
             detail.setId(Long.parseLong(detail.getPaymentRef().replace("DET70", "")));
             detailRepository.updateStatus(detail.getId(), detail.getStatus(), detail.getStatusDescription(), detail.getExternalRef(), detail.getCbsRef(), detail.getXRate());
