@@ -2,10 +2,6 @@ package org.arispay.service.fbl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
-
-import org.arispay.data.dtoauth.JwtLoginReq;
-import org.arispay.data.dtoauth.JwtLoginResp;
 import org.arispay.data.fbl.dtorequest.masspayments.BulkTransactionRequest;
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
 import org.arispay.ports.spi.fbl.BulkTransactionPersistencePort;
@@ -19,10 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-
 @Service
 public class BulkPaymentService {
 
@@ -34,6 +26,9 @@ public class BulkPaymentService {
 
     @Autowired
     private BulkTransactionPersistencePort bulkTransactionPersistencePort;
+    
+    @Autowired
+    private TokenService tokenService;
 
     public BulkTransactionResponse initiateBulkTransactionRequest(BulkTransactionRequest bulkTransactionRequest) {
         try {
@@ -42,7 +37,7 @@ public class BulkPaymentService {
             URI uri = new URI("https://sandbox.familybank.co.ke:1044/api/v1/Transaction");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Accept", "*/*");
-            headers.add("Authorization", "Bearer " + getAccessToken());
+            headers.add("Authorization", "Bearer " + tokenService.getAccessToken());
             headers.setContentType(MediaType.APPLICATION_JSON);
 
 
@@ -55,54 +50,6 @@ public class BulkPaymentService {
             BulkTransactionResponse response = responseEntity.getBody();
             bulkTransactionPersistencePort.updateBulkTransaction(response, "A");
             return response;
-
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public String getAccessToken() {
-        String FBL_ACCESS_TOKEN = "FBL_ACCESS_TOKEN";
-        JwtLoginResp tokenBody = (JwtLoginResp) redisTemplate.opsForValue().get(FBL_ACCESS_TOKEN);
-        String token = tokenBody == null ? null : tokenBody.getAccessToken();
-        if (token == null || isTokenExpired(token)) {
-            token = generateNewToken();
-            redisTemplate.opsForValue().set(FBL_ACCESS_TOKEN, token);
-        }
-        return token;
-    }
-
-    private boolean isTokenExpired(String token) {
-        DecodedJWT decodedJWT = null;
-        try {
-            decodedJWT = JWT.decode(token);
-            Date expiresAt = decodedJWT.getExpiresAt();
-            return expiresAt.before(new Date());
-        } catch (JWTDecodeException e) {
-            e.printStackTrace();
-            return true;
-        }
-    }
-
-    private String generateNewToken() {
-        try {
-            URI uri = new URI("https://sandbox.familybank.co.ke:1045/connect/token");
-            JwtLoginReq tokenRequest = new JwtLoginReq("client@sandbox.familybank.co.ke", "#secret123$",
-                    "client_credentials", "OB_BULK_PAY");
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Accept", "*/*");
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            HttpEntity<JwtLoginReq> httpEntity = new HttpEntity<>(tokenRequest, headers);
-            ResponseEntity<JwtLoginResp> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, httpEntity,
-                    JwtLoginResp.class);
-
-            JwtLoginResp response = responseEntity.getBody();
-
-            return response == null ? null : response.getAccessToken();
 
         } catch (URISyntaxException e) {
             e.printStackTrace();

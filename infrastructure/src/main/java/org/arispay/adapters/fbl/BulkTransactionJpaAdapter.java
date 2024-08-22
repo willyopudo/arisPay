@@ -66,8 +66,9 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
                 bulkTransaction.getProcessTime());
         for (Detail detail: bulkTransaction.getDtl()) {
             detail.setId(Long.parseLong(detail.getPaymentRef().replace("DET70", "")));
-            detailRepository.updateStatus(detail.getId(), detail.getStatus(), detail.getStatusDescription(), detail.getExternalRef(), detail.getCbsRef(), detail.getXRate());
         }
+
+        detailRepository.batchDetailUpdate(bulkTransaction.getDtl());
 
         return bulkTransactionMapper.bulkTransToBulkTransResponse(bulkTransaction);
     }
