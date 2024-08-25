@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public interface BulkTransactionRepository extends JpaRepository<BulkTransaction, Long> {
     @Modifying
@@ -16,5 +18,11 @@ public interface BulkTransactionRepository extends JpaRepository<BulkTransaction
                       @Param("statusDescription") String statusDescription,
                       @Param("cbsRef") String cbsRef,
                       @Param("processFlg") String processFlg,
-                      @Param("processTime") Timestamp processTime);
+                      @Param("processTime") LocalDateTime processTime);
+
+    @Query("SELECT b.batchRef " +
+            "FROM BulkTransaction b WHERE TIME_TO_SEC(TIMEDIFF(b.processTime, :nowTime)) / 60 > :timeInterval " +
+            "AND b.processFlg = 'A'")
+    List<String> findPendingTransactions(@Param("nowTime") LocalDateTime now,
+                                         @Param("timeInterval") int timeInterval);
 }

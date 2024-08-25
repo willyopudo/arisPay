@@ -10,7 +10,7 @@ import org.arispay.repository.fbl.BulkTransactionRepository;
 import org.arispay.repository.fbl.DetailRepository;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -53,11 +53,11 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
     }
 
     @Override
-    public BulkTransactionResponse updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse, String processFlg) {
+    public void updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse, String processFlg) {
         BulkTransaction bulkTransaction = bulkTransactionMapper.bulkTransResponseToBulkTrans(bulkTransactionResponse);
         bulkTransaction.setId(Long.parseLong(bulkTransaction.getBatchRef().replace("BULK70", "")));
         bulkTransaction.setProcessFlg(processFlg);
-        bulkTransaction.setProcessTime( new Timestamp(System.currentTimeMillis()));
+        bulkTransaction.setProcessTime(LocalDateTime.now());
         bulkTransactionRepository.updateStatus(bulkTransaction.getId(),
                 bulkTransaction.getStatus(),
                 bulkTransaction.getStatusDescription(),
@@ -70,11 +70,16 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
 
         detailRepository.batchDetailUpdate(bulkTransaction.getDtl());
 
-        return bulkTransactionMapper.bulkTransToBulkTransResponse(bulkTransaction);
+        bulkTransactionMapper.bulkTransToBulkTransResponse(bulkTransaction);
     }
 
     @Override
     public List<BulkTransactionResponse> getBulkTransactions() {
         return bulkTransactionMapper.bulkTransListToBulkTransResponseList(bulkTransactionRepository.findAll());
+    }
+
+    @Override
+    public List<String> queryBulkTransactions(LocalDateTime nowTime, int timeInterval) {
+        return bulkTransactionRepository.findPendingTransactions(nowTime, timeInterval);
     }
 }

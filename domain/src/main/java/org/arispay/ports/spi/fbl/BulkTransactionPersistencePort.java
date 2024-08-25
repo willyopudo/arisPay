@@ -3,6 +3,7 @@ package org.arispay.ports.spi.fbl;
 import org.arispay.data.fbl.dtorequest.masspayments.BulkTransactionRequest;
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BulkTransactionPersistencePort {
@@ -10,7 +11,9 @@ public interface BulkTransactionPersistencePort {
 
     void deleteBulkTransactionById(Long id);
 
-    BulkTransactionResponse updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse, String processFlg);
+    void updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse, String processFlg);
 
     List<BulkTransactionResponse> getBulkTransactions();
+
+    List<String> queryBulkTransactions(LocalDateTime nowTime, int timeInterval);
 }

@@ -6,7 +6,6 @@ import org.arispay.data.fbl.dtorequest.masspayments.BulkTransactionRequest;
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
 import org.arispay.ports.spi.fbl.BulkTransactionPersistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,9 +16,6 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class BulkPaymentService {
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private RestTemplate restTemplate;

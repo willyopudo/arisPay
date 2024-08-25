@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -46,7 +46,7 @@ public class BulkTransaction {
     @OneToMany(mappedBy = "transaction")
     private List<Detail> dtl;
 
-    private Timestamp processTime;
+    private LocalDateTime processTime;
 
     private String processFlg;
 
