@@ -33,7 +33,7 @@ public class BulkTransaction {
 
     private String narration;
 
-    private Date valueDate;
+    private LocalDateTime valueDate;
 
     private String currency;
 
@@ -51,4 +51,10 @@ public class BulkTransaction {
     private String processFlg;
 
     private int noOfTries;
+
+    private LocalDateTime postingTime;
+
+    private String postingFlg;
+
+    private int postingTryCount;
 }

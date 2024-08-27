@@ -29,12 +29,14 @@ public class BulkPaymentQueryService {
     private TokenService tokenService;
 
     @Scheduled(cron = "*/5 * * * *")
-    public void queryBulkTransactionStatus() {
+    private void queryBulkTransactionStatus() {
         try {
 
             List<String> batchRefs = bulkTransactionPersistencePort.queryBulkTransactions(LocalDateTime.now(), 5);
 
             for(String batchRef: batchRefs) {
+
+                bulkTransactionPersistencePort.markProcessingStage(Long.parseLong(batchRef.replace("BULK70", "")),"S");
                 HttpHeaders headers = new HttpHeaders();
                 headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
                 headers.add("Authorization", "Bearer " + tokenService.getAccessToken());

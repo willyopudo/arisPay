@@ -2,10 +2,12 @@ package org.arispay.adapters.fbl;
 
 import org.arispay.data.fbl.dtorequest.masspayments.BulkTransactionRequest;
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
+import org.arispay.entity.Transaction;
 import org.arispay.entity.fbl.BulkTransaction;
 import org.arispay.entity.fbl.Detail;
 import org.arispay.mappers.fbl.BulkTransactionMapper;
 import org.arispay.ports.spi.fbl.BulkTransactionPersistencePort;
+import org.arispay.repository.TransactionRepository;
 import org.arispay.repository.fbl.BulkTransactionRepository;
 import org.arispay.repository.fbl.DetailRepository;
 import org.springframework.stereotype.Service;
@@ -22,12 +24,16 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
 
     private final DetailRepository detailRepository;
 
+    private final TransactionRepository transactionRepository;
+
     public BulkTransactionJpaAdapter(BulkTransactionRepository bulkTransactionRepository,
                                      BulkTransactionMapper bulkTransactionMapper,
-                                     DetailRepository detailRepository) {
+                                     DetailRepository detailRepository,
+                                     TransactionRepository transactionRepository) {
         this.bulkTransactionRepository = bulkTransactionRepository;
         this.bulkTransactionMapper = bulkTransactionMapper;
         this.detailRepository = detailRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
@@ -81,5 +87,45 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
     @Override
     public List<String> queryBulkTransactions(LocalDateTime nowTime, int timeInterval) {
         return bulkTransactionRepository.findPendingTransactions(nowTime, timeInterval);
+    }
+
+    @Override
+    public void markProcessingStage(Long id, String processFlg) {
+        bulkTransactionRepository.markProcessingStage(id, processFlg);
+    }
+
+    @Override
+    public void postTransactions() {
+        try {
+            List<BulkTransaction> unpostedTransactions = bulkTransactionRepository.findUnpostedTransactions();
+            for (BulkTransaction bulkTransaction : unpostedTransactions) {
+                try {
+                    bulkTransactionRepository.markPostingStage(bulkTransaction.getId(), "S");
+                    for (Detail detail : bulkTransaction.getDtl()) {
+                        Transaction transaction = new Transaction();
+                        transaction.setBankAccount(bulkTransaction.getAccountDr());
+                        transaction.setBankTranRef(detail.getCbsRef());
+                        transaction.setNarration(detail.getRemarks());
+                        transaction.setPayerName(detail.getSenderDetails());
+                        transaction.setPayerPhone(detail.getSenderDetails());
+                        transaction.setPaymentMode(detail.getPaymentType());
+                        transaction.setTranAmount(detail.getPaymentAmount());
+                        transaction.setTransDate(bulkTransaction.getValueDate());
+                        transaction.setCrDrInd("C");
+                        transaction.setCreatedBy("SYSTEM");
+                        transaction.setCreatedDate(LocalDateTime.now());
+                        transaction.setApiChannel("/api/v1/fbl/bulk-payments/initiate");
+
+                    }
+                    bulkTransactionRepository.markPostingStage(bulkTransaction.getId(), "P");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    bulkTransactionRepository.markPostingStage(bulkTransaction.getId(), "X");
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

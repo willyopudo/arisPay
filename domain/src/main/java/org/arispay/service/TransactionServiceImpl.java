@@ -8,7 +8,7 @@ import org.arispay.ports.spi.TransactionPersistencePort;
 
 public class TransactionServiceImpl implements TransactionServicePort {
 
-    private TransactionPersistencePort transactionPersistencePort;
+    private final TransactionPersistencePort transactionPersistencePort;
 
     public TransactionServiceImpl(TransactionPersistencePort transactionPersistencePort) {
         this.transactionPersistencePort = transactionPersistencePort;

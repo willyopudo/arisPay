@@ -25,4 +25,17 @@ public interface BulkTransactionRepository extends JpaRepository<BulkTransaction
             "AND b.processFlg = 'A'")
     List<String> findPendingTransactions(@Param("nowTime") LocalDateTime now,
                                          @Param("timeInterval") int timeInterval);
+
+    @Query("SELECT b " +
+            "FROM BulkTransaction b WHERE b.processFlg = 'P' AND (b.postingFlg IS NULL OR b.postingFlg = 'X') AND b.postingTryCount < 3 ")
+    List<BulkTransaction> findUnpostedTransactions();
+
+    @Modifying
+    @Query("UPDATE BulkTransaction b SET  b.processFlg = :processFlg WHERE b.id = :id")
+    void markProcessingStage(@Param("id") Long id, @Param("processFlg") String processFlg);
+
+    @Modifying
+    @Query("UPDATE BulkTransaction b SET  b.postingFlg = :postingFlg WHERE b.id = :id")
+    void markPostingStage(@Param("id") Long id, @Param("postingFlg") String postingFlg);
+
 }
