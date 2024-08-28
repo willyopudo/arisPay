@@ -61,23 +61,36 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
     @Override
     public void updateBulkTransaction(BulkTransactionResponse bulkTransactionResponse, String processFlg) {
         BulkTransaction bulkTransaction = bulkTransactionMapper.bulkTransResponseToBulkTrans(bulkTransactionResponse);
-        bulkTransaction.setId(Long.parseLong(bulkTransaction.getBatchRef().replace("BULK70", "")));
-        bulkTransaction.setProcessFlg(processFlg);
-        bulkTransaction.setProcessTime(LocalDateTime.now());
-        bulkTransactionRepository.updateStatus(bulkTransaction.getId(),
-                bulkTransaction.getStatus(),
-                bulkTransaction.getStatusDescription(),
-                bulkTransaction.getCbsRef(),
-                bulkTransaction.getProcessFlg(),
-                bulkTransaction.getProcessTime(),
-                bulkTransaction.getNoOfTries() + 1);
-        for (Detail detail: bulkTransaction.getDtl()) {
-            detail.setId(Long.parseLong(detail.getPaymentRef().replace("DET70", "")));
+        try {
+
+            bulkTransaction.setId(Long.parseLong(bulkTransaction.getBatchRef().replace("BULK70", "")));
+            bulkTransaction.setProcessFlg(processFlg);
+            bulkTransaction.setProcessTime(LocalDateTime.now());
+            bulkTransactionRepository.updateStatus(bulkTransaction.getId(),
+                    bulkTransaction.getStatus(),
+                    bulkTransaction.getStatusDescription(),
+                    bulkTransaction.getCbsRef(),
+                    bulkTransaction.getProcessFlg(),
+                    bulkTransaction.getProcessTime(),
+                    bulkTransaction.getNoOfTries() + 1);
+            for (Detail detail : bulkTransaction.getDtl()) {
+                detail.setId(Long.parseLong(detail.getPaymentRef().replace("DET70", "")));
+            }
+
+            detailRepository.batchDetailUpdate(bulkTransaction.getDtl());
+
+            bulkTransactionMapper.bulkTransToBulkTransResponse(bulkTransaction);
         }
-
-        detailRepository.batchDetailUpdate(bulkTransaction.getDtl());
-
-        bulkTransactionMapper.bulkTransToBulkTransResponse(bulkTransaction);
+        catch (Exception e) {
+            e.printStackTrace();
+            bulkTransactionRepository.updateStatus(bulkTransaction.getId(),
+                    null,
+                    null,
+                    null,
+                    "X",
+                    bulkTransaction.getProcessTime(),
+                    bulkTransaction.getNoOfTries() + 1);
+        }
     }
 
     @Override
@@ -118,10 +131,10 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
                         transaction.setApiChannel("/api/v1/fbl/bulk-payments/initiate");
 
                     }
-                    bulkTransactionRepository.markPostingStageSuccess(bulkTransaction.getId(), "P", LocalDateTime.now(), bulkTransaction.getPostingTryCount() + 1);
+                    bulkTransactionRepository.markPostingStageFinal(bulkTransaction.getId(), "P", LocalDateTime.now(), bulkTransaction.getPostingTryCount() + 1);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    bulkTransactionRepository.markPostingStage(bulkTransaction.getId(), "X");
+                    bulkTransactionRepository.markPostingStageFinal(bulkTransaction.getId(), "X", LocalDateTime.now(), bulkTransaction.getPostingTryCount() + 1);
                 }
             }
         }

@@ -41,7 +41,7 @@ public interface BulkTransactionRepository extends JpaRepository<BulkTransaction
 
     @Modifying
     @Query("UPDATE BulkTransaction b SET  b.postingFlg = :postingFlg, b.postingTime = :postingTime, b.postingTryCount = :postingTryCount WHERE b.id = :id")
-    void markPostingStageSuccess(@Param("id") Long id,
+    void markPostingStageFinal(@Param("id") Long id,
                                  @Param("postingFlg") String postingFlg,
                                  @Param("postingTime") LocalDateTime postingTime,
                                  @Param("postingTryCount") int postingTryCount);
