@@ -21,4 +21,5 @@ public interface BulkTransactionPersistencePort {
     void markProcessingStage(Long id, String processFlg);
     
     void postTransactions();
+
 }

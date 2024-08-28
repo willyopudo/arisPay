@@ -12,13 +12,14 @@ import java.util.List;
 
 public interface BulkTransactionRepository extends JpaRepository<BulkTransaction, Long> {
     @Modifying
-    @Query("UPDATE BulkTransaction b SET b.status = :status, b.statusDescription = :statusDescription, b.cbsRef = :cbsRef, b.processFlg = :processFlg, b.processTime= :processTime WHERE b.id = :id")
+    @Query("UPDATE BulkTransaction b SET b.status = :status, b.statusDescription = :statusDescription, b.cbsRef = :cbsRef, b.processFlg = :processFlg, b.processTime= :processTime, b.noOfTries = :noOfTries WHERE b.id = :id")
     void updateStatus(@Param("id") Long id,
                       @Param("status") String status,
                       @Param("statusDescription") String statusDescription,
                       @Param("cbsRef") String cbsRef,
                       @Param("processFlg") String processFlg,
-                      @Param("processTime") LocalDateTime processTime);
+                      @Param("processTime") LocalDateTime processTime,
+                      @Param("noOfTries") int noOfTries);
 
     @Query("SELECT b.batchRef " +
             "FROM BulkTransaction b WHERE TIME_TO_SEC(TIMEDIFF(b.processTime, :nowTime)) / 60 > :timeInterval " +
@@ -37,5 +38,13 @@ public interface BulkTransactionRepository extends JpaRepository<BulkTransaction
     @Modifying
     @Query("UPDATE BulkTransaction b SET  b.postingFlg = :postingFlg WHERE b.id = :id")
     void markPostingStage(@Param("id") Long id, @Param("postingFlg") String postingFlg);
+
+    @Modifying
+    @Query("UPDATE BulkTransaction b SET  b.postingFlg = :postingFlg, b.postingTime = :postingTime, b.postingTryCount = :postingTryCount WHERE b.id = :id")
+    void markPostingStageSuccess(@Param("id") Long id,
+                                 @Param("postingFlg") String postingFlg,
+                                 @Param("postingTime") LocalDateTime postingTime,
+                                 @Param("postingTryCount") int postingTryCount);
+
 
 }

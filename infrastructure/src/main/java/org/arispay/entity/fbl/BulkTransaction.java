@@ -1,11 +1,6 @@
 package org.arispay.entity.fbl;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,11 +45,11 @@ public class BulkTransaction {
 
     private String processFlg;
 
-    private int noOfTries;
+    private int noOfTries = 0;
 
     private LocalDateTime postingTime;
 
     private String postingFlg;
 
-    private int postingTryCount;
+    private int postingTryCount = 0;
 }
