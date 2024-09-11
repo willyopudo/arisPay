@@ -43,9 +43,9 @@ public class OpenApiConfig {
         prodServer.setDescription("Server URL in Production environment");
 
         Contact contact = new Contact();
-        contact.setEmail("wouma@arispay.com");
-        contact.setName("Wilfred");
-        contact.setUrl("https://www.arispay.com");
+        contact.setEmail("admin@arispay.co.ke");
+        contact.setName("ArisAdmin");
+        contact.setUrl("https://www.arispay.co.ke");
 
         License mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
 

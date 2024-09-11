@@ -47,6 +47,6 @@ public class ClientController {
 
     @DeleteMapping("/{id}")
     public void deleteCompanyByID(@PathVariable long id) {
-        clientServicePort.deleteClientById(id);
+        clientServicePort.deleteClientById(Long.valueOf(id));
     }
 }

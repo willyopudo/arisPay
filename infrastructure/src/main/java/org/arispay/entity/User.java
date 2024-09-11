@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User implements Serializable {
+public class User extends AuditableEntity implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
 
@@ -28,9 +28,6 @@ public class User implements Serializable {
 
 	@Column(nullable = false)
 	private String username;
-
-	@Column(nullable = false)
-	private String name;
 
 	@Column(nullable = false)
 	private String firstName;
@@ -48,31 +45,12 @@ public class User implements Serializable {
 	private String phoneNumber;
 
 	@Column(nullable = false)
-	private byte status = 1;
-
-	@Column(nullable = false, unique = true)
-	private String idNumber;
-
-	@Column(nullable = false)
 	private String address;
 
 	private String zipCode;
 
 	@Column(nullable = false)
 	private String town;
-
-	@Column(nullable = false)
-	private byte recordStatus;
-
-	@Column(nullable = false)
-	private String createdBy;
-
-	@Column(nullable = false)
-	private Date createdDate = new java.util.Date();
-
-	private String modifiedBy;
-
-	private Date modifiedDate = new java.util.Date();
 
 	@ManyToOne
 	@JoinColumn(name = "company_id", nullable = false)
