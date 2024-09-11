@@ -22,7 +22,7 @@ public interface BulkTransactionRepository extends JpaRepository<BulkTransaction
                       @Param("noOfTries") int noOfTries);
 
     @Query("SELECT b.batchRef " +
-            "FROM BulkTransaction b WHERE TIME_TO_SEC(TIMEDIFF(b.processTime, :nowTime)) / 60 > :timeInterval " +
+            "FROM BulkTransaction b WHERE (CAST(TIME_TO_SEC(TIMEDIFF(b.processTime, :nowTime)) AS DOUBLE) / 60) > :timeInterval " +
             "AND b.processFlg = 'A'")
     List<String> findPendingTransactions(@Param("nowTime") LocalDateTime now,
                                          @Param("timeInterval") int timeInterval);
