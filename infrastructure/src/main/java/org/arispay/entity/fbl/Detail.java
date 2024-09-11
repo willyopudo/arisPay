@@ -68,7 +68,7 @@ public class Detail {
 
     private String status;
 
-    private double statusDescription;
+    private String statusDescription;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bulk_id")

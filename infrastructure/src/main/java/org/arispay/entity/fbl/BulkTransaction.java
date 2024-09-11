@@ -1,17 +1,12 @@
 package org.arispay.entity.fbl;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -33,7 +28,7 @@ public class BulkTransaction {
 
     private String narration;
 
-    private Date valueDate;
+    private LocalDateTime valueDate;
 
     private String currency;
 
@@ -41,14 +36,20 @@ public class BulkTransaction {
 
     private String status;
 
-    private double statusDescription;
+    private String statusDescription;
 
     @OneToMany(mappedBy = "transaction")
     private List<Detail> dtl;
 
-    private Timestamp processTime;
+    private LocalDateTime processTime;
 
     private String processFlg;
 
-    private int noOfTries;
+    private int noOfTries = 0;
+
+    private LocalDateTime postingTime;
+
+    private String postingFlg;
+
+    private int postingTryCount = 0;
 }
