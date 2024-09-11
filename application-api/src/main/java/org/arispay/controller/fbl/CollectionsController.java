@@ -150,7 +150,7 @@ public class CollectionsController {
             logger.error(ex.getMessage(), "Error Message: " + ex);
             GenericHttpResponse<?> httpResponse = new GenericHttpResponse<>();
             httpResponse.setHttpStatus(HttpStatus.CONFLICT);
-            if (ex.getMessage().contains("duplicate")) {
+            if (ex.getMessage().toLowerCase().contains("duplicate")) {
                 httpResponse.setMessage("Duplicate request for transaction reference: "
                         + confirmationRequest.getPayload().getTxnReference());
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(httpResponse);

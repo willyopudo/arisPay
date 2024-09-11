@@ -17,8 +17,8 @@ spring:
     config:
       enabled: false
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/arispay_db
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/arispay_db
     username: wilfusr
     password: Dailydose2010@
   jpa:
@@ -26,8 +26,8 @@ spring:
       ddl-auto: update
       jdbc:
         time_zone: UTC
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   servlet:
     multipart:

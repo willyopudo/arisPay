@@ -1,7 +1,6 @@
 package org.arispay.service;
 
 import org.arispay.data.ClientDto;
-import org.arispay.data.CompanyDto;
 import org.arispay.ports.api.ClientServicePort;
 import org.arispay.ports.spi.ClientPersistencePort;
 
