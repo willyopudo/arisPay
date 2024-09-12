@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
 import org.arispay.data.GenericHttpResponse;
+import org.arispay.data.dtoauth.UserLoginRespDto;
 import org.arispay.data.dtoauth.WebLoginResponse;
 import org.arispay.entity.User;
 import org.arispay.data.dtoauth.JwtLoginReq;
@@ -55,7 +56,9 @@ public class AuthController {
 			User user = new User();
 			user.setUsername(username);
 			String token = jwtUtil.createToken(user);
-			WebLoginResponse webLoginResp = new WebLoginResponse(token, 3600, "Bearer", userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), userDetails.getAuthoritiesList());
+			UserLoginRespDto userDetail = new UserLoginRespDto(userDetails.getId(), userDetails.getUsername(), userDetails.getUsername(), userDetails.getEmail(), "avatar-1.png", userDetails.getAuthoritiesList(), userDetails.getAuthoritiesList().getFirst());
+
+			WebLoginResponse webLoginResp = new WebLoginResponse(token, 3600, "Bearer", userDetail);
 			JwtLoginResp loginRes = new JwtLoginResp(token,3600, "Bearer");
 
             logger.info("Token issued success for user: {} , Token : {}", username, token);

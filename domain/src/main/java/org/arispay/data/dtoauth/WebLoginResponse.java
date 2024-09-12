@@ -21,15 +21,6 @@ public class WebLoginResponse {
     @JsonProperty("token_type")
     private String tokenType;
 
-    @JsonProperty("id")
-    private Long id;
-
-    @JsonProperty("username")
-    private String username;
-
-    @JsonProperty("email")
-    private String email;
-
-    @JsonProperty("roles")
-    private List<String> authorities;
+    @JsonProperty("userDetails")
+    private UserLoginRespDto userDetails;
 }
