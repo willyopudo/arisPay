@@ -56,7 +56,7 @@ public class AuthController {
 			User user = new User();
 			user.setUsername(username);
 			String token = jwtUtil.createToken(user);
-			UserLoginRespDto userDetail = new UserLoginRespDto(userDetails.getId(), userDetails.getUsername(), userDetails.getUsername(), userDetails.getEmail(), "avatar-1.png", userDetails.getAuthoritiesList(), userDetails.getAuthoritiesList().getFirst());
+			UserLoginRespDto userDetail = new UserLoginRespDto(userDetails.getId(), userDetails.getUsername(), userDetails.getFullName(), userDetails.getEmail(), userDetails.getId() + ".png", userDetails.getAuthoritiesList(), userDetails.getAuthoritiesList().getFirst().substring(5));
 
 			WebLoginResponse webLoginResp = new WebLoginResponse(token, 3600, "Bearer", userDetail);
 			JwtLoginResp loginRes = new JwtLoginResp(token,3600, "Bearer");
