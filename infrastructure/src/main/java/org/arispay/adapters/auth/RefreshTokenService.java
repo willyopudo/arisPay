@@ -15,8 +15,8 @@ import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
-    @Value("${custom.arispay.app.jwt-refresh-expiration-minutes}")
-    private  Long refreshTokenDurationMinutes;
+    @Value("${custom.arispay.app.jwt-refresh-expiration-seconds}")
+    private  Long refreshTokenDurationSeconds;
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
@@ -32,7 +32,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = new RefreshToken();
 
         refreshToken.setUser(userRepository.findById(userId).get());
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMinutes));
+        refreshToken.setExpiryDate(Instant.now().plusSeconds(refreshTokenDurationSeconds));
         refreshToken.setToken(UUID.randomUUID().toString());
 
         refreshToken = refreshTokenRepository.save(refreshToken);

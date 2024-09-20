@@ -51,4 +51,4 @@ custom:
     app:
       jwt-secret: GFYGHI5342@#$%65287629hshgERRjy2789}-0uhuyTUUWFR4
       jwt-expiration-minutes: 15
-      jwt-refresh-expiration-minutes: 720
+      jwt-refresh-expiration-seconds: 600

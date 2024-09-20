@@ -18,8 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class JwtUtil {
 	private static final Logger logger = LogManager.getLogger(JwtUtil.class);
 
-	@Value("${custom.arispay.app.jwt-secret}")
-	private  String secret_key;
+	private final String secretKey;
 
 	@Value("${custom.arispay.app.jwt-expiration-minutes}")
 	private  int accessTokenValidity;
@@ -31,8 +30,9 @@ public class JwtUtil {
 	protected final String TOKEN_HEADER = "Authorization";
 	protected final String TOKEN_PREFIX = "Bearer ";
 
-	public JwtUtil() {
-		this.jwtParser = Jwts.parser().setSigningKey(secret_key);
+	public JwtUtil(@Value("${custom.arispay.app.jwt-secret}") String secretKey) {
+		this.secretKey = secretKey;
+		this.jwtParser = Jwts.parser().setSigningKey(this.secretKey);
 	}
 
 	public String createToken(User user) {
@@ -44,7 +44,7 @@ public class JwtUtil {
 		return Jwts.builder()
 				.setClaims(claims)
 				.setExpiration(tokenValidity)
-				.signWith(SignatureAlgorithm.HS256, secret_key)
+				.signWith(SignatureAlgorithm.HS256, secretKey)
 				.compact();
 	}
 

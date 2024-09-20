@@ -1,16 +1,15 @@
 package org.arispay.controller;
 
+import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.adapters.auth.RefreshTokenService;
 import org.arispay.auth.JwtUtil;
 import org.arispay.data.GenericHttpResponse;
-import org.arispay.data.dtoauth.UserLoginRespDto;
-import org.arispay.data.dtoauth.WebLoginResponse;
+import org.arispay.data.dtoauth.*;
 import org.arispay.entity.User;
-import org.arispay.data.dtoauth.JwtLoginReq;
-import org.arispay.data.dtoauth.JwtLoginResp;
 import org.arispay.entity.auth.RefreshToken;
+import org.arispay.exception.TokenRefreshException;
 import org.arispay.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -88,5 +87,20 @@ public class AuthController {
 			GenericHttpResponse<?> genericHttpResponse = new GenericHttpResponse<String>(HttpStatus.BAD_REQUEST, e.getMessage(), null);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericHttpResponse);
 		}
+	}
+
+	@PostMapping("/refreshtoken")
+	public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
+		String requestRefreshToken = request.getRefreshToken();
+
+		return refreshTokenService.findByToken(requestRefreshToken)
+				.map(refreshTokenService::verifyExpiration)
+				.map(RefreshToken::getUser)
+				.map(user -> {
+					String token = jwtUtil.createToken(user);
+					return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken, "Bearer"));
+				})
+				.orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+						"Refresh token is not in database!"));
 	}
 }
