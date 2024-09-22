@@ -1,5 +1,6 @@
 package org.arispay.adapters.auth;
 
+import org.arispay.entity.User;
 import org.arispay.entity.auth.RefreshToken;
 import org.arispay.exception.TokenRefreshException;
 import org.arispay.repository.UserRepository;
@@ -28,14 +29,19 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
+    public Optional<RefreshToken> findByUser(User user) {
+        return refreshTokenRepository.findByUser(user);
+    }
+
     public RefreshToken createRefreshToken(Long userId) {
-        RefreshToken refreshToken = new RefreshToken();
+        RefreshToken refreshToken = findByUser(userRepository.findById(userId).get()).orElse(new RefreshToken());
+        if(refreshToken.getToken() == null) {
+            refreshToken.setUser(userRepository.findById(userId).get());
+            refreshToken.setExpiryDate(Instant.now().plusSeconds(refreshTokenDurationSeconds));
+            refreshToken.setToken(UUID.randomUUID().toString());
 
-        refreshToken.setUser(userRepository.findById(userId).get());
-        refreshToken.setExpiryDate(Instant.now().plusSeconds(refreshTokenDurationSeconds));
-        refreshToken.setToken(UUID.randomUUID().toString());
-
-        refreshToken = refreshTokenRepository.save(refreshToken);
+            refreshToken = refreshTokenRepository.save(refreshToken);
+        }
         return refreshToken;
     }
 

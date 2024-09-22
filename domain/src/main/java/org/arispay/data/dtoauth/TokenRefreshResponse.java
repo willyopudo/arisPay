@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TokenRefreshResponse {
+    @JsonProperty("statusCode")
+    private int statusCode;
+
     @JsonProperty("access_token")
     private String accessToken;
 
