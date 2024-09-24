@@ -1,8 +1,12 @@
 package org.arispay.auth;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.arispay.controller.UserController;
 import org.arispay.entity.User;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
@@ -12,18 +16,23 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class JwtUtil {
+	private static final Logger logger = LogManager.getLogger(JwtUtil.class);
 
+	private final String secretKey;
 
-	private final String secret_key = "GFYGHI5342@#$%65287629hshgERRjy2789}-0uhuyTUUWFR4";
-	protected final long accessTokenValidity = 60;
+	@Value("${custom.arispay.app.jwt-expiration-minutes}")
+	private  int accessTokenValidity;
+	//private final String secret_key = "GFYGHI5342@#$%65287629hshgERRjy2789}-0uhuyTUUWFR4";
+	//protected final long accessTokenValidity = 60;
 
 	private final JwtParser jwtParser;
 
 	protected final String TOKEN_HEADER = "Authorization";
 	protected final String TOKEN_PREFIX = "Bearer ";
 
-	public JwtUtil() {
-		this.jwtParser = Jwts.parser().setSigningKey(secret_key);
+	public JwtUtil(@Value("${custom.arispay.app.jwt-secret}") String secretKey) {
+		this.secretKey = secretKey;
+		this.jwtParser = Jwts.parser().setSigningKey(this.secretKey);
 	}
 
 	public String createToken(User user) {
@@ -35,7 +44,7 @@ public class JwtUtil {
 		return Jwts.builder()
 				.setClaims(claims)
 				.setExpiration(tokenValidity)
-				.signWith(SignatureAlgorithm.HS256, secret_key)
+				.signWith(SignatureAlgorithm.HS256, secretKey)
 				.compact();
 	}
 
@@ -52,12 +61,23 @@ public class JwtUtil {
 			return null;
 		} catch (ExpiredJwtException ex) {
 			req.setAttribute("expired", ex.getMessage());
+            logger.error("Token expired {}", ex.getMessage());
 			throw ex;
-		} catch (Exception ex) {
+		} catch (SignatureException ex) {
 			req.setAttribute("invalid", ex.getMessage());
+			logger.error("Invalid JWT signature: {}", ex.getMessage());
 			throw ex;
+		} catch (MalformedJwtException e) {
+			logger.error("Invalid JWT token: {}", e.getMessage());
+			throw e;
+		} catch (UnsupportedJwtException e) {
+			logger.error("JWT token is unsupported: {}", e.getMessage());
+			throw e;
+		} catch (IllegalArgumentException e) {
+			logger.error("JWT claims string is empty: {}", e.getMessage());
+			throw e;
 		}
-	}
+    }
 
 	public String resolveToken(HttpServletRequest request) {
 

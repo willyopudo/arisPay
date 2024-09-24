@@ -49,4 +49,11 @@ public class UserDto {
 
 	@NotEmpty
 	private String role;
+
+	@NotEmpty
+	private String status;
+
+	private String currentPlan;
+
+	private String avatar;
 }

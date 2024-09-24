@@ -28,7 +28,7 @@ import java.util.List;
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     @Autowired
     private final UserServicePort userServicePort;
@@ -88,7 +88,13 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDto>> users() {
         List<UserDto> users = userServicePort.findAllUsers();
-        users.forEach(e -> e.setPassword(null));
+        for (UserDto user : users) {
+            user.setPassword(null);
+            user.setStatus("active");
+            user.setCurrentPlan("enterprise");
+            user.setAvatar("/images/avatars/" + user.getId() + ".png");
+        }
+        //users.forEach(e -> e.setPassword(null));
         return ResponseEntity.ok(users);
     }
     //Fetch single user
