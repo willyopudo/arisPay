@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -45,5 +46,8 @@ public class Company {
 	private String modifiedBy;
 
 	private Date modifiedDate = new java.util.Date();
+
+	@OneToMany(mappedBy = "company")
+	private List<UserCompany> users;
 
 }
