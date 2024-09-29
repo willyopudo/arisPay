@@ -1,16 +1,22 @@
 package org.arispay.adapters;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.arispay.data.UserDto;
 import org.arispay.entity.Role;
 import org.arispay.entity.User;
+import org.arispay.entity.UserCompany;
 import org.arispay.mappers.UserMapper;
 import org.arispay.ports.spi.UserPersistencePort;
+import org.arispay.repository.CompanyRepository;
 import org.arispay.repository.RoleRepository;
+import org.arispay.repository.UserCompanyRepository;
 import org.arispay.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserJpaAdapter implements UserPersistencePort {
@@ -20,19 +26,44 @@ public class UserJpaAdapter implements UserPersistencePort {
 	private UserMapper userMapper;
 	@Autowired
 	private RoleRepository roleRepository;
+	@Autowired
+	private UserCompanyRepository userCompanyRepository;
+	@Autowired
+	private CompanyRepository companyRepository;
+
+	private static final Logger logger = LogManager.getLogger(UserJpaAdapter.class);
 
 	@Override
 	public UserDto saveUser(UserDto userDto) {
-		User user = userMapper.convert(userDto);
-		User userSaved = userRepository.save(user);
+		try {
+			User user = userMapper.convert(userDto);
+			user.getCompanies().getFirst().setUser(user);
+			User userSaved = userRepository.save(user);
 
-		return userMapper.convert(userSaved);
+			List<UserCompany> userCompanies = userCompanyRepository.findByUserId(userSaved.getId());
+
+			boolean isDefaultCompany = userCompanies.isEmpty();
+			user.getCompanies().getFirst().setDefault(isDefaultCompany);
+
+
+			if (userCompanyRepository.findByUserIdAndCompanyId(user.getId(), Objects.requireNonNull(companyRepository.findById(user.getCompanies().getFirst().getCompany().getId()).orElse(null)).getId()).isEmpty()) {
+				userCompanyRepository.save(user.getCompanies().getFirst());
+				userCompanies.add(user.getCompanies().getFirst());
+			}
+
+			userSaved.setCompanies(userCompanies);
+
+			return userMapper.convert(userSaved);
+		}catch (Exception e){
+            logger.error("Error occurred while saving user: {}", e.getMessage());
+			throw e;
+		}
 
 	}
 
 	@Override
 	public void deleteUserById(Long id) {
-
+		userRepository.deleteById(id);
 	}
 
 	@Override

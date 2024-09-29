@@ -47,6 +47,7 @@ public class UserController {
     public ResponseEntity<GenericHttpResponse<?>> register(@Valid @RequestBody UserDto userDto,
                                                             BindingResult result,
                                                             Model model, Principal principal) {
+        userDto.setId(null);
         GenericHttpResponse<UserDto> response = new GenericHttpResponse<>();
         UserDto existingUser = userServicePort.findUserByEmail(userDto.getEmail());
         List<CompanyDto> companies = companyServicePort.getCompanies();
@@ -77,6 +78,7 @@ public class UserController {
         if (userDto.getRole() == null)
             userDto.setRole("ROLE_USER");
         UserDto savedUser =  userServicePort.saveUser(userDto);
+        savedUser.setPassword(null);
 
         response.setHttpStatus(HttpStatus.OK);
         response.setMessage("User registered successfully");
@@ -113,12 +115,14 @@ public class UserController {
         UserDto existingUser = userServicePort.findUserById(Math.toIntExact(id));
         if (existingUser != null) {
             existingUser.setEmail(userDto.getEmail());
-            existingUser.setPassword(userDto.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
             existingUser.setRole(userDto.getRole());
             existingUser.setFirstName(userDto.getFirstName());
             existingUser.setLastName(userDto.getLastName());
+            existingUser.setCompanyIds(userDto.getCompanyIds());
 
             UserDto updatedUser = userServicePort.saveUser(existingUser);
+            updatedUser.setPassword(null);
             response.setHttpStatus(HttpStatus.OK);
             response.setMessage("User updated successfully");
             response.setData(updatedUser);

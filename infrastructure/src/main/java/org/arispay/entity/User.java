@@ -10,6 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 @Getter
@@ -61,5 +62,26 @@ public class User extends AuditableEntity implements Serializable {
 			joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},
 			inverseJoinColumns = {@JoinColumn(name = "ROLE_ID", referencedColumnName = "ID")})
 	private List<Role> roles = new ArrayList<>();
+
+//	public void addCompany(Company company) {
+//		UserCompany userCompany = new UserCompany(this, company,false);
+//		companies.add(userCompany);
+//		company.getUsers().add(userCompany);
+//	}
+//
+//	public void removeCompany(Company company) {
+//		for (Iterator<UserCompany> iterator = companies.iterator();
+//			 iterator.hasNext(); ) {
+//			UserCompany userCompany = iterator.next();
+//
+//			if (userCompany.getUser().equals(this) &&
+//					userCompany.getCompany().equals(company)) {
+//				iterator.remove();
+//				userCompany.getCompany().getUsers().remove(userCompany);
+//				userCompany.setUser(null);
+//				userCompany.setCompany(null);
+//			}
+//		}
+//	}
 
 }

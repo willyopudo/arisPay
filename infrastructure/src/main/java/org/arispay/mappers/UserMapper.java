@@ -25,8 +25,8 @@ public abstract class UserMapper {
 	@Autowired
 	private UserCompanyRepository userCompanyRepository;
 
-	@Autowired
-	private UserRepository userRepository;
+//	@Autowired
+//	private UserRepository userRepository;
 
 	//mock comment
 	@Mapping(source = "companyIds", target = "companies", qualifiedByName = "idsToCompanies")
@@ -47,11 +47,14 @@ public abstract class UserMapper {
 	public abstract List<User> userDtoListToUserList(List<UserDto> userDtoList);
 
 	@Named("idsToCompanies")
-	public List<UserCompany> userIdToUserCompanies(List<Long> userIds) {
+	public List<UserCompany> companyIdToUserCompanies(List<Long> companyIds) {
 		List<UserCompany> userCompanies = new ArrayList<>();
 		UserCompany userCompany = new UserCompany();
-		userCompany.setUser(userRepository.findById(userIds.getFirst()).orElse(null));
-		return userCompanyRepository.findAll(Example.of(userCompany));
+		userCompany.setCompany(companyRepository.findById(companyIds.getFirst()).orElse(null));
+
+		userCompanies.add(userCompany);
+		return userCompanies;
+		//return userCompanyRepository.findAll(Example.of(userCompany));
 	}
 
 	@Named("companiesToIds")
