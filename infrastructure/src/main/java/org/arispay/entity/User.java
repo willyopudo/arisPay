@@ -52,9 +52,8 @@ public class User extends AuditableEntity implements Serializable {
 	@Column(nullable = false)
 	private String town;
 
-	@ManyToOne
-	@JoinColumn(name = "company_id", nullable = false)
-	private Company company;
+	@OneToMany(mappedBy = "user")
+	private List<UserCompany> companies = new ArrayList<>();
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(

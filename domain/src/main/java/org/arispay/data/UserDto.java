@@ -32,7 +32,7 @@ public class UserDto {
 	private String email;
 
 	@NotNull(message = "Company can not be empty")
-	private Long companyId;
+	private List<Long> companyIds;
 	//@NotEmpty(message = "Password should not be empty")
 	private String password;
 
