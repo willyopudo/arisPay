@@ -8,10 +8,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -54,7 +51,7 @@ public class User extends AuditableEntity implements Serializable {
 	private String town;
 
 	@OneToMany(mappedBy = "user")
-	private List<UserCompany> companies = new ArrayList<>();
+	private Set<UserCompany> userCompanies;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(

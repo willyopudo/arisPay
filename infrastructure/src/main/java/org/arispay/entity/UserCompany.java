@@ -10,15 +10,18 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "users_companies")
-@IdClass(UserCompanyId.class)
+//@IdClass(UserCompanyId.class)
 public class UserCompany {
     @Id
-    @ManyToOne
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @Id
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
