@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserCompanyDto {
-    private Integer id;
+    private Long id;
+    private Integer companyId;
     private boolean isDefault;
 }

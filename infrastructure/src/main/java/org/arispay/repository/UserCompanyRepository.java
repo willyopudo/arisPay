@@ -12,5 +12,5 @@ import java.util.List;
 @Repository
 public interface UserCompanyRepository extends JpaRepository<UserCompany, UserCompanyId> {
     List<UserCompany> findByUserId(Long userId);
-    List<UserCompany> findByUserIdAndCompanyId(Long userId, Long companyId);
+    UserCompany findByUserIdAndCompanyId(Long userId, Long companyId);
 }

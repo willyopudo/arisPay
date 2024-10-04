@@ -50,10 +50,10 @@ public class User extends AuditableEntity implements Serializable {
 	@Column(nullable = false)
 	private String town;
 
-	@OneToMany(mappedBy = "user")
-	private Set<UserCompany> userCompanies;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<UserCompany> userCompanies;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
 			name = "users_roles",
 			joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},

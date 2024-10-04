@@ -130,29 +130,22 @@ public class UserController {
             existingUser.setLastName(userDto.getLastName());
 
             for(UserCompanyDto ucDto : userDto.getUserCompanies()){
-                CompanyDto companyDto = companyServicePort.getCompanyById(Long.valueOf(ucDto.getId()));
-                UserCompanyDto uc = new UserCompanyDto(companyDto.getId().intValue(), ucDto.isDefault());
+                CompanyDto companyDto = companyServicePort.getCompanyById(Long.valueOf(ucDto.getCompanyId()));
+                UserCompanyDto uc = new UserCompanyDto(ucDto.getId(), companyDto.getId().intValue(), ucDto.isDefault());
 
                 //Check if company in this iteration is not already related to the user we are updating
-                if(existingUser.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getId(), ucDto.getId())))
+                if(existingUser.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())))
                     existingUser.getUserCompanies().add(uc);
                 else{
                     //If the company exists for the user, we'll update only 'isDefault' field and persist later
-                    UserCompanyDto existingUc = existingUser.getUserCompanies().stream().filter((e) -> Objects.equals(e.getId(), ucDto.getId())).findFirst().get();
+                    UserCompanyDto existingUc = existingUser.getUserCompanies().stream().filter((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())).findFirst().get();
                     existingUc.setDefault(ucDto.isDefault());
                 }
             }
 
             //Let's iterate over the UserCompanies for the user we want to update
             //If a company is not in the list submitted in the Dto, we remove the association and persist change
-            Iterator<UserCompanyDto> ucs = existingUser.getUserCompanies().iterator();
-            while(ucs.hasNext()){
-                UserCompanyDto uc = ucs.next();
-                if(userDto.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getId(), uc.getId()))){
-                    ucs.remove();
-                    userServicePort.deleteUserCompanyById(existingUser.getId(), Long.valueOf(uc.getId()));
-                }
-            }
+            existingUser.getUserCompanies().removeIf(uc -> userDto.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), uc.getCompanyId())));
 
             UserDto updatedUser = userServicePort.saveUser(existingUser);
             updatedUser.setPassword(null);

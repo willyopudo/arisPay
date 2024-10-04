@@ -3,6 +3,7 @@ package org.arispay.adapters;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.data.CompanyDto;
+import org.arispay.data.UserCompanyDto;
 import org.arispay.data.UserDto;
 import org.arispay.entity.Role;
 import org.arispay.entity.User;
@@ -17,6 +18,7 @@ import org.arispay.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,6 +46,20 @@ public class UserJpaAdapter implements UserPersistencePort {
 				userCompany.setUser(user);
 			}
 			User userSaved = userRepository.save(user);
+			//Let's iterate over the UserCompanies for the user we just updated
+			//If a company is not in the list submitted in the Dto, we remove the association and persist change
+			if(user.getId() != null) {
+				List<UserCompany> userCompanies = userCompanyRepository.findByUserId(user.getId());
+				Iterator<UserCompany> ucs = userCompanies.iterator();
+				while (ucs.hasNext()) {
+					UserCompany uc = ucs.next();
+					if (userDto.getUserCompanies().stream().noneMatch((e) -> e.getCompanyId() == uc.getCompany().getId().intValue())) {
+						ucs.remove();
+						userCompanyRepository.delete(uc);
+					}
+				}
+			}
+
 
 //			List<UserCompany> userCompanies = userCompanyRepository.findByUserId(userSaved.getId());
 //
@@ -110,8 +126,10 @@ public class UserJpaAdapter implements UserPersistencePort {
 //	}
 	@Override
 	public void deleteUserCompanyById(Long userId, Long companyId) {
-		UserCompanyId userCompanyId = new UserCompanyId(userId, companyId);
-		userCompanyRepository.deleteById(userCompanyId);
+		//UserCompanyId userCompanyId = new UserCompanyId(userId, companyId);
+		UserCompany userCompany = userCompanyRepository.findByUserIdAndCompanyId(userId, companyId);
+		if(userCompany != null)
+			userCompanyRepository.delete(userCompany);
 	}
 
 }
