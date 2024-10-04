@@ -7,10 +7,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.data.CompanyDto;
 import org.arispay.data.GenericHttpResponse;
+import org.arispay.data.UserCompanyDto;
 import org.arispay.data.UserDto;
+import org.arispay.entity.Company;
+import org.arispay.entity.UserCompany;
 import org.arispay.globconfig.security.ApplicationUserRole;
 import org.arispay.ports.api.CompanyServicePort;
 import org.arispay.ports.api.UserServicePort;
+import org.arispay.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,7 +26,10 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -41,6 +48,8 @@ public class UserController {
     @Value("${spring.application.name}")
     private String appName;
     private static final Logger logger = LogManager.getLogger(UserController.class);
+    @Autowired
+    private CompanyRepository companyRepository;
 
     // Register new user
     @PostMapping
@@ -119,7 +128,31 @@ public class UserController {
             existingUser.setRole(userDto.getRole());
             existingUser.setFirstName(userDto.getFirstName());
             existingUser.setLastName(userDto.getLastName());
-            existingUser.setCompanyIds(userDto.getCompanyIds());
+
+            for(UserCompanyDto ucDto : userDto.getUserCompanies()){
+                CompanyDto companyDto = companyServicePort.getCompanyById(Long.valueOf(ucDto.getId()));
+                UserCompanyDto uc = new UserCompanyDto(companyDto.getId().intValue(), ucDto.isDefault());
+
+                //Check if company in this iteration is not already related to the user we are updating
+                if(existingUser.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getId(), ucDto.getId())))
+                    existingUser.getUserCompanies().add(uc);
+                else{
+                    //If the company exists for the user, we'll update only 'isDefault' field and persist later
+                    UserCompanyDto existingUc = existingUser.getUserCompanies().stream().filter((e) -> Objects.equals(e.getId(), ucDto.getId())).findFirst().get();
+                    existingUc.setDefault(ucDto.isDefault());
+                }
+            }
+
+            //Let's iterate over the UserCompanies for the user we want to update
+            //If a company is not in the list submitted in the Dto, we remove the association and persist change
+            Iterator<UserCompanyDto> ucs = existingUser.getUserCompanies().iterator();
+            while(ucs.hasNext()){
+                UserCompanyDto uc = ucs.next();
+                if(userDto.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getId(), uc.getId()))){
+                    ucs.remove();
+                    userServicePort.deleteUserCompanyById(existingUser.getId(), Long.valueOf(uc.getId()));
+                }
+            }
 
             UserDto updatedUser = userServicePort.saveUser(existingUser);
             updatedUser.setPassword(null);
