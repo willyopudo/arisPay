@@ -18,4 +18,6 @@ public interface UserPersistencePort {
 	UserDto findUserByUserName2(String username);
 
 	List<UserDto> findAllUsers();
+
+	void deleteUserCompanyById(Long userId, Long companyId);
 }

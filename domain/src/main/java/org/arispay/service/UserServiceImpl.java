@@ -54,4 +54,9 @@ public class UserServiceImpl implements UserServicePort {
 //				.collect(Collectors.toList());
 		return users;
 	}
+
+	@Override
+	public void deleteUserCompanyById(Long userId, Long companyId) {
+		userPersistencePort.deleteUserCompanyById(userId, companyId);
+	}
 }

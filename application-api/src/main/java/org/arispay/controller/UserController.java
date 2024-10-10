@@ -7,10 +7,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.data.CompanyDto;
 import org.arispay.data.GenericHttpResponse;
+import org.arispay.data.UserCompanyDto;
 import org.arispay.data.UserDto;
+import org.arispay.entity.Company;
+import org.arispay.entity.UserCompany;
 import org.arispay.globconfig.security.ApplicationUserRole;
 import org.arispay.ports.api.CompanyServicePort;
 import org.arispay.ports.api.UserServicePort;
+import org.arispay.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,7 +26,10 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -41,12 +48,15 @@ public class UserController {
     @Value("${spring.application.name}")
     private String appName;
     private static final Logger logger = LogManager.getLogger(UserController.class);
+    @Autowired
+    private CompanyRepository companyRepository;
 
     // Register new user
     @PostMapping
     public ResponseEntity<GenericHttpResponse<?>> register(@Valid @RequestBody UserDto userDto,
                                                             BindingResult result,
                                                             Model model, Principal principal) {
+        userDto.setId(null);
         GenericHttpResponse<UserDto> response = new GenericHttpResponse<>();
         UserDto existingUser = userServicePort.findUserByEmail(userDto.getEmail());
         List<CompanyDto> companies = companyServicePort.getCompanies();
@@ -77,6 +87,7 @@ public class UserController {
         if (userDto.getRole() == null)
             userDto.setRole("ROLE_USER");
         UserDto savedUser =  userServicePort.saveUser(userDto);
+        savedUser.setPassword(null);
 
         response.setHttpStatus(HttpStatus.OK);
         response.setMessage("User registered successfully");
@@ -113,12 +124,31 @@ public class UserController {
         UserDto existingUser = userServicePort.findUserById(Math.toIntExact(id));
         if (existingUser != null) {
             existingUser.setEmail(userDto.getEmail());
-            existingUser.setPassword(userDto.getPassword());
+            existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
             existingUser.setRole(userDto.getRole());
             existingUser.setFirstName(userDto.getFirstName());
             existingUser.setLastName(userDto.getLastName());
 
+            for(UserCompanyDto ucDto : userDto.getUserCompanies()){
+                CompanyDto companyDto = companyServicePort.getCompanyById(Long.valueOf(ucDto.getCompanyId()));
+                UserCompanyDto uc = new UserCompanyDto(ucDto.getId(), companyDto.getId().intValue(), ucDto.isDefault());
+
+                //Check if company in this iteration is not already related to the user we are updating
+                if(existingUser.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())))
+                    existingUser.getUserCompanies().add(uc);
+                else{
+                    //If the company exists for the user, we'll update only 'isDefault' field and persist later
+                    UserCompanyDto existingUc = existingUser.getUserCompanies().stream().filter((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())).findFirst().get();
+                    existingUc.setDefault(ucDto.isDefault());
+                }
+            }
+
+            //Let's iterate over the UserCompanies for the user we want to update
+            //If a company is not in the list submitted in the Dto, we remove the association and persist change
+            existingUser.getUserCompanies().removeIf(uc -> userDto.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), uc.getCompanyId())));
+
             UserDto updatedUser = userServicePort.saveUser(existingUser);
+            updatedUser.setPassword(null);
             response.setHttpStatus(HttpStatus.OK);
             response.setMessage("User updated successfully");
             response.setData(updatedUser);

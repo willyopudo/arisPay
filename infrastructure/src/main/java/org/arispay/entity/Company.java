@@ -47,7 +47,7 @@ public class Company {
 
 	private Date modifiedDate = new java.util.Date();
 
-	@OneToMany(mappedBy = "company")
-	private List<UserCompany> users;
+	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+	private List<UserCompany> userCompanies;
 
 }

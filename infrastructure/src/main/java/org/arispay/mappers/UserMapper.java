@@ -1,10 +1,8 @@
 package org.arispay.mappers;
 
+import org.arispay.data.UserCompanyDto;
 import org.arispay.data.UserDto;
-import org.arispay.entity.Company;
-import org.arispay.entity.Role;
-import org.arispay.entity.User;
-import org.arispay.entity.UserCompany;
+import org.arispay.entity.*;
 import org.arispay.repository.*;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -25,44 +23,50 @@ public abstract class UserMapper {
 	@Autowired
 	private UserCompanyRepository userCompanyRepository;
 
-	@Autowired
-	private UserRepository userRepository;
+//	@Autowired
+//	private UserRepository userRepository;
 
 	//mock comment
-	@Mapping(source = "companyIds", target = "companies", qualifiedByName = "idsToCompanies")
+	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "idsToCompanies")
 	@Mapping(source = "role", target = "roles", qualifiedByName = "roleNameToRoles")
 	public abstract User convert(UserDto userDto);
 
-	@Mapping(source = "companies", target = "companyIds", qualifiedByName = "companiesToIds")
+	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "companiesToIds")
 	@Mapping(source = "roles", target = "role", qualifiedByName = "RoleListToRoleName")
 	@InheritInverseConfiguration
 	public abstract UserDto convert(User user);
 
-	@Mapping(source = "companies", target = "companyIds", qualifiedByName = "companiesToIds")
+	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "companiesToIds")
 	@Mapping(source = "roles", target = "role", qualifiedByName = "RoleListToRoleName")
 	public abstract List<UserDto> userListToUserDtoList(List<User> userList);
 
-	@Mapping(source = "companyIds", target = "companies", qualifiedByName = "idsToCompanies")
+	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "idsToCompanies")
 	@Mapping(source = "role", target = "roles", qualifiedByName = "roleNameToRoles")
 	public abstract List<User> userDtoListToUserList(List<UserDto> userDtoList);
 
 	@Named("idsToCompanies")
-	public List<UserCompany> userIdToUserCompanies(List<Long> userIds) {
+	public List<UserCompany> userCompanyIdsToUserCompanies(List<UserCompanyDto> userCompanyDtos) {
 		List<UserCompany> userCompanies = new ArrayList<>();
-		UserCompany userCompany = new UserCompany();
-		userCompany.setUser(userRepository.findById(userIds.getFirst()).orElse(null));
-		return userCompanyRepository.findAll(Example.of(userCompany));
+		for(UserCompanyDto userCompanyDto : userCompanyDtos) {
+			Company company = companyRepository.findById(Long.valueOf(userCompanyDto.getCompanyId())).orElse(null);
+			UserCompany userCompany =  new UserCompany(company, userCompanyDto.isDefault());
+			userCompany.setId(userCompanyDto.getId());
+			userCompanies.add(userCompany);
+
+		}
+		return userCompanies;
+		//return userCompanyRepository.findAll(Example.of(userCompany));
 	}
 
 	@Named("companiesToIds")
-	public static List<Long> companyToId(List<UserCompany> companies) {
+	public static List<UserCompanyDto> companyToId(List<UserCompany> companies) {
 
-		List<Long> companyIds = new ArrayList<>();
+		List<UserCompanyDto> userCompanies = new ArrayList<>();
 		for( UserCompany company: companies ) {
-			companyIds.add(company.getCompany().getId());
+			userCompanies.add(new UserCompanyDto(company.getId(),company.getCompany().getId().intValue(), company.isDefault()));
 		}
 
-		return companyIds;
+		return userCompanies;
 	}
 
 	@Named("roleNameToRoles")

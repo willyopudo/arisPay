@@ -31,8 +31,8 @@ public class UserDto {
 	@Email
 	private String email;
 
-	@NotNull(message = "Company can not be empty")
-	private List<Long> companyIds;
+	@NotNull(message = "User Companies can not be empty")
+	private List<UserCompanyDto> userCompanies;
 	//@NotEmpty(message = "Password should not be empty")
 	private String password;
 
