@@ -1,10 +1,12 @@
 package org.arispay.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.arispay.enums.CompanyIdentifierType;
 
 import java.util.Date;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "companies")
-public class Company {
+public class Company extends AuditableEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -28,24 +30,21 @@ public class Company {
 
 	private String shortCode;
 
+	private String businessRegNum;
+
+	@Email
+	private String email;
+
+	private String phoneNumber;
+
+	private String category;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "identifier_type")
+	private CompanyIdentifierType identifierType;
+
 	@Column(nullable = false)
 	private Float balance;
-
-	@Column(nullable = false)
-	private byte recordStatus;
-
-	@Column(nullable = false)
-	private byte isEnabled;
-
-	@Column(nullable = false)
-	private String createdBy;
-
-	@Column(nullable = false)
-	private Date createdDate = new java.util.Date();
-
-	private String modifiedBy;
-
-	private Date modifiedDate = new java.util.Date();
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
 	private List<UserCompany> userCompanies;

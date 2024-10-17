@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserCompanyDto {
     private Long id;
-    private Integer companyId;
+    private Long companyId;
     private boolean isDefault;
 }
