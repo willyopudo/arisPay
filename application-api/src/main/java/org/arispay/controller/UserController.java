@@ -91,8 +91,8 @@ public class UserController {
             existingUser.setLastName(userDto.getLastName());
 
             for(UserCompanyDto ucDto : userDto.getUserCompanies()){
-                CompanyDto companyDto = companyServicePort.getCompanyById(Long.valueOf(ucDto.getCompanyId()));
-                UserCompanyDto uc = new UserCompanyDto(ucDto.getId(), companyDto.getId().intValue(), ucDto.isDefault());
+                CompanyDto companyDto = companyServicePort.getCompanyById(ucDto.getCompanyId());
+                UserCompanyDto uc = new UserCompanyDto(ucDto.getId(), companyDto.getId(), ucDto.isDefault());
 
                 //Check if company in this iteration is not already related to the user we are updating
                 if(existingUser.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())))
