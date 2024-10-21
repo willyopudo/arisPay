@@ -43,9 +43,6 @@ public class Company extends AuditableEntity{
 	@Column(name = "identifier_type")
 	private CompanyIdentifierType identifierType;
 
-	@Column(nullable = false)
-	private Float balance;
-
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
 	private List<UserCompany> userCompanies;
 

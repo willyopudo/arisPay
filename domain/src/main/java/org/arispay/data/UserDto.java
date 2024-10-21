@@ -17,7 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 	private Long id;
 	@NotEmpty
@@ -32,7 +32,7 @@ public class UserDto {
 	private String email;
 
 	@NotNull(message = "User Companies can not be empty")
-	private List<UserCompanyDto> userCompanies;
+	private List<UserCompanyDto> userCompanies = new ArrayList<>();
 	//@NotEmpty(message = "Password should not be empty")
 	private String password;
 

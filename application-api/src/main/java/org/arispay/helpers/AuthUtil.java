@@ -1,5 +1,6 @@
 package org.arispay.helpers;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.Logger;
 import org.arispay.data.*;
@@ -10,10 +11,12 @@ import org.arispay.ports.api.UserServicePort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@Service
 public class AuthUtil {
 
     public static ResponseEntity<GenericHttpResponse<?>> getGenericHttpResponseResponseEntity(@RequestBody @Valid UserDto userDto, BindingResult result, GenericHttpResponse<UserDto> response, UserDto existingUser, Logger logger, PasswordEncoder passwordEncoder, UserServicePort userServicePort) {
@@ -52,6 +55,7 @@ public class AuthUtil {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
+    @Transactional
     public static ResponseEntity<GenericHttpResponse<?>> registerCompanyAdmin(@RequestBody @Valid RegistrationDto registrationDto,
                                                                                               BindingResult result, GenericHttpResponse<RegistrationDto> response,
                                                                                               UserDto existingUser,
@@ -59,7 +63,7 @@ public class AuthUtil {
                                                                                               PasswordEncoder passwordEncoder,
                                                                                               UserServicePort userServicePort,
                                                                                               CompanyServicePort companyServicePort,
-                                                                                              CompanyAccountServicePort companyAccountServicePort) {
+                                                                                              CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort) {
         if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
             result.rejectValue("email", null,
                     "There is already an account registered with the same email");

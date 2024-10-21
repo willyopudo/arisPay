@@ -32,6 +32,4 @@ public class CompanyDto {
 	private String category;
 
 	private String identifierType;
-
-	private Float balance;
 }
