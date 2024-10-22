@@ -23,7 +23,7 @@ public class CompanyAccountJpaAdapter implements CompanyAccountPersistencePort<C
 
 	@Override
 	public CompanyAccountDto add(CompanyAccountDto obj) {
-		CompanyAccount companyAccount = ObjectMapperUtils.map(obj, CompanyAccount.class);
+		CompanyAccount companyAccount = companyAccountMapper.companyAccountDtoToCompanyAccount(obj);
 
 		CompanyAccount companyAccountSaved = companyAccountRepository.save(companyAccount);
 
