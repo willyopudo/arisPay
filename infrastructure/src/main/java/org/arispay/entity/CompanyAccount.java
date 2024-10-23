@@ -40,4 +40,7 @@ public class CompanyAccount extends AuditableEntity {
 	@Column(nullable = false)
 	private String bankName;
 
+	@Column(nullable = false)
+	private Float balance;
+
 }

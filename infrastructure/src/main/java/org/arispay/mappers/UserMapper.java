@@ -47,13 +47,16 @@ public abstract class UserMapper {
 	@Named("idsToCompanies")
 	public List<UserCompany> userCompanyIdsToUserCompanies(List<UserCompanyDto> userCompanyDtos) {
 		List<UserCompany> userCompanies = new ArrayList<>();
-		for(UserCompanyDto userCompanyDto : userCompanyDtos) {
-			Company company = companyRepository.findById(Long.valueOf(userCompanyDto.getCompanyId())).orElse(null);
-			UserCompany userCompany =  new UserCompany(company, userCompanyDto.isDefault());
-			userCompany.setId(userCompanyDto.getId());
-			userCompanies.add(userCompany);
+		if(!(userCompanyDtos == null)) {
+			for(UserCompanyDto userCompanyDto : userCompanyDtos) {
+				Company company = companyRepository.findById(userCompanyDto.getCompanyId()).orElse(null);
+				UserCompany userCompany =  new UserCompany(company, userCompanyDto.isDefault());
+				userCompany.setId(userCompanyDto.getId());
+				userCompanies.add(userCompany);
 
+			}
 		}
+
 		return userCompanies;
 		//return userCompanyRepository.findAll(Example.of(userCompany));
 	}
@@ -63,7 +66,7 @@ public abstract class UserMapper {
 
 		List<UserCompanyDto> userCompanies = new ArrayList<>();
 		for( UserCompany company: companies ) {
-			userCompanies.add(new UserCompanyDto(company.getId(),company.getCompany().getId().intValue(), company.isDefault()));
+			userCompanies.add(new UserCompanyDto(company.getId(),company.getCompany().getId(), company.isDefault()));
 		}
 
 		return userCompanies;

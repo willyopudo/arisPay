@@ -73,4 +73,6 @@ public class ArisPayApiConfig {
 		return new TransactionRejectedServiceImpl(rejectedTransactionPersistence());
 	}
 
+
+
 }

@@ -5,11 +5,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.adapters.auth.RefreshTokenService;
 import org.arispay.auth.JwtUtil;
-import org.arispay.data.GenericHttpResponse;
+import org.arispay.data.*;
 import org.arispay.data.dtoauth.*;
+import org.arispay.entity.CompanyAccount;
 import org.arispay.entity.User;
 import org.arispay.entity.auth.RefreshToken;
 import org.arispay.exception.TokenRefreshException;
+import org.arispay.helpers.AuthUtil;
+import org.arispay.ports.api.CompanyAccountServicePort;
+import org.arispay.ports.api.CompanyServicePort;
+import org.arispay.ports.api.UserServicePort;
 import org.arispay.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,13 +23,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -42,11 +46,38 @@ public class AuthController {
 
 	private final JwtUtil jwtUtil;
 
-	public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+	private final PasswordEncoder passwordEncoder;
+
+	private final UserServicePort userServicePort;
+
+	private final CompanyServicePort companyServicePort;
+
+	private final CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort;
+
+
+	public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, PasswordEncoder passwordEncoder, UserServicePort userServicePort,
+						  CompanyServicePort companyServicePort, CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort) {
 		this.authenticationManager = authenticationManager;
 		this.jwtUtil = jwtUtil;
+		this.passwordEncoder = passwordEncoder;
+		this.userServicePort = userServicePort;
+		this.companyServicePort = companyServicePort;
+		this.companyAccountServicePort = companyAccountServicePort;
 
 	}
+
+	// Register new user
+	@PostMapping("/register")
+	public ResponseEntity<GenericHttpResponse<?>> register(@Valid @RequestBody RegistrationDto registrationDto,
+														   BindingResult result,
+														   Model model, Principal principal) {
+		registrationDto.getUserDto().setId(null);
+		GenericHttpResponse<RegistrationDto> response = new GenericHttpResponse<>();
+		UserDto existingUser = userServicePort.findUserByEmail(registrationDto.getUserDto().getEmail());
+
+		return AuthUtil.registerCompanyAdmin(registrationDto, result, response, existingUser, logger, passwordEncoder, userServicePort, companyServicePort, companyAccountServicePort);
+	}
+
 
 	@ResponseBody
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -102,5 +133,15 @@ public class AuthController {
 				})
 				.orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
 						"Refresh token is not in database!"));
+	}
+
+	@GetMapping("/test-controller")
+	public RegistrationDto returnObjectInBrowser() {
+		RegistrationDto someClass = new RegistrationDto();
+		someClass.setCompanyAccountDto(new CompanyAccountDto());
+		someClass.setUserDto(new UserDto());
+		someClass.setCompanyDto(new CompanyDto());
+		someClass.getUserDto().getUserCompanies().add(new UserCompanyDto());
+		return someClass;
 	}
 }
