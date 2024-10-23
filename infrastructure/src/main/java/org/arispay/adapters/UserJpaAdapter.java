@@ -61,19 +61,6 @@ public class UserJpaAdapter implements UserPersistencePort {
 			}
 
 
-//			List<UserCompany> userCompanies = userCompanyRepository.findByUserId(userSaved.getId());
-//
-//			boolean isDefaultCompany = userCompanies.isEmpty();
-//			user.getCompanies().getFirst().setDefault(isDefaultCompany);
-//
-//
-//			if (userCompanyRepository.findByUserIdAndCompanyId(user.getId(), Objects.requireNonNull(companyRepository.findById(user.getCompanies().getFirst().getCompany().getId()).orElse(null)).getId()).isEmpty()) {
-//				userCompanyRepository.save(user.getCompanies().getFirst());
-//				userCompanies.add(user.getCompanies().getFirst());
-//			}
-//
-//			userSaved.setCompanies(userCompanies);
-
 			return userMapper.convert(userSaved);
 		}catch (Exception e){
             logger.error("Error occurred while saving user: {}", e.getMessage());
