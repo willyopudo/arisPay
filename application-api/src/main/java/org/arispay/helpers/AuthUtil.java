@@ -65,11 +65,11 @@ public class AuthUtil {
                                                                                               CompanyServicePort companyServicePort,
                                                                                               CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort) {
         if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
-            result.rejectValue("email", null,
+            result.rejectValue("userDto.email", null,
                     "There is already an account registered with the same email");
         }
         if (registrationDto.getUserDto().getPassword().isEmpty()) {
-            result.rejectValue("password", null,
+            result.rejectValue("userDto.password", null,
                     "Password cannot be empty");
         }
         if (result.hasErrors()) {
@@ -87,8 +87,7 @@ public class AuthUtil {
         }
 
         registrationDto.getUserDto().setPassword(passwordEncoder.encode(registrationDto.getUserDto().getPassword()));
-        if (registrationDto.getUserDto().getRole() == null) {
-            registrationDto.getUserDto().setRole("ROLE_USER");
+        if (registrationDto.getUserDto().getRole().contains("ROLE_COMPANY_USER")) {
             UserDto savedUser = userServicePort.saveUser(registrationDto.getUserDto());
             savedUser.setPassword(null);
             registrationDto.setUserDto(savedUser);
