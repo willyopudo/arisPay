@@ -47,7 +47,7 @@ public class UserController {
 
     // Register new user
     @PostMapping
-    public ResponseEntity<GenericHttpResponse<?>> register(@Valid @RequestBody UserDto userDto,
+    public ResponseEntity<GenericHttpResponse<UserDto>> register(@Valid @RequestBody UserDto userDto,
                                                             BindingResult result,
                                                             Model model, Principal principal) {
         userDto.setId(null);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.arispay.data.UserCompanyDto;
 
 import java.util.List;
 
@@ -31,4 +32,7 @@ public class UserLoginRespDto {
 
     @JsonProperty("role")
     private String role;
+
+    private Long companyId;
+
 }
