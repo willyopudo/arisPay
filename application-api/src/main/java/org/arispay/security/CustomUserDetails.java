@@ -2,6 +2,7 @@ package org.arispay.security;
 
 import org.arispay.entity.Role;
 import org.arispay.entity.User;
+import org.arispay.entity.UserCompany;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -57,6 +58,8 @@ public class CustomUserDetails implements UserDetails {
 	public Long getId() {
 		return user.getId();
 	}
+
+	public List<UserCompany> getUserCompanies() {return user.getUserCompanies();}
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;

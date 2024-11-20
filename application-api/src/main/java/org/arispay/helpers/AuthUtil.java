@@ -19,15 +19,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Service
 public class AuthUtil {
 
-    public static ResponseEntity<GenericHttpResponse<?>> getGenericHttpResponseResponseEntity(@RequestBody @Valid UserDto userDto, BindingResult result, GenericHttpResponse<UserDto> response, UserDto existingUser, Logger logger, PasswordEncoder passwordEncoder, UserServicePort userServicePort) {
+    public static ResponseEntity<GenericHttpResponse<UserDto>> getGenericHttpResponseResponseEntity(@RequestBody @Valid UserDto userDto, BindingResult result, GenericHttpResponse<UserDto> response, UserDto existingUser, Logger logger, PasswordEncoder passwordEncoder, UserServicePort userServicePort) {
         if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
             result.rejectValue("email", null,
                     "There is already an account registered with the same email");
         }
-        if (userDto.getPassword().isEmpty()) {
-            result.rejectValue("password", null,
-                    "Password cannot be empty");
-        }
+//        if (userDto.getPassword().isEmpty()) {
+//            result.rejectValue("password", null,
+//                    "Password cannot be empty");
+//        }
         if (result.hasErrors()) {
             logger.debug("There were errors");
             StringBuilder errors = new StringBuilder();
@@ -42,9 +42,9 @@ public class AuthUtil {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+//        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         if (userDto.getRole() == null)
-            userDto.setRole("ROLE_USER");
+            userDto.setRole("ROLE_COMPANY_USER");
         UserDto savedUser =  userServicePort.saveUser(userDto);
         savedUser.setPassword(null);
 

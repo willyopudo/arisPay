@@ -7,11 +7,12 @@ import org.arispay.adapters.auth.RefreshTokenService;
 import org.arispay.auth.JwtUtil;
 import org.arispay.data.*;
 import org.arispay.data.dtoauth.*;
-import org.arispay.entity.CompanyAccount;
 import org.arispay.entity.User;
+import org.arispay.entity.UserCompany;
 import org.arispay.entity.auth.RefreshToken;
 import org.arispay.exception.TokenRefreshException;
 import org.arispay.helpers.AuthUtil;
+import org.arispay.mappers.UserMapper;
 import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.ports.api.CompanyServicePort;
 import org.arispay.ports.api.UserServicePort;
@@ -29,6 +30,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -54,16 +57,18 @@ public class AuthController {
 
 	private final CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort;
 
+	private final UserMapper userMapper;
+
 
 	public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, PasswordEncoder passwordEncoder, UserServicePort userServicePort,
-						  CompanyServicePort companyServicePort, CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort) {
+						  CompanyServicePort companyServicePort, CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort, UserMapper userMapper) {
 		this.authenticationManager = authenticationManager;
 		this.jwtUtil = jwtUtil;
 		this.passwordEncoder = passwordEncoder;
 		this.userServicePort = userServicePort;
 		this.companyServicePort = companyServicePort;
 		this.companyAccountServicePort = companyAccountServicePort;
-
+		this.userMapper = userMapper;
 	}
 
 	// Register new user
@@ -92,9 +97,12 @@ public class AuthController {
 			User user = new User();
 			user.setUsername(username);
 			String token = jwtUtil.createToken(user);
+			List<UserCompany> userCompanies = userDetails.getUserCompanies().stream().filter(UserCompany::isDefault).toList();
+			UserCompany userCompany = userCompanies.stream().findFirst().get();
 
 			//Build UserDetails object
-			UserLoginRespDto userDetail = new UserLoginRespDto(userDetails.getId(), userDetails.getUsername(), userDetails.getFullName(), userDetails.getEmail(), userDetails.getId() + ".png", userDetails.getAuthoritiesList(), userDetails.getAuthoritiesList().getFirst().substring(5));
+			UserLoginRespDto userDetail = new UserLoginRespDto(userDetails.getId(), userDetails.getUsername(), userDetails.getFullName(), userDetails.getEmail(), userDetails.getId() + ".png", userDetails.getAuthoritiesList(), userDetails.getAuthoritiesList().getFirst().substring(5),
+					userCompany.getCompany().getId());
 
 			//Generate refresh token
 			RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
