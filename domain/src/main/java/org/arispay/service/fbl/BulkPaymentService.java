@@ -30,7 +30,7 @@ public class BulkPaymentService {
         try {
             bulkTransactionRequest = bulkTransactionPersistencePort.addBulkTransaction(bulkTransactionRequest);
 
-            URI uri = new URI("https://sandbox.familybank.co.ke:1044/api/v1/Transaction");
+            URI uri = new URI("https://openbaknk.bakabc.com/api/v1/Transaction");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Accept", "*/*");
             headers.add("Authorization", "Bearer " + tokenService.getAccessToken());

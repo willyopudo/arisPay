@@ -14,7 +14,7 @@ public class BulkPostingService {
         this.bulkTransactionPersistencePort = bulkTransactionPersistencePort;
     }
 
-    @Scheduled(cron = "*/5 * * * *")
+    @Scheduled(cron = "*/5 * * * * *")
     private void postTransactions() {
         bulkTransactionPersistencePort.postTransactions();
     }
