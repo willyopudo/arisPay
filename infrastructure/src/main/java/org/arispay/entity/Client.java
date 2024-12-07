@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.arispay.enums.IdentifierType;
+import org.arispay.enums.ClientIdentifierType;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -26,7 +26,7 @@ public class Client extends AuditableEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "identifier_type")
-    private IdentifierType identifierType;
+    private ClientIdentifierType identifierType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "company_id", nullable = false)

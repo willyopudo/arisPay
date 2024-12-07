@@ -10,6 +10,7 @@ import java.util.List;
 public interface CompanyMapper {
 	// CompanyMapper INSTANCE = Mappers.getMapper(CompanyMapper.class);
 
+	//Dummy comment
 	CompanyDto companyToCompanyDto(Company company);
 
 	Company companyDtoToCompany(CompanyDto companyDto);

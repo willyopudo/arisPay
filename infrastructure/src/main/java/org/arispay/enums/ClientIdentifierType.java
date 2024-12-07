@@ -1,5 +1,5 @@
 package org.arispay.enums;
 
-public enum IdentifierType {
+public enum ClientIdentifierType {
     ID_NUMBER,MSSIDN,ACCOUNT_NUMBER,BILL_NUMBER,REG_NUMBER,INVOICE_NUMBER
 }

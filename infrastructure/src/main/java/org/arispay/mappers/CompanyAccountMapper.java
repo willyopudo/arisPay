@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring", uses = CompanyRepository.class)
 public abstract class CompanyAccountMapper {
-
     @Autowired
     private CompanyRepository companyRepository;
 

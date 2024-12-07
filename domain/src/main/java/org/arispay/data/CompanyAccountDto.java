@@ -20,4 +20,6 @@ public class CompanyAccountDto {
 
 	private String bankName;
 
+	private Float balance;
+
 }

@@ -8,9 +8,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -38,7 +36,7 @@ public class User extends AuditableEntity implements Serializable {
 	@Column(nullable = false, unique = true)
 	private String email;
 
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private String password;
 
 	@Column(nullable = false, unique = true)
@@ -52,15 +50,35 @@ public class User extends AuditableEntity implements Serializable {
 	@Column(nullable = false)
 	private String town;
 
-	@ManyToOne
-	@JoinColumn(name = "company_id", nullable = false)
-	private Company company;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<UserCompany> userCompanies;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
 			name = "users_roles",
 			joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},
 			inverseJoinColumns = {@JoinColumn(name = "ROLE_ID", referencedColumnName = "ID")})
 	private List<Role> roles = new ArrayList<>();
+
+//	public void addCompany(Company company) {
+//		UserCompany userCompany = new UserCompany(this, company,false);
+//		companies.add(userCompany);
+//		company.getUsers().add(userCompany);
+//	}
+//
+//	public void removeCompany(Company company) {
+//		for (Iterator<UserCompany> iterator = companies.iterator();
+//			 iterator.hasNext(); ) {
+//			UserCompany userCompany = iterator.next();
+//
+//			if (userCompany.getUser().equals(this) &&
+//					userCompany.getCompany().equals(company)) {
+//				iterator.remove();
+//				userCompany.getCompany().getUsers().remove(userCompany);
+//				userCompany.setUser(null);
+//				userCompany.setCompany(null);
+//			}
+//		}
+//	}
 
 }

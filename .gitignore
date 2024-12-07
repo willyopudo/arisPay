@@ -43,3 +43,4 @@ build/
 ### Dev Env ###
 log4j2-dev.xml
 application-dev.yml
+.env

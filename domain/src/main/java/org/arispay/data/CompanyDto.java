@@ -1,5 +1,6 @@
 package org.arispay.data;
 
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,13 +22,14 @@ public class CompanyDto {
 
 	private String shortCode;
 
-	private Float balance;
+	private String businessRegNum;
 
-	private byte recordStatus;
+	@Email
+	private String email;
 
-	private byte isEnabled;
+	private String phoneNumber;
 
-	private String createdBy;
+	private String category;
 
-	private Date createdDate;
+	private String identifierType;
 }

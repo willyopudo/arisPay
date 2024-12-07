@@ -18,4 +18,8 @@ public interface UserServicePort {
 	UserDto findUserByUserName2(String username);
 
 	List<UserDto> findAllUsers();
+
+	//public void findUserCompanyByUserIdAndCompanyId(Long userId, Long companyId);
+
+	public void deleteUserCompanyById(Long userId, Long companyId);
 }

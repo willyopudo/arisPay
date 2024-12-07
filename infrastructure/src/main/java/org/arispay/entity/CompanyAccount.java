@@ -24,11 +24,11 @@ public class CompanyAccount extends AuditableEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "company_id", nullable = false)
-	@OnDelete(action = OnDeleteAction.CASCADE)
+	//@OnDelete(action = OnDeleteAction.CASCADE)
 	@JsonIgnore
 	private Company company;
 
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String accountNumber;
 
 	@Column(nullable = false)
@@ -39,5 +39,8 @@ public class CompanyAccount extends AuditableEntity {
 
 	@Column(nullable = false)
 	private String bankName;
+
+	@Column(nullable = false)
+	private Float balance;
 
 }
