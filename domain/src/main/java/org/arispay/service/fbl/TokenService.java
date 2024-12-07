@@ -49,8 +49,8 @@ public class TokenService {
 
     private String generateNewToken() {
         try {
-            URI uri = new URI("https://sandbox.familybank.co.ke:1045/connect/token");
-            JwtLoginReq tokenRequest = new JwtLoginReq("client@sandbox.familybank.co.ke", "#secret123$",
+            URI uri = new URI("https://openbaknk.bakabc.com/connect/token");
+            JwtLoginReq tokenRequest = new JwtLoginReq("client@sandbox.bankabc", "#secret123$",
                 "client_credentials", "OB_BULK_PAY");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Accept", "*/*");

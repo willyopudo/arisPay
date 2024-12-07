@@ -16,14 +16,16 @@ public abstract class ClientMapper {
 
     @Autowired
     private CompanyRepository companyRepository;
-
+    //dummy comment
     @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
+    @Mapping(source = "company", target = "companyName", qualifiedByName = "companyToName")
     public abstract ClientDto clientToClientDto(Client client);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
     public abstract Client clientDtoToClient(ClientDto clientDto);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
+    @Mapping(source = "company", target = "companyName", qualifiedByName = "companyToName")
     public abstract List<ClientDto> clientListToClientDtoList(List<Client> clientList);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
@@ -37,5 +39,9 @@ public abstract class ClientMapper {
     @Named("companyToId")
     public static Long companyToId(Company company) {
         return company.getId();
+    }
+    @Named("companyToName")
+    public static String companyToName(Company company) {
+        return company.getName();
     }
 }
