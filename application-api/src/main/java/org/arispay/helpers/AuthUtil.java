@@ -1,13 +1,17 @@
 package org.arispay.helpers;
 
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.Logger;
 import org.arispay.data.*;
+import org.arispay.data.dtoauth.EmailDetails;
 import org.arispay.data.dtoauth.RegistrationDto;
 import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.ports.api.CompanyServicePort;
 import org.arispay.ports.api.UserServicePort;
+import org.arispay.service.EmailService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,11 +19,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.thymeleaf.context.Context;
 
 @Service
 public class AuthUtil {
 
-    public static ResponseEntity<GenericHttpResponse<UserDto>> getGenericHttpResponseResponseEntity(@RequestBody @Valid UserDto userDto, BindingResult result, GenericHttpResponse<UserDto> response, UserDto existingUser, Logger logger, PasswordEncoder passwordEncoder, UserServicePort userServicePort) {
+    @Autowired
+    private EmailService emailService;
+
+    public ResponseEntity<GenericHttpResponse<UserDto>> getGenericHttpResponseResponseEntity(@RequestBody @Valid UserDto userDto, BindingResult result, GenericHttpResponse<UserDto> response, UserDto existingUser, Logger logger, PasswordEncoder passwordEncoder, UserServicePort userServicePort) {
         if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
             result.rejectValue("email", null,
                     "There is already an account registered with the same email");
@@ -47,6 +55,22 @@ public class AuthUtil {
             userDto.setRole("ROLE_COMPANY_USER");
         UserDto savedUser =  userServicePort.saveUser(userDto);
         savedUser.setPassword(null);
+
+        String message = String.format("Dear  %s, you have been created on ArisPay by your Company Admin.", savedUser.getFirstName());
+        String subject = "Update your user details";
+
+        Context context = new Context();
+        // Set variables for the template
+        context.setVariable("message", message);
+        context.setVariable("subject", subject);
+
+        EmailDetails emailDetails = new EmailDetails(savedUser.getEmail(), "", subject, "");
+
+        try {
+            emailService.sendHTMLMail(emailDetails, "companyUserEmailTemplate", context);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
 
         response.setHttpStatus(HttpStatus.OK);
         response.setMessage("User registered successfully");
