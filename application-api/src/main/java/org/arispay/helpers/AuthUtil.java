@@ -21,6 +21,9 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.thymeleaf.context.Context;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Service
 public class AuthUtil {
 
@@ -53,16 +56,23 @@ public class AuthUtil {
 //        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         if (userDto.getRole() == null)
             userDto.setRole("ROLE_COMPANY_USER");
+
+        String token = UUID.randomUUID().toString();
+        userDto.setToken(token);
+        userDto.setTokenExpiration(LocalDateTime.now().plusHours(1));
         UserDto savedUser =  userServicePort.saveUser(userDto);
         savedUser.setPassword(null);
 
         String message = String.format("Dear  %s, you have been created on ArisPay by your Company Admin.", savedUser.getFirstName());
         String subject = "Update your user details";
+        String link = "http://localhost:3000/pages/authentication/set-password";
 
         Context context = new Context();
         // Set variables for the template
         context.setVariable("message", message);
         context.setVariable("subject", subject);
+        context.setVariable("link", link);
+        context.setVariable("token", token);
 
         EmailDetails emailDetails = new EmailDetails(savedUser.getEmail(), "", subject, "");
 

@@ -16,8 +16,10 @@ import org.arispay.repository.RoleRepository;
 import org.arispay.repository.UserCompanyRepository;
 import org.arispay.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -103,6 +105,12 @@ public class UserJpaAdapter implements UserPersistencePort {
 		return userMapper.userListToUserDtoList(users);
 	}
 
+	@Override
+	public UserDto findUserByToken(String token) {
+		UserDto convert = userMapper.convert(userRepository.findByToken(token).get());
+		return convert;
+	}
+
 	private Role checkRoleExist(String roleName) {
 		Role role = new Role();
 		role.setName(roleName);
@@ -113,10 +121,25 @@ public class UserJpaAdapter implements UserPersistencePort {
 //	}
 	@Override
 	public void deleteUserCompanyById(Long userId, Long companyId) {
-		//UserCompanyId userCompanyId = new UserCompanyId(userId, companyId);
 		UserCompany userCompany = userCompanyRepository.findByUserIdAndCompanyId(userId, companyId);
 		if(userCompany != null)
 			userCompanyRepository.delete(userCompany);
+	}
+
+	@Override
+	public UserDto setPassword(String token, String password) {
+		User user = userRepository.findByToken(token)
+				.orElseThrow(() -> new RuntimeException("Invalid token"));
+		if (user.getTokenExpiration().isBefore(LocalDateTime.now())) {
+			throw new RuntimeException("Token expired");
+		}
+		user.setPassword(new BCryptPasswordEncoder().encode(password));
+		user.setToken(null);
+		user.setTokenExpiration(null);
+		User savedUser = userRepository.save(user);
+		savedUser.setPassword(null);
+		return userMapper.convert(savedUser);
+
 	}
 
 }

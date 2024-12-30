@@ -143,6 +143,19 @@ public class AuthController {
 						"Refresh token is not in database!"));
 	}
 
+	@PostMapping("/set-password")
+	public ResponseEntity<?> setPassword(@Valid @RequestBody SetPasswordRequest setPasswordRequest) {
+		try {
+			UserDto userDto = userServicePort.setPassword(setPasswordRequest.getToken(), setPasswordRequest.getPassword());
+			return ResponseEntity.ok(userDto);
+		}
+		catch (Exception e) {
+			GenericHttpResponse<?> genericHttpResponse = new GenericHttpResponse<String>(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), null);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(genericHttpResponse);
+		}
+
+	}
+
 	@GetMapping("/test-controller")
 	public RegistrationDto returnObjectInBrowser() {
 		RegistrationDto someClass = new RegistrationDto();

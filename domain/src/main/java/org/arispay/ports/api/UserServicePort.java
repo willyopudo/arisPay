@@ -19,6 +19,10 @@ public interface UserServicePort {
 
 	List<UserDto> findAllUsers();
 
+	UserDto findUserByToken (String token);
+
+	UserDto setPassword(String token, String password);
+
 	//public void findUserCompanyByUserIdAndCompanyId(Long userId, Long companyId);
 
 	public void deleteUserCompanyById(Long userId, Long companyId);
