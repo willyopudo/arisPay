@@ -28,7 +28,7 @@ public class BulkPaymentQueryService {
     @Autowired
     private TokenService tokenService;
 
-    @Scheduled(cron = "*/5 * * * *")
+    @Scheduled(cron = "*/5 * * * * *")
     private void queryBulkTransactionStatus() {
         try {
 
@@ -43,7 +43,7 @@ public class BulkPaymentQueryService {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<?> httpEntity = new HttpEntity<>(headers);
 
-                String uri = "https://sandbox.familybank.co.ke:1044/api/v1/Transaction";
+                String uri = "https://openbaknk.bakabc.com/api/v1/Transaction";
 
                 String urlTemplate = UriComponentsBuilder.fromHttpUrl(uri)
                         .queryParam("BatchREF", "{BatchREF}")

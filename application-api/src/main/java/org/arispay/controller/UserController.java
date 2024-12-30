@@ -25,10 +25,11 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -62,12 +63,13 @@ public class UserController {
     // Fetch list of users
     @GetMapping
     public ResponseEntity<List<UserDto>> users() {
+        Random rn = new Random();
         List<UserDto> users = userServicePort.findAllUsers();
         for (UserDto user : users) {
             user.setPassword(null);
             user.setStatus("active");
             user.setCurrentPlan("enterprise");
-            user.setAvatar("/images/avatars/" + user.getId() + ".png");
+            user.setAvatar("/images/avatars/" + (1 + rn.nextInt(2 - 1 + 1)) + ".png");
         }
         //users.forEach(e -> e.setPassword(null));
         return ResponseEntity.ok(users);

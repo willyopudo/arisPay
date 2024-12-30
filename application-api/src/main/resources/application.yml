@@ -16,19 +16,6 @@ spring:
   cloud:
     config:
       enabled: false
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/arispay_db
-    username: wilfusr
-    password: Dailydose2010@
-  jpa:
-    hibernate:
-      ddl-auto: update
-      jdbc:
-        time_zone: UTC
-    database: POSTGRESQL
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
   servlet:
     multipart:
       max-file-size: 4MB
@@ -44,11 +31,11 @@ management:
 custom:
   arispay:
     openapi:
-      dev-url: http://localhost:8082
-      prod-url: https://arispay.com:8082
+      dev-url: ${OPENAPI_DEV_URL}
+      prod-url: ${OPENAPI_PROD_URL}
     api:
       version: 1
     app:
-      jwt-secret: GFYGHI5342@#$%65287629hshgERRjy2789}-0uhuyTUUWFR4
+      jwt-secret: ${JWT_SECRET}
       jwt-expiration-minutes: 60
       jwt-refresh-expiration-seconds: 86400
