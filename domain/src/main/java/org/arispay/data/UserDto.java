@@ -9,8 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -56,4 +56,8 @@ public class UserDto {
 	private String currentPlan;
 
 	private String avatar;
+
+	private String token;
+
+	private LocalDateTime tokenExpiration;
 }

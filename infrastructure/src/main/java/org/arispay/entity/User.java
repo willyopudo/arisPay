@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -59,6 +60,10 @@ public class User extends AuditableEntity implements Serializable {
 			joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},
 			inverseJoinColumns = {@JoinColumn(name = "ROLE_ID", referencedColumnName = "ID")})
 	private List<Role> roles = new ArrayList<>();
+
+	private String token;
+
+	private LocalDateTime tokenExpiration;
 
 //	public void addCompany(Company company) {
 //		UserCompany userCompany = new UserCompany(this, company,false);

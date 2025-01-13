@@ -19,5 +19,9 @@ public interface UserPersistencePort {
 
 	List<UserDto> findAllUsers();
 
+	UserDto findUserByToken (String token);
+
 	void deleteUserCompanyById(Long userId, Long companyId);
+
+	UserDto setPassword(String token, String password);
 }

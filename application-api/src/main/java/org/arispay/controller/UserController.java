@@ -40,6 +40,9 @@ public class UserController {
     private final CompanyServicePort companyServicePort;
 
     @Autowired
+    private final AuthUtil authUtil;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
     ApplicationUserRole[] roles = ApplicationUserRole.class.getEnumConstants();
     @Value("${spring.application.name}")
@@ -55,7 +58,7 @@ public class UserController {
         GenericHttpResponse<UserDto> response = new GenericHttpResponse<>();
         UserDto existingUser = userServicePort.findUserByEmail(userDto.getEmail());
 
-        return AuthUtil.getGenericHttpResponseResponseEntity(userDto, result, response, existingUser, logger, passwordEncoder, userServicePort);
+        return authUtil.getGenericHttpResponseResponseEntity(userDto, result, response, existingUser, logger, passwordEncoder, userServicePort);
     }
     // Fetch list of users
     @GetMapping

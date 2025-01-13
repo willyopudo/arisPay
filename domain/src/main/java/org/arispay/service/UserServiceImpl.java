@@ -56,7 +56,19 @@ public class UserServiceImpl implements UserServicePort {
 	}
 
 	@Override
+	public UserDto findUserByToken(String token) {
+		return userPersistencePort.findUserByToken(token);
+	}
+
+	@Override
+	public UserDto setPassword(String token, String password) {
+		return userPersistencePort.setPassword(token, password);
+	}
+
+	@Override
 	public void deleteUserCompanyById(Long userId, Long companyId) {
 		userPersistencePort.deleteUserCompanyById(userId, companyId);
 	}
+
+
 }
