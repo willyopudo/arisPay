@@ -29,7 +29,7 @@ import java.util.Random;
 
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -62,7 +62,7 @@ public class UserController {
     }
     // Fetch list of users
     @GetMapping
-    public ResponseEntity<List<UserDto>> users() {
+    public ResponseEntity<List<UserDto>> getAllUsers() {
         Random rn = new Random();
         List<UserDto> users = userServicePort.findAllUsers();
         for (UserDto user : users) {
@@ -97,7 +97,7 @@ public class UserController {
 
             for(UserCompanyDto ucDto : userDto.getUserCompanies()){
                 CompanyDto companyDto = companyServicePort.getCompanyById(ucDto.getCompanyId());
-                UserCompanyDto uc = new UserCompanyDto(ucDto.getId(), companyDto.getId(), ucDto.isDefault());
+                UserCompanyDto uc = new UserCompanyDto(ucDto.getId(), companyDto.getId(), ucDto.getCompanyName(), ucDto.isDefault());
 
                 //Check if company in this iteration is not already related to the user we are updating
                 if(existingUser.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())))

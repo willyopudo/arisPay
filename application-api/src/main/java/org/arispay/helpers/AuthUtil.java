@@ -129,7 +129,7 @@ public class AuthUtil {
         else if (registrationDto.getUserDto().getRole().contains("ROLE_COMPANY_ADMIN")) {
             CompanyDto savedCompany = companyServicePort.addCompany(registrationDto.getCompanyDto());
             UserDto savedUser = registrationDto.getUserDto();
-            UserCompanyDto userCompanyDto = new UserCompanyDto(null, savedCompany.getId(), true);
+            UserCompanyDto userCompanyDto = new UserCompanyDto(null, savedCompany.getId(), savedCompany.getName(), true);
             savedUser.getUserCompanies().add(userCompanyDto);
             savedUser = userServicePort.saveUser(savedUser);
             savedUser.setPassword(null);
