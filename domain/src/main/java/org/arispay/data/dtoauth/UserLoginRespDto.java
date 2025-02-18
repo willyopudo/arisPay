@@ -35,4 +35,6 @@ public class UserLoginRespDto {
 
     private Long companyId;
 
+    private String companyName;
+
 }

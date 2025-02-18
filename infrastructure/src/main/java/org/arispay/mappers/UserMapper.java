@@ -66,7 +66,7 @@ public abstract class UserMapper {
 
 		List<UserCompanyDto> userCompanies = new ArrayList<>();
 		for( UserCompany company: companies ) {
-			userCompanies.add(new UserCompanyDto(company.getId(),company.getCompany().getId(), company.isDefault()));
+			userCompanies.add(new UserCompanyDto(company.getId(),company.getCompany().getId(), company.getCompany().getName(), company.isDefault()));
 		}
 
 		return userCompanies;
