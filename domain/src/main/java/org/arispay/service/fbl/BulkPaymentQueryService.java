@@ -43,7 +43,7 @@ public class BulkPaymentQueryService {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<?> httpEntity = new HttpEntity<>(headers);
 
-                String uri = "https://openbaknk.bakabc.com/api/v1/Transaction";
+                String uri = "https://openbank.bankabc.com/api/v1/Transaction";
 
                 String urlTemplate = UriComponentsBuilder.fromHttpUrl(uri)
                         .queryParam("BatchREF", "{BatchREF}")

@@ -29,7 +29,7 @@ import java.util.Random;
 
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
 @CrossOrigin(origins = "http://localhost:3000")
