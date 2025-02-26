@@ -16,6 +16,9 @@ import org.arispay.repository.RoleRepository;
 import org.arispay.repository.UserCompanyRepository;
 import org.arispay.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -84,7 +87,6 @@ public class UserJpaAdapter implements UserPersistencePort {
 	@Override
 	public UserDto findUserById(int id) {
 		User user = userRepository.findById(id);
-		user.setPassword(null);
 		return userMapper.convert(user);
 	}
 
@@ -100,9 +102,10 @@ public class UserJpaAdapter implements UserPersistencePort {
 	}
 
 	@Override
-	public List<UserDto> findAllUsers() {
-		List<User> users = userRepository.findAll();
-		return userMapper.userListToUserDtoList(users);
+	public Page<UserDto> findAllUsers(int page, int itemsPerPage) {
+		Pageable pageable = PageRequest.of(page, itemsPerPage);
+		Page<User> users = userRepository.findAll(pageable);
+		return userMapper.usersPagetoUsersDtoPage(users);
 	}
 
 	@Override

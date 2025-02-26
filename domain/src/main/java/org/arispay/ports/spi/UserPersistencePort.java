@@ -1,6 +1,7 @@
 package org.arispay.ports.spi;
 
 import org.arispay.data.UserDto;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface UserPersistencePort {
 
 	UserDto findUserByUserName2(String username);
 
-	List<UserDto> findAllUsers();
+	Page<UserDto> findAllUsers(int page, int itemsPerPage);
 
 	UserDto findUserByToken (String token);
 
