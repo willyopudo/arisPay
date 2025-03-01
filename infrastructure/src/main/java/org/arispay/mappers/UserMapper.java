@@ -10,6 +10,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,12 @@ public abstract class UserMapper {
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "idsToCompanies")
 	@Mapping(source = "role", target = "roles", qualifiedByName = "roleNameToRoles")
 	public abstract List<User> userDtoListToUserList(List<UserDto> userDtoList);
+
+	// ✅ Manually map Page<User> to Page<UserDto>
+	public  Page<UserDto> usersPagetoUsersDtoPage(Page<User> usersPage) {
+		List<UserDto> dtoList = userListToUserDtoList(usersPage.getContent());  // Convert list
+		return new PageImpl<>(dtoList, usersPage.getPageable(), usersPage.getTotalElements());
+	}
 
 	@Named("idsToCompanies")
 	public List<UserCompany> userCompanyIdsToUserCompanies(List<UserCompanyDto> userCompanyDtos) {

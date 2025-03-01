@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -219,7 +220,7 @@ public class AuthController {
 		String userName = userDetails.getUsername();
 		System.out.println("User name active " + userName);
 		UserDto user = userServicePort.findUserByUsername(userName);
-		List<UserDto> users = userServicePort.findAllUsers();
+		Page<UserDto> users = userServicePort.findAllUsers(1,1);
 
 		model.addAttribute("activeUser", user);
 		model.addAttribute("users", users);

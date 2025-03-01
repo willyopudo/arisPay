@@ -15,6 +15,7 @@ import org.arispay.ports.api.CompanyServicePort;
 import org.arispay.ports.api.UserServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -62,9 +63,9 @@ public class UserController {
     }
     // Fetch list of users
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int itemsPerPage) {
         Random rn = new Random();
-        List<UserDto> users = userServicePort.findAllUsers();
+        Page<UserDto> users = userServicePort.findAllUsers(page -1 , itemsPerPage);
         for (UserDto user : users) {
             user.setPassword(null);
             user.setStatus("active");
@@ -78,8 +79,10 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getById(@PathVariable Long id) {
         UserDto user = userServicePort.findUserById(Math.toIntExact(id));
-        if (user != null)
+        if (user != null) {
+            user.setPassword(null);
             return ResponseEntity.ok(user);
+        }
         return ResponseEntity.notFound().build();
     }
 
@@ -89,9 +92,11 @@ public class UserController {
         GenericHttpResponse<UserDto> response = new GenericHttpResponse<>();
         UserDto existingUser = userServicePort.findUserById(Math.toIntExact(id));
         if (existingUser != null) {
-            existingUser.setEmail(userDto.getEmail());
-            existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
-            existingUser.setRole(userDto.getRole());
+            existingUser.setAvatar(userDto.getAddress());
+            existingUser.setPhoneNumber(userDto.getPhoneNumber());
+            //existingUser.setEmail(userDto.getEmail());
+            //existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            //existingUser.setRole(userDto.getRole());
             existingUser.setFirstName(userDto.getFirstName());
             existingUser.setLastName(userDto.getLastName());
 
