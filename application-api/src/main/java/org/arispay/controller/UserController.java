@@ -5,10 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.arispay.data.CompanyDto;
-import org.arispay.data.GenericHttpResponse;
-import org.arispay.data.UserCompanyDto;
-import org.arispay.data.UserDto;
+import org.arispay.data.*;
 import org.arispay.globconfig.security.ApplicationUserRole;
 import org.arispay.helpers.AuthUtil;
 import org.arispay.ports.api.CompanyServicePort;
@@ -63,9 +60,14 @@ public class UserController {
     }
     // Fetch list of users
     @GetMapping
-    public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int itemsPerPage) {
+    public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "5") int itemsPerPage,
+                                                     @RequestParam(name = "status", required = false) String status,
+                                                     @RequestParam(name = "role", required = false) String role,
+                                                     @RequestParam(name = "plan", required = false) String currentPlan) {
         Random rn = new Random();
-        Page<UserDto> users = userServicePort.findAllUsers(page -1 , itemsPerPage);
+        UserFilterDto filterDto = new UserFilterDto(status, role, currentPlan);
+        Page<UserDto> users = userServicePort.findAllUsers(page -1 , itemsPerPage, filterDto);
         for (UserDto user : users) {
             user.setPassword(null);
             user.setStatus("active");

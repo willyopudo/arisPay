@@ -3,6 +3,7 @@ package com.arisweb.controller;
 import lombok.RequiredArgsConstructor;
 import org.arispay.data.CompanyDto;
 import org.arispay.data.UserDto;
+import org.arispay.data.UserFilterDto;
 import org.arispay.ports.api.CompanyServicePort;
 import org.arispay.ports.api.UserServicePort;
 import com.arisweb.security.ApplicationUserRole;
@@ -220,7 +221,7 @@ public class AuthController {
 		String userName = userDetails.getUsername();
 		System.out.println("User name active " + userName);
 		UserDto user = userServicePort.findUserByUsername(userName);
-		Page<UserDto> users = userServicePort.findAllUsers(1,1);
+		Page<UserDto> users = userServicePort.findAllUsers(1,1, new UserFilterDto());
 
 		model.addAttribute("activeUser", user);
 		model.addAttribute("users", users);

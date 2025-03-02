@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.arispay.data.CompanyDto;
 import org.arispay.data.UserCompanyDto;
 import org.arispay.data.UserDto;
+import org.arispay.data.UserFilterDto;
 import org.arispay.entity.Role;
 import org.arispay.entity.User;
 import org.arispay.entity.UserCompany;
@@ -15,10 +16,12 @@ import org.arispay.repository.CompanyRepository;
 import org.arispay.repository.RoleRepository;
 import org.arispay.repository.UserCompanyRepository;
 import org.arispay.repository.UserRepository;
+import org.arispay.specifications.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -102,9 +105,11 @@ public class UserJpaAdapter implements UserPersistencePort {
 	}
 
 	@Override
-	public Page<UserDto> findAllUsers(int page, int itemsPerPage) {
+	public Page<UserDto> findAllUsers(int page, int itemsPerPage, UserFilterDto filterDto) {
 		Pageable pageable = PageRequest.of(page, itemsPerPage);
-		Page<User> users = userRepository.findAll(pageable);
+		// Apply specification and pagination
+		Specification<User> specification = UserSpecification.getSpecification(filterDto);
+		Page<User> users = userRepository.findAll(specification,pageable);
 		return userMapper.usersPagetoUsersDtoPage(users);
 	}
 
