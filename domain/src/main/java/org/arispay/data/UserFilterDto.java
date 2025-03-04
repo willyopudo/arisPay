@@ -3,6 +3,7 @@ package org.arispay.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Sort;
 
 @Data
 @AllArgsConstructor
@@ -11,4 +12,6 @@ public class UserFilterDto {
     private String status;
     private String role;
     private String currentPlan;
+    private Sort.Direction direction = Sort.Direction.ASC;
+    private String sortBy = "firstName";
 }

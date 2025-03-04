@@ -13,6 +13,9 @@ import org.arispay.ports.api.UserServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,9 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 
 @RestController
@@ -64,14 +65,40 @@ public class UserController {
                                                      @RequestParam(defaultValue = "5") int itemsPerPage,
                                                      @RequestParam(name = "status", required = false) String status,
                                                      @RequestParam(name = "role", required = false) String role,
-                                                     @RequestParam(name = "plan", required = false) String currentPlan) {
+                                                     @RequestParam(name = "plan", required = false) String currentPlan,
+                                                     @RequestParam(name = "sortBy", defaultValue = "firstName", required = false) String sortBy,
+                                                     @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy) {
         Random rn = new Random();
-        UserFilterDto filterDto = new UserFilterDto(status, role, currentPlan);
-        Page<UserDto> users = userServicePort.findAllUsers(page -1 , itemsPerPage, filterDto);
+
+        List<Sort.Order> orders = new ArrayList<>();
+        // Validate the sortBy field against User entity properties
+        List<String> validSortFields = Arrays.asList(
+                "id", "username", "firstName", "lastName", "email",
+                "phoneNumber", "address", "town", "zipCode", "createdDate",
+
+                // Special field for role name sorting
+                "roleName"
+        );
+
+        if (!validSortFields.contains(translateSortBy(sortBy))) {
+            sortBy = "firstName"; // Default to id if invalid field
+        }
+
+        // Determine sort direction
+        Sort.Direction direction = "desc".equalsIgnoreCase(orderBy)
+                ? Sort.Direction.DESC : Sort.Direction.ASC;
+
+        // Add information to the filter DTO
+        UserFilterDto filterDto = new UserFilterDto(status, role, currentPlan, direction, translateSortBy(sortBy));
+
+        // Create pageable based on whether we're sorting by role or standard field
+        Pageable pageable = PageRequest.of(page, itemsPerPage);
+
+        Page<UserDto> users = userServicePort.findAllUsers(pageable, filterDto);
+
         for (UserDto user : users) {
             user.setPassword(null);
             user.setStatus("active");
-            user.setCurrentPlan("enterprise");
             user.setAvatar("/images/avatars/" + (1 + rn.nextInt(2 - 1 + 1)) + ".png");
         }
         //users.forEach(e -> e.setPassword(null));
@@ -156,5 +183,14 @@ public class UserController {
         }
         return new ResponseEntity<>(response, response.getHttpStatus());
 
+    }
+
+    private String translateSortBy(String sortBy) {
+        return switch (sortBy) {
+            case "plan" -> "currentPlan";
+            case "role" -> "roleName";
+            case "status" -> "isEnabled";
+            default -> "firstName";
+        };
     }
 }
