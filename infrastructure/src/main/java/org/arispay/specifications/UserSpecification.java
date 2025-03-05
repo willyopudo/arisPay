@@ -30,9 +30,17 @@ public class UserSpecification {
                 Join<Object, Role> roleJoin = root.join("roles");
                 predicates.add(criteriaBuilder.equal(roleJoin.get("name"), filterDto.getRole()));
             }
+            if (filterDto.getSearch() != null) {
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), "%" + filterDto.getSearch().toLowerCase() + "%"),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")), "%" + filterDto.getSearch().toLowerCase() + "%"),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + filterDto.getSearch().toLowerCase() + "%"),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("currentPlan")), "%" + filterDto.getSearch().toLowerCase() + "%")));
+            }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
 
         };
     }
+
 }

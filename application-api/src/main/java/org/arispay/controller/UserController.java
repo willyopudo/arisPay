@@ -67,7 +67,8 @@ public class UserController {
                                                      @RequestParam(name = "role", required = false) String role,
                                                      @RequestParam(name = "plan", required = false) String currentPlan,
                                                      @RequestParam(name = "sortBy", defaultValue = "firstName", required = false) String sortBy,
-                                                     @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy) {
+                                                     @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
+                                                     @RequestParam(name = "search", required = false) String search) {
         Random rn = new Random();
 
         List<Sort.Order> orders = new ArrayList<>();
@@ -89,10 +90,10 @@ public class UserController {
                 ? Sort.Direction.DESC : Sort.Direction.ASC;
 
         // Add information to the filter DTO
-        UserFilterDto filterDto = new UserFilterDto(status, role, currentPlan, direction, translateSortBy(sortBy));
+        UserFilterDto filterDto = new UserFilterDto(status, role, currentPlan, search, direction, translateSortBy(sortBy));
 
         // Create pageable based on whether we're sorting by role or standard field
-        Pageable pageable = PageRequest.of(page, itemsPerPage);
+        Pageable pageable = PageRequest.of(page-1, itemsPerPage);
 
         Page<UserDto> users = userServicePort.findAllUsers(pageable, filterDto);
 

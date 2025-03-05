@@ -12,6 +12,7 @@ public class UserFilterDto {
     private String status;
     private String role;
     private String currentPlan;
+    private String search;
     private Sort.Direction direction = Sort.Direction.ASC;
     private String sortBy = "firstName";
 }
