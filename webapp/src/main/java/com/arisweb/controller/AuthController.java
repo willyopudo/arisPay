@@ -3,6 +3,7 @@ package com.arisweb.controller;
 import lombok.RequiredArgsConstructor;
 import org.arispay.data.CompanyDto;
 import org.arispay.data.UserDto;
+import org.arispay.data.UserFilterDto;
 import org.arispay.ports.api.CompanyServicePort;
 import org.arispay.ports.api.UserServicePort;
 import com.arisweb.security.ApplicationUserRole;
@@ -16,6 +17,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -220,7 +223,8 @@ public class AuthController {
 		String userName = userDetails.getUsername();
 		System.out.println("User name active " + userName);
 		UserDto user = userServicePort.findUserByUsername(userName);
-		Page<UserDto> users = userServicePort.findAllUsers(1,1);
+		Pageable pageable = PageRequest.of(1, 5);
+		Page<UserDto> users = userServicePort.findAllUsers(pageable, new UserFilterDto());
 
 		model.addAttribute("activeUser", user);
 		model.addAttribute("users", users);

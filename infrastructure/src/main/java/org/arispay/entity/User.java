@@ -65,6 +65,8 @@ public class User extends AuditableEntity implements Serializable {
 
 	private LocalDateTime tokenExpiration;
 
+	private String currentPlan;
+
 //	public void addCompany(Company company) {
 //		UserCompany userCompany = new UserCompany(this, company,false);
 //		companies.add(userCompany);

@@ -1,9 +1,11 @@
 package org.arispay.service;
 
 import org.arispay.data.UserDto;
+import org.arispay.data.UserFilterDto;
 import org.arispay.ports.api.UserServicePort;
 import org.arispay.ports.spi.UserPersistencePort;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,8 +50,8 @@ public class UserServiceImpl implements UserServicePort {
 	}
 
 	@Override
-	public Page<UserDto> findAllUsers(int page, int itemsPerPage) {
-		Page<UserDto> users = userPersistencePort.findAllUsers(page, itemsPerPage);
+	public Page<UserDto> findAllUsers(Pageable pageable, UserFilterDto filterDto) {
+		Page<UserDto> users = userPersistencePort.findAllUsers(pageable, filterDto);
 //		return users.stream()
 //				.map(this::mapToUserDto)
 //				.collect(Collectors.toList());
