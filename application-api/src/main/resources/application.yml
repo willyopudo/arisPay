@@ -37,5 +37,5 @@ custom:
       version: 1
     app:
       jwt-secret: ${JWT_SECRET}
-      jwt-expiration-minutes: 60
+      jwt-expiration-minutes: 1
       jwt-refresh-expiration-seconds: 86400
