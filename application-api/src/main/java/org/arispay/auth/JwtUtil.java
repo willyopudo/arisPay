@@ -6,6 +6,7 @@ import org.arispay.controller.UserController;
 import org.arispay.entity.User;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.arispay.entity.UserCompany;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -37,8 +38,15 @@ public class JwtUtil {
 
 	public String createToken(User user) {
 		Claims claims = Jwts.claims().setSubject(user.getUsername());
+
+		claims.put("companyId", user.getUserCompanies().stream()
+				.filter(UserCompany::isDefault)
+				.map(userCompany -> userCompany.getCompany().getId())
+				.findFirst()
+				.orElse(null));
 		claims.put("firstName", user.getFirstName());
 		claims.put("lastName", user.getLastName());
+
 		Date tokenCreateTime = new Date();
 		Date tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(accessTokenValidity));
 		return Jwts.builder()

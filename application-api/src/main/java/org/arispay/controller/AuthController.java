@@ -96,6 +96,7 @@ public class AuthController {
 
 			User user = new User();
 			user.setUsername(username);
+			user.setUserCompanies(userDetails.getUserCompanies());
 			String token = jwtUtil.createToken(user);
 			List<UserCompany> userCompanies = userDetails.getUserCompanies().stream().filter(UserCompany::isDefault).toList();
 			UserCompany userCompany = userCompanies.stream().findFirst().get();
