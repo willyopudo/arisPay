@@ -1,10 +1,12 @@
 package org.arispay.controller;
-
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.arispay.auth.JwtUtil;
 import org.arispay.data.*;
 import org.arispay.globconfig.security.ApplicationUserRole;
 import org.arispay.helpers.AuthUtil;
@@ -47,6 +49,9 @@ public class UserController {
     private final AuthUtil authUtil;
 
     @Autowired
+    private final JwtUtil jwtUtil;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
     ApplicationUserRole[] roles = ApplicationUserRole.class.getEnumConstants();
     @Value("${spring.application.name}")
@@ -73,7 +78,8 @@ public class UserController {
                                                                         @RequestParam(name = "plan", required = false) String currentPlan,
                                                                         @RequestParam(name = "sortBy", defaultValue = "firstName", required = false) String sortBy,
                                                                         @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
-                                                                        @RequestParam(name = "search", required = false) String search) {
+                                                                        @RequestParam(name = "search", required = false) String search,
+                                                                         HttpServletRequest request) {
         Random rn = new Random();
 
         List<Sort.Order> orders = new ArrayList<>();
@@ -109,9 +115,13 @@ public class UserController {
         }
         //users.forEach(e -> e.setPassword(null));
         //Fetch user summary stats
-        IUserSummary userSummary = userRepository.getUserSummaries(1L).orElse(null);
+        Claims claims = jwtUtil.resolveClaims(request);
+
+        Long companyId = claims.get("companyId", Long.class);
+        IUserSummary userSummary = userRepository.getUserSummaries(companyId).orElse(null);
         return ResponseEntity.ok(new Pair<>(users, userSummary));
     }
+
     //Fetch single user
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getById(@PathVariable Long id) {
