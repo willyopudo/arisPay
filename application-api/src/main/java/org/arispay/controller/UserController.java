@@ -10,6 +10,8 @@ import org.arispay.globconfig.security.ApplicationUserRole;
 import org.arispay.helpers.AuthUtil;
 import org.arispay.ports.api.CompanyServicePort;
 import org.arispay.ports.api.UserServicePort;
+import org.arispay.repository.UserRepository;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -39,6 +41,9 @@ public class UserController {
     private final CompanyServicePort companyServicePort;
 
     @Autowired
+    private final UserRepository userRepository;
+
+    @Autowired
     private final AuthUtil authUtil;
 
     @Autowired
@@ -61,14 +66,14 @@ public class UserController {
     }
     // Fetch list of users
     @GetMapping
-    public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page,
-                                                     @RequestParam(defaultValue = "5") int itemsPerPage,
-                                                     @RequestParam(name = "status", required = false) String status,
-                                                     @RequestParam(name = "role", required = false) String role,
-                                                     @RequestParam(name = "plan", required = false) String currentPlan,
-                                                     @RequestParam(name = "sortBy", defaultValue = "firstName", required = false) String sortBy,
-                                                     @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
-                                                     @RequestParam(name = "search", required = false) String search) {
+    public ResponseEntity<Pair<Page<UserDto>, IUserSummary>> getAllUsers(@RequestParam(defaultValue = "0") int page,
+                                                                        @RequestParam(defaultValue = "5") int itemsPerPage,
+                                                                        @RequestParam(name = "status", required = false) String status,
+                                                                        @RequestParam(name = "role", required = false) String role,
+                                                                        @RequestParam(name = "plan", required = false) String currentPlan,
+                                                                        @RequestParam(name = "sortBy", defaultValue = "firstName", required = false) String sortBy,
+                                                                        @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
+                                                                        @RequestParam(name = "search", required = false) String search) {
         Random rn = new Random();
 
         List<Sort.Order> orders = new ArrayList<>();
@@ -103,7 +108,9 @@ public class UserController {
             user.setAvatar("/images/avatars/" + (1 + rn.nextInt(2 - 1 + 1)) + ".png");
         }
         //users.forEach(e -> e.setPassword(null));
-        return ResponseEntity.ok(users);
+        //Fetch user summary stats
+        IUserSummary userSummary = userRepository.getUserSummaries(1L).orElse(null);
+        return ResponseEntity.ok(new Pair<>(users, userSummary));
     }
     //Fetch single user
     @GetMapping("/{id}")

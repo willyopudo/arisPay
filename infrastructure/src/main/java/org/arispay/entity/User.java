@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.arispay.data.UserSummary;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,6 +17,18 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@SqlResultSetMapping(
+		name = "UserSummaryMapping",
+		classes = @ConstructorResult(
+				targetClass = UserSummary.class,
+				columns = {
+						@ColumnResult(name = "totalUsers", type = Long.class),
+						@ColumnResult(name = "activeUsers", type = Long.class),
+						@ColumnResult(name = "pendingUsers", type = Long.class),
+						@ColumnResult(name = "inactiveUsers", type = Long.class)
+				}
+		)
+)
 @Table(name = "users")
 public class User extends AuditableEntity implements Serializable {
 	@Serial
