@@ -1,6 +1,7 @@
 package org.arispay.ports.api;
 
 import org.arispay.data.ClientDto;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface ClientServicePort {
 
     ClientDto updateClient(ClientDto clientDto);
 
-    List<ClientDto> getClients();
+    Page<ClientDto> getClients();
 
     ClientDto getClientById(String id);
 

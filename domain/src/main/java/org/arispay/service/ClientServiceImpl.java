@@ -3,6 +3,7 @@ package org.arispay.service;
 import org.arispay.data.ClientDto;
 import org.arispay.ports.api.ClientServicePort;
 import org.arispay.ports.spi.ClientPersistencePort;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class ClientServiceImpl implements ClientServicePort {
 	}
 
 	@Override
-	public List<ClientDto> getClients() {
+	public Page<ClientDto> getClients() {
 		return clientPersistencePort.getClients();
 	}
 

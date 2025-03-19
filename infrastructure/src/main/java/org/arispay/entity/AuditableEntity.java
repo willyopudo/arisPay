@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.arispay.enums.RecordStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -19,7 +20,7 @@ import java.util.Date;
 @MappedSuperclass
 public class AuditableEntity {
 	@Column(nullable = false)
-	protected byte recordStatus = 0;
+	protected RecordStatus recordStatus;
 
 	@Column(nullable = false)
 	protected byte isEnabled = 1;

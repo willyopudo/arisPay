@@ -3,6 +3,8 @@ package org.arispay.mappers;
 import org.arispay.data.UserCompanyDto;
 import org.arispay.data.UserDto;
 import org.arispay.entity.*;
+import org.arispay.enums.CurrentPlan;
+import org.arispay.enums.RecordStatus;
 import org.arispay.repository.*;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -31,19 +33,27 @@ public abstract class UserMapper {
 	//mock comment
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "idsToCompanies")
 	@Mapping(source = "role", target = "roles", qualifiedByName = "roleNameToRoles")
+	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "StringToCurrentPlan")
+	@Mapping(source = "status", target = "recordStatus", qualifiedByName = "StringToRecordStatus")
 	public abstract User convert(UserDto userDto);
 
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "companiesToIds")
 	@Mapping(source = "roles", target = "role", qualifiedByName = "RoleListToRoleName")
+	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "CurrentPlanToString")
+	@Mapping(source = "recordStatus", target = "status", qualifiedByName = "RecordStatusToString")
 	@InheritInverseConfiguration
 	public abstract UserDto convert(User user);
 
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "companiesToIds")
 	@Mapping(source = "roles", target = "role", qualifiedByName = "RoleListToRoleName")
+	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "CurrentPlanToString")
+	@Mapping(source = "recordStatus", target = "status", qualifiedByName = "RecordStatusToString")
 	public abstract List<UserDto> userListToUserDtoList(List<User> userList);
 
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "idsToCompanies")
 	@Mapping(source = "role", target = "roles", qualifiedByName = "roleNameToRoles")
+	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "StringToCurrentPlan")
+	@Mapping(source = "status", target = "recordStatus", qualifiedByName = "StringToRecordStatus")
 	public abstract List<User> userDtoListToUserList(List<UserDto> userDtoList);
 
 	// ✅ Manually map Page<User> to Page<UserDto>
@@ -93,5 +103,25 @@ public abstract class UserMapper {
 	@Named("RoleListToRoleName")
 	public String RoleListToRoleName(List<Role> roles) {
 		return roles.getFirst().getName();
+	}
+
+	@Named("CurrentPlanToString")
+	public String CurrentPlanToString(CurrentPlan currentPlan) {
+		return currentPlan.toString();
+	}
+
+	@Named("StringToCurrentPlan")
+	public CurrentPlan StringToCurrentPlan(String currentPlan) {
+		return CurrentPlan.fromString(currentPlan);
+	}
+
+	@Named("StringToRecordStatus")
+	public RecordStatus StringToRecordStatus(String recordStatus) {
+		return RecordStatus.fromString(recordStatus);
+	}
+
+	@Named("RecordStatusToString")
+	public String RecordStatusToString(RecordStatus recordStatus) {
+		return recordStatus.toString();
 	}
 }

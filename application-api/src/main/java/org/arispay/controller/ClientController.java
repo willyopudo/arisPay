@@ -6,12 +6,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.arispay.data.ClientDto;
 import org.arispay.ports.api.ClientServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/clients")
+@RequestMapping("/api/v1/client")
 @SecurityRequirement(name = "Bearer Authentication")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ClientController {
@@ -36,7 +37,7 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientDto>> getAllClients() {
+    public ResponseEntity<Page<ClientDto>> getAllClients() {
         return ResponseEntity.ok(clientServicePort.getClients());
     }
 

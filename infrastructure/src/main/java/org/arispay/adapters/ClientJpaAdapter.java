@@ -7,6 +7,9 @@ import org.arispay.ports.spi.ClientPersistencePort;
 import org.arispay.repository.ClientRepository;
 import org.arispay.specifications.ClientSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -40,10 +43,11 @@ public class ClientJpaAdapter implements ClientPersistencePort {
     }
 
     @Override
-    public List<ClientDto> getClients() {
-        List<Client> clientList = clientRepository.findAll();
+    public Page<ClientDto> getClients() {
+        Pageable pageable = PageRequest.of(0, 10);
 
-        return clientMapper.clientListToClientDtoList(clientList);
+        Page<Client> clientList = clientRepository.findAll(pageable);
+        return clientMapper.clientsPagetoClientsDtoPage(clientList);
     }
 
     @Override
