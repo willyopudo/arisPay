@@ -18,6 +18,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = CompanyRepository.class)
 public abstract class ClientMapper {
 
+    // ✅ Manually map Client to ClientDto
     @Autowired
     private CompanyRepository companyRepository;
     //dummy comment

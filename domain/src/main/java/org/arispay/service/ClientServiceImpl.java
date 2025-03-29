@@ -1,9 +1,11 @@
 package org.arispay.service;
 
 import org.arispay.data.ClientDto;
+import org.arispay.data.GenericFilterDto;
 import org.arispay.ports.api.ClientServicePort;
 import org.arispay.ports.spi.ClientPersistencePort;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -31,8 +33,8 @@ public class ClientServiceImpl implements ClientServicePort {
 	}
 
 	@Override
-	public Page<ClientDto> getClients() {
-		return clientPersistencePort.getClients();
+	public Page<ClientDto> getClients(Long companyId, Pageable pageable, GenericFilterDto filterDto) {
+		return clientPersistencePort.getClients(companyId, pageable, filterDto);
 	}
 
 	@Override

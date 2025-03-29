@@ -1,5 +1,6 @@
 package org.arispay.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.Date;
 @MappedSuperclass
 public class AuditableEntity {
 	@Column(nullable = false)
-	protected RecordStatus recordStatus;
+	protected RecordStatus recordStatus = RecordStatus.PENDING;
 
 	@Column(nullable = false)
 	protected byte isEnabled = 1;
@@ -29,6 +30,7 @@ public class AuditableEntity {
 	protected String createdBy = "system";
 
 	@Column(nullable = false, updatable = false)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	protected LocalDateTime createdDate = LocalDateTime.now();
 
 	protected String modifiedBy;

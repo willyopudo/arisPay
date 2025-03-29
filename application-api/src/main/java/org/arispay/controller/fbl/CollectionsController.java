@@ -62,7 +62,9 @@ public class CollectionsController {
 
             // Finally, fetch the client by company ID and customer ID
             CompanyAccountDto fetchedAccount = companyAccountServicePort.getByAccountNumber(collectionAccount);
-
+            if (fetchedAccount == null) {
+                return buildNotFoundResponse("ACCOUNT_NOT_FOUND", "COLLECTION ACCOUNT IS NOT VALID");
+            }
             fetchedClient = clientServicePort.getClientByIdAndCompany(fetchedAccount.getCompanyId(), customerId);
             if (fetchedClient == null) {
                 return buildNotFoundResponse("ACCOUNT_NOT_FOUND", "COLLECTION ACCOUNT IS NOT VALID");
