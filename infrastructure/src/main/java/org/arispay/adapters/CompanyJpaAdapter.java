@@ -5,6 +5,7 @@ import org.arispay.data.CompanyDto;
 import org.arispay.mappers.CompanyMapper;
 import org.arispay.ports.spi.CompanyPersistencePort;
 import org.arispay.repository.CompanyRepository;
+import org.arispay.utils.UniquePrefixGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,8 @@ public class CompanyJpaAdapter implements CompanyPersistencePort {
 	public CompanyDto addCompany(CompanyDto companyDto) {
 
 		Company company = companyMapper.companyDtoToCompany(companyDto);
+
+		company.setCode(UniquePrefixGenerator.generateUniquePrefix(4));
 
 		Company companySaved = companyRepository.save(company);
 

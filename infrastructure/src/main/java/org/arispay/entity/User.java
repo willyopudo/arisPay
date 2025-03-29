@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.arispay.data.UserSummary;
+import org.arispay.enums.CurrentPlan;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -78,7 +79,7 @@ public class User extends AuditableEntity implements Serializable {
 
 	private LocalDateTime tokenExpiration;
 
-	private String currentPlan;
+	private CurrentPlan currentPlan;
 
 //	public void addCompany(Company company) {
 //		UserCompany userCompany = new UserCompany(this, company,false);

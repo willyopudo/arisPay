@@ -110,7 +110,6 @@ public class UserController {
 
         for (UserDto user : users) {
             user.setPassword(null);
-            user.setStatus("active");
             user.setAvatar("/images/avatars/" + (1 + rn.nextInt(2 - 1 + 1)) + ".png");
         }
         //users.forEach(e -> e.setPassword(null));
@@ -144,6 +143,8 @@ public class UserController {
             //existingUser.setEmail(userDto.getEmail());
             //existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
             //existingUser.setRole(userDto.getRole());
+            existingUser.setCurrentPlan(userDto.getCurrentPlan());
+            existingUser.setStatus(userDto.getStatus());
             existingUser.setFirstName(userDto.getFirstName());
             existingUser.setLastName(userDto.getLastName());
 

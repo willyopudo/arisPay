@@ -24,6 +24,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
 	Optional<User> findByToken(String token);
 
-	@Query(nativeQuery = true, value="SELECT COUNT(u.id) AS totalUsers , SUM(CASE WHEN u.is_enabled = 1 then 1 else 0 END) AS activeUsers, SUM(CASE WHEN u.is_enabled = 0 then 1 else 0 END) AS pendingUsers, SUM(CASE WHEN u.is_enabled = 2 then 1 else 0 END) AS inactiveUsers FROM users u inner join users_companies uc on u.id  = uc.user_id where uc.company_id = :companyId")
+	@Query(nativeQuery = true, value="SELECT COUNT(u.id) AS totalUsers , SUM(CASE WHEN u.record_status = 0 then 1 else 0 END) AS activeUsers, SUM(CASE WHEN u.record_status = 2 then 1 else 0 END) AS pendingUsers, SUM(CASE WHEN u.record_status = 1 then 1 else 0 END) AS inactiveUsers FROM users u inner join users_companies uc on u.id  = uc.user_id where uc.company_id = :companyId")
 	Optional<IUserSummary> getUserSummaries(@Param("companyId") Long companyId);
 }

@@ -22,11 +22,16 @@ public class Client extends AuditableEntity {
 
     private String clientName;
 
+    @Column(unique = true)
     private String clientId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "identifier_type")
     private ClientIdentifierType identifierType;
+    @Column(name = "client_email")
+    private String clientEmail;
+
+    private String clientPhone;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "company_id", nullable = false)

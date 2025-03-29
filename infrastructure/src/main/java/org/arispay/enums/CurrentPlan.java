@@ -1,13 +1,14 @@
 package org.arispay.enums;
 
-import java.util.HashMap;
-import java.util.Map;
+public enum CurrentPlan {
+    BASIC("basic"),
+    ENTERPRISE("enterprise"),
+    STANDARD("standard"),
+    SPECIAL("special");
 
-public enum RecordStatus {
-    ACTIVE("active"), INACTIVE("inactive"), PENDING("pending");
     private final String value;
 
-    RecordStatus(String value) {
+    CurrentPlan(String value) {
         this.value = value;
     }
 
@@ -20,8 +21,8 @@ public enum RecordStatus {
         return value;
     }
 
-    public static RecordStatus fromString(String text) {
-        for (RecordStatus plan : RecordStatus.values()) {
+    public static CurrentPlan fromString(String text) {
+        for (CurrentPlan plan : CurrentPlan.values()) {
             if (plan.value.equalsIgnoreCase(text)) {
                 return plan;
             }
