@@ -1,8 +1,10 @@
 package org.arispay.adapters;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.arispay.data.ClientDto;
 import org.arispay.data.GenericFilterDto;
 import org.arispay.entity.Client;
+import org.arispay.enums.ClientIdentifierType;
 import org.arispay.enums.RecordStatus;
 import org.arispay.mappers.ClientMapper;
 import org.arispay.ports.spi.ClientPersistencePort;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -47,12 +50,36 @@ public class ClientJpaAdapter implements ClientPersistencePort {
 
     @Override
     public ClientDto updateClient(ClientDto clientDto) {
-        return addClient(clientDto);
+        Optional<Client> existingClientOptional = clientRepository.findById(clientDto.getId());
+
+        if (existingClientOptional.isPresent()) {
+            Client existingClient = existingClientOptional.get();
+            existingClient.setClientName(clientDto.getClientName());
+            existingClient.setClientEmail(clientDto.getClientEmail());
+            existingClient.setClientPhone(clientDto.getClientPhone());
+            existingClient.setRecordStatus(RecordStatus.fromString(clientDto.getStatus()));
+            existingClient.setIdentifierType(ClientIdentifierType.valueOf(clientDto.getIdentifierType()));
+
+            Client updatedClient = clientRepository.save(existingClient);
+            return clientMapper.clientToClientDto(updatedClient);
+        } else {
+            throw new EntityNotFoundException("Client not found with id: " + clientDto.getId());
+        }
     }
 
     @Override
     public Page<ClientDto> getClients(Long companyId, Pageable pageable, GenericFilterDto filterDto) {
         Specification<Client> clientSpecification = ClientSpecification.buildComplexSpecification(companyId, null, filterDto);
+
+        // Create sort for standard fields if specified
+        if (filterDto.getSortBy() != null && filterDto.getDirection() != null) {
+            Sort sort = Sort.by(filterDto.getDirection(), filterDto.getSortBy());
+            pageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    sort
+            );
+        }
         Page<Client> clientList = clientRepository.findAll(clientSpecification, pageable);
         return clientMapper.clientsPagetoClientsDtoPage(clientList);
     }

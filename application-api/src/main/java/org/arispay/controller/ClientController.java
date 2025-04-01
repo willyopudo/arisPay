@@ -2,6 +2,7 @@ package org.arispay.controller;
 
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.arispay.auth.JwtUtil;
 import org.arispay.data.ClientDto;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +40,18 @@ public class ClientController {
         return clientServicePort.addClient(clientDto);
     }
 
-    @PutMapping
-    public ClientDto updateClient(@RequestBody ClientDto clientDto) {
-        return clientServicePort.updateClient(clientDto);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateClient(@RequestBody ClientDto clientDto, @PathVariable long id) {
+        if(clientDto.getId() != id) {
+            return ResponseEntity.badRequest().body("Id in path and body do not match");
+        }
+        try{
+            ClientDto updatedClient = clientServicePort.updateClient(clientDto);
+            return ResponseEntity.ok(updatedClient);
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+
     }
 
     @GetMapping("/{id}")
@@ -53,16 +64,22 @@ public class ClientController {
                                                          @RequestParam(defaultValue = "5") int itemsPerPage,
                                                          @RequestParam(name = "status", required = false, defaultValue = "") String status,
                                                          @RequestParam(name = "identifierType", required = false, defaultValue = "") String identifierType,
+                                                         @RequestParam(name = "search", required = false) String search,
+                                                         @RequestParam(name = "sortBy", defaultValue = "clientName", required = false) String sortBy,
+                                                         @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
                                                          HttpServletRequest request) {
 
         Claims claims = jwtUtil.resolveClaims(request);
 
+        // Determine sort direction
+        Sort.Direction direction = "desc".equalsIgnoreCase(orderBy)
+                ? Sort.Direction.DESC : Sort.Direction.ASC;
 
         GenericFilterDto filterDto = new GenericFilterDto(
                 List.of( status, identifierType),
-                null,
-                null,
-                null
+                search,
+                direction,
+                sortBy
         );
 
         Long companyId = claims.get("companyId", Long.class);
@@ -72,7 +89,7 @@ public class ClientController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCompanyByID(@PathVariable long id) {
+    public void deleteClientById(@PathVariable long id) {
         clientServicePort.deleteClientById(Long.valueOf(id));
     }
 
