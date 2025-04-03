@@ -39,8 +39,23 @@ public class ClientJpaAdapter implements ClientPersistencePort {
             client.setClientId(null);
         }
         client.setCreatedDate(LocalDateTime.now());
-        Client clientSaved = clientRepository.save(client);
-        return clientMapper.clientToClientDto(clientSaved);
+
+         String clientId = clientRepository.insertClient(
+                 client.getClientName(),
+                client.getClientId(),
+                client.getClientEmail(),
+                 client.getIdentifierType().name(),
+                client.getClientPhone(),
+                 (byte) 0,
+                 "admin",
+                 client.getCompany().getId().intValue()
+             //"" // OUT parameter placeholder
+         );
+        Optional<Client> clientSaved = clientRepository.findByClientId(clientId);
+        if(clientSaved.isPresent()){
+            return clientMapper.clientToClientDto(clientSaved.get());
+        }
+        return new ClientDto();
     }
 
     @Override
