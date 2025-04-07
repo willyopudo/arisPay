@@ -34,7 +34,7 @@ public class ClientJpaAdapter implements ClientPersistencePort {
     @Override
     public ClientDto addClient(ClientDto clientDto) {
         Client client = clientMapper.clientDtoToClient(clientDto);
-        client.setRecordStatus(RecordStatus.ACTIVE);
+        //client.setRecordStatus(RecordStatus.ACTIVE);
         if(client.getClientId() == null || client.getClientId().isEmpty()){
             client.setClientId(null);
         }
@@ -46,7 +46,7 @@ public class ClientJpaAdapter implements ClientPersistencePort {
                 client.getClientEmail(),
                  client.getIdentifierType().name(),
                 client.getClientPhone(),
-                 (byte) 0,
+                 (byte) client.getRecordStatus().ordinal(),
                  "admin",
                  client.getCompany().getId().intValue()
              //"" // OUT parameter placeholder
