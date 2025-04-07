@@ -59,6 +59,14 @@ public class ClientSpecification {
                         logger.info("Invalid identifier type: {}. Error message: {}", filterDto.getFilters().get(1), e.getMessage());
                     }
                 }
+
+                if (filterDto.getSearch() != null) {
+                    predicates.add(criteriaBuilder.or(
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("clientName")), "%" + filterDto.getSearch().toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("clientId")), "%" + filterDto.getSearch().toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("clientEmail")), "%" + filterDto.getSearch().toLowerCase() + "%")));
+//                        criteriaBuilder.like(criteriaBuilder.lower(root.get("currentPlan").as(String.class)), "%" + filterDto.getSearch().toLowerCase() + "%")));
+                }
             }
 
             // Combine all predicates

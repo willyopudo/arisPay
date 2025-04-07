@@ -5,6 +5,7 @@ import org.arispay.data.UserDto;
 import org.arispay.entity.Client;
 import org.arispay.entity.Company;
 import org.arispay.entity.User;
+import org.arispay.enums.RecordStatus;
 import org.arispay.repository.CompanyRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,19 +22,23 @@ public abstract class ClientMapper {
     // ✅ Manually map Client to ClientDto
     @Autowired
     private CompanyRepository companyRepository;
-    //dummy comment
+    //dummy
     @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
     @Mapping(source = "company", target = "companyName", qualifiedByName = "companyToName")
+    @Mapping(source = "recordStatus", target = "status", qualifiedByName = "RecordStatusToString")
     public abstract ClientDto clientToClientDto(Client client);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
+    @Mapping(source = "status", target = "recordStatus", qualifiedByName = "StringToRecordStatus")
     public abstract Client clientDtoToClient(ClientDto clientDto);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "companyToId")
     @Mapping(source = "company", target = "companyName", qualifiedByName = "companyToName")
+    @Mapping(source = "recordStatus", target = "status", qualifiedByName = "RecordStatusToString")
     public abstract List<ClientDto> clientListToClientDtoList(List<Client> clientList);
 
     @Mapping(source = "company", target = "company", qualifiedByName = "idToCompany")
+    @Mapping(source = "status", target = "recordStatus", qualifiedByName = "StringToRecordStatus")
     public abstract List<Client> ClientDtoListToclientList(List<ClientDto> ClientDtoList);
 
     @Named("idToCompany")
@@ -53,5 +58,15 @@ public abstract class ClientMapper {
     public Page<ClientDto> clientsPagetoClientsDtoPage(Page<Client> clientsPage) {
         List<ClientDto> dtoList = clientListToClientDtoList(clientsPage.getContent());  // Convert list
         return new PageImpl<>(dtoList, clientsPage.getPageable(), clientsPage.getTotalElements());
+    }
+
+    @Named("StringToRecordStatus")
+    public RecordStatus StringToRecordStatus(String recordStatus) {
+        return RecordStatus.fromString(recordStatus);
+    }
+
+    @Named("RecordStatusToString")
+    public String RecordStatusToString(RecordStatus recordStatus) {
+        return recordStatus.toString();
     }
 }
