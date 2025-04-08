@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CompanyAccountDto {
+
+	private Long id;
+
 	private Long companyId;
 
 	private String accountNumber;
@@ -22,4 +25,5 @@ public class CompanyAccountDto {
 
 	private Float balance;
 
+	private String status;
 }

@@ -29,7 +29,8 @@ public interface ClientRepository extends JpaRepository<Client, Long>, JpaSpecif
             @Param("p_status") byte status,
             @Param("p_created_by") String createdBy,
             @Param("p_company_id") Integer companyId
-            //@Param("p_client_id") String clientId
     );
+
+
 
 }

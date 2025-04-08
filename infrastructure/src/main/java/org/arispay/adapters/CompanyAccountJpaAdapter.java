@@ -1,13 +1,22 @@
 package org.arispay.adapters;
 
 import org.arispay.data.CompanyAccountDto;
+import org.arispay.data.GenericFilterDto;
+import org.arispay.entity.Client;
 import org.arispay.entity.CompanyAccount;
 import org.arispay.mappers.CompanyAccountMapper;
 import org.arispay.ports.spi.CompanyAccountPersistencePort;
 import org.arispay.ports.spi.GenericPersistencePort;
 import org.arispay.repository.CompanyAccountRepository;
+import org.arispay.specifications.ClientSpecification;
+import org.arispay.specifications.CompanyAccountSpecification;
 import org.arispay.utils.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,6 +70,23 @@ public class CompanyAccountJpaAdapter implements CompanyAccountPersistencePort<C
 	public CompanyAccountDto getByAccountNumber(String accountNumber) {
 		Optional<CompanyAccount> companyAccount = companyAccountRepository.findByAccountNumber(accountNumber);
 		return companyAccountMapper.companyAccountToCompanyAccountDto(companyAccount.orElse(null));
+	}
+
+	@Override
+	public Page<CompanyAccountDto> getAll(Long companyId, Pageable pageable, GenericFilterDto filterDto) {
+		Specification<CompanyAccount> companyAccountSpecification = CompanyAccountSpecification.buildComplexSpecification(companyId, filterDto);
+		// Create sort for standard fields if specified
+		if (filterDto.getSortBy() != null && filterDto.getDirection() != null) {
+			Sort sort = Sort.by(filterDto.getDirection(), filterDto.getSortBy());
+			pageable = PageRequest.of(
+					pageable.getPageNumber(),
+					pageable.getPageSize(),
+					sort
+			);
+		}
+
+		Page<CompanyAccount> accountList = companyAccountRepository.findAll(companyAccountSpecification, pageable);
+		return companyAccountMapper.accountsPagetoAccountsDtoPage(accountList);
 	}
 
 	@Override
