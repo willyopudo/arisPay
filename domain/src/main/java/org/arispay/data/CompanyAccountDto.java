@@ -17,6 +17,8 @@ public class CompanyAccountDto {
 
 	private String accountNumber;
 
+	private String companyName;
+
 	private String accountName;
 
 	private String bankCode;
@@ -26,4 +28,6 @@ public class CompanyAccountDto {
 	private Float balance;
 
 	private String status;
+
+	private String currency;
 }

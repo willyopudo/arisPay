@@ -9,6 +9,8 @@ import org.arispay.data.GenericFilterDto;
 import org.arispay.entity.Client;
 import org.arispay.entity.Company;
 import org.arispay.entity.CompanyAccount;
+import org.arispay.enums.ClientIdentifierType;
+import org.arispay.enums.RecordStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -29,6 +31,27 @@ public class CompanyAccountSpecification {
             if (companyId != null) {
                 Join<Company, CompanyAccount> companyAccount = root.join("company");
                 predicates.add(criteriaBuilder.equal(companyAccount.get("id"), companyId));
+            }
+
+            // Generic Filter Specifications
+            if (filterDto != null && filterDto.getFilters() != null) {
+                // Record Status Filter
+                if (!filterDto.getFilters().isEmpty() && filterDto.getFilters().get(0) != null && !filterDto.getFilters().get(0).isEmpty()) {
+                    try {
+                        RecordStatus status = RecordStatus.fromString(filterDto.getFilters().get(0));
+                        predicates.add(criteriaBuilder.equal(root.get("recordStatus"), status));
+                    } catch (IllegalArgumentException e) {
+                        logger.info("Invalid status: {}. Error message: {}", filterDto.getFilters().get(0), e.getMessage());
+                    }
+                }
+
+                if (filterDto.getSearch() != null) {
+                    predicates.add(criteriaBuilder.or(
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("accountName")), "%" + filterDto.getSearch().toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("accountNumber")), "%" + filterDto.getSearch().toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("bank").get("bankName")), "%" + filterDto.getSearch().toLowerCase() + "%")));
+//                        criteriaBuilder.like(criteriaBuilder.lower(root.get("currentPlan").as(String.class)), "%" + filterDto.getSearch().toLowerCase() + "%")));
+                }
             }
 
             // Combine all predicates

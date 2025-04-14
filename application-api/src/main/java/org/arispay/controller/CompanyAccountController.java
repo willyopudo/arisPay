@@ -45,9 +45,9 @@ public class CompanyAccountController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CompanyAccountDto>> getAllCompanyAccounts(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<CompanyAccountDto>> getAllCompanyAccounts(@RequestParam(defaultValue = "1") int page,
                                                          @RequestParam(defaultValue = "5") int itemsPerPage,
-//                                                         @RequestParam(name = "status", required = false, defaultValue = "") String status,
+                                                         @RequestParam(name = "status", required = false, defaultValue = "") String status,
 //                                                         @RequestParam(name = "identifierType", required = false, defaultValue = "") String identifierType,
                                                          @RequestParam(name = "search", required = false) String search,
                                                          @RequestParam(name = "sortBy", defaultValue = "id", required = false) String sortBy,
@@ -64,8 +64,7 @@ public class CompanyAccountController {
                 ? Sort.Direction.DESC : Sort.Direction.ASC;
 
         GenericFilterDto filterDto = new GenericFilterDto(
-//                List.of( status, identifierType),
-               null,
+                List.of( status),
                 search,
                 direction,
                 sortBy
