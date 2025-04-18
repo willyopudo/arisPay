@@ -7,12 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
-import org.arispay.data.ClientDto;
-import org.arispay.data.CompanyAccountDto;
-import org.arispay.data.CompanyDto;
-import org.arispay.data.GenericFilterDto;
+import org.arispay.data.*;
 import org.arispay.entity.CompanyAccount;
+import org.arispay.ports.api.BankServicePort;
 import org.arispay.ports.api.CompanyAccountServicePort;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +33,9 @@ public class CompanyAccountController {
     @Autowired
     CompanyAccountServicePort<CompanyAccountDto> companyAccountService;
 
+    @Autowired
+    BankServicePort bankService;
+
     private final JwtUtil jwtUtil;
 
     private static final Logger logger = LogManager.getLogger(CompanyAccountController.class);
@@ -45,15 +47,15 @@ public class CompanyAccountController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CompanyAccountDto>> getAllCompanyAccounts(@RequestParam(defaultValue = "1") int page,
-                                                         @RequestParam(defaultValue = "5") int itemsPerPage,
-                                                         @RequestParam(name = "status", required = false, defaultValue = "") String status,
+    public ResponseEntity<Pair<Page<CompanyAccountDto>, List<SelectDto>>> getAllCompanyAccounts(@RequestParam(defaultValue = "1") int page,
+                                                                                               @RequestParam(defaultValue = "5") int itemsPerPage,
+                                                                                               @RequestParam(name = "status", required = false, defaultValue = "") String status,
 //                                                         @RequestParam(name = "identifierType", required = false, defaultValue = "") String identifierType,
-                                                         @RequestParam(name = "search", required = false) String search,
-                                                         @RequestParam(name = "sortBy", defaultValue = "id", required = false) String sortBy,
-                                                         @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
-                                                         HttpServletRequest request,
-                                                         Authentication authentication) {
+                                                                                               @RequestParam(name = "search", required = false) String search,
+                                                                                               @RequestParam(name = "sortBy", defaultValue = "id", required = false) String sortBy,
+                                                                                               @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
+                                                                                               HttpServletRequest request,
+                                                                                               Authentication authentication) {
 
         logger.info("Authentication: {}", authentication.getAuthorities());
 
@@ -72,7 +74,9 @@ public class CompanyAccountController {
 
         Long companyId = claims.get("companyId", Long.class);
 
+        List<SelectDto> banks = bankService.getBanks();
+
         Pageable pageable = PageRequest.of(page-1, itemsPerPage);
-        return ResponseEntity.ok(companyAccountService.getAll(companyId, pageable, filterDto));
+        return ResponseEntity.ok(new Pair<>(companyAccountService.getAll(companyId, pageable, filterDto), banks));
     }
 }

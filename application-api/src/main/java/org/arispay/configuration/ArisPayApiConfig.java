@@ -73,6 +73,16 @@ public class ArisPayApiConfig {
 		return new TransactionRejectedServiceImpl(rejectedTransactionPersistence());
 	}
 
+	@Bean
+	public BankPersistencePort bankPersistence() {
+		return new BankJpaAdapter();
+	}
+
+	@Bean
+	public BankServicePort bankService() {
+		return new BankServiceImpl(bankPersistence());
+	}
+
 
 
 }
