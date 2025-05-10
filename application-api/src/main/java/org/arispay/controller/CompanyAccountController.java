@@ -2,17 +2,16 @@ package org.arispay.controller;
 
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
 import org.arispay.data.*;
-import org.arispay.entity.CompanyAccount;
 import org.arispay.ports.api.BankServicePort;
 import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.repository.CompanyAccountRepository;
-import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -92,5 +91,19 @@ public class CompanyAccountController {
 
         Pageable pageable = PageRequest.of(page-1, itemsPerPage);
         return ResponseEntity.ok(new Triplet<>(companyAccountService.getAll(companyId, pageable, filterDto), banks, companyAccountSummary));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCompanyAccount(@RequestBody CompanyAccountDto companyAccountDto, @PathVariable long id) {
+        if(companyAccountDto.getId() != id) {
+            return ResponseEntity.badRequest().body("Id in path and body do not match");
+        }
+        try{
+            CompanyAccountDto updatedClient = companyAccountService.update(companyAccountDto);
+            return ResponseEntity.ok(updatedClient);
+        }catch (EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+
     }
 }
