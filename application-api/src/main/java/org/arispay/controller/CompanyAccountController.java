@@ -11,7 +11,9 @@ import org.arispay.data.*;
 import org.arispay.entity.CompanyAccount;
 import org.arispay.ports.api.BankServicePort;
 import org.arispay.ports.api.CompanyAccountServicePort;
+import org.arispay.repository.CompanyAccountRepository;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +38,9 @@ public class CompanyAccountController {
     @Autowired
     BankServicePort bankService;
 
+    @Autowired
+    CompanyAccountRepository companyAccountRepository;
+
     private final JwtUtil jwtUtil;
 
     private static final Logger logger = LogManager.getLogger(CompanyAccountController.class);
@@ -47,7 +52,7 @@ public class CompanyAccountController {
     }
 
     @GetMapping
-    public ResponseEntity<Pair<Page<CompanyAccountDto>, List<SelectDto>>> getAllCompanyAccounts(@RequestParam(defaultValue = "1") int page,
+    public ResponseEntity<Triplet<Page<CompanyAccountDto>, List<SelectDto>, ISummary>> getAllCompanyAccounts(@RequestParam(defaultValue = "1") int page,
                                                                                                @RequestParam(defaultValue = "5") int itemsPerPage,
                                                                                                @RequestParam(name = "status", required = false, defaultValue = "") String status,
 //                                                         @RequestParam(name = "identifierType", required = false, defaultValue = "") String identifierType,
@@ -65,6 +70,13 @@ public class CompanyAccountController {
         Sort.Direction direction = "desc".equalsIgnoreCase(orderBy)
                 ? Sort.Direction.DESC : Sort.Direction.ASC;
 
+        if (sortBy.startsWith("bank")) {
+            // Need to handle differently with joins
+            sortBy = "bank.bankCode";
+        } else if (sortBy.startsWith("status")) {
+            sortBy = "recordStatus";
+        }
+
         GenericFilterDto filterDto = new GenericFilterDto(
                 List.of( status),
                 search,
@@ -74,9 +86,11 @@ public class CompanyAccountController {
 
         Long companyId = claims.get("companyId", Long.class);
 
+        ISummary companyAccountSummary = companyAccountRepository.getCompanyAccountSummaries(companyId).orElse(null);
+
         List<SelectDto> banks = bankService.getBanks();
 
         Pageable pageable = PageRequest.of(page-1, itemsPerPage);
-        return ResponseEntity.ok(new Pair<>(companyAccountService.getAll(companyId, pageable, filterDto), banks));
+        return ResponseEntity.ok(new Triplet<>(companyAccountService.getAll(companyId, pageable, filterDto), banks, companyAccountSummary));
     }
 }
