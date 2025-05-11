@@ -17,9 +17,16 @@ public class BankJpaAdapter implements BankPersistencePort {
 
     @Override
     public List<SelectDto> getBanks() {
+        // Fetch all banks from the repository
+        // and map them to SelectDto objects
+        // using a stream to transform the list
+        // into a list of SelectDto
+        // using the bank code and name
+
         List<Bank> banks = bankRepository.findAll();
         return banks.stream()
-                .map(bank -> new SelectDto(bank.getBankName(), bank.getBankCode()))
+                .sorted((b1, b2) -> b1.getBankCode().compareTo(b2.getBankCode()))
+                .map(bank -> new SelectDto(bank.getBankCode() + " " + bank.getBankName(), bank.getBankCode()))
                 .toList();
     }
 }

@@ -106,4 +106,14 @@ public class CompanyAccountController {
         }
 
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCompanyAccountById(@PathVariable long id) {
+        try{
+        companyAccountService.deleteById(Long.valueOf(id));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Company account deleted successfully");
+    }catch (Exception e){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+}
 }
