@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
 import org.arispay.data.ClientDto;
 import org.arispay.data.GenericFilterDto;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +32,8 @@ public class ClientController {
 
     private final JwtUtil jwtUtil;
 
+    private static final Logger logger = LogManager.getLogger(ClientController.class);
+
     public ClientController(JwtUtil jwtUtil, ClientServicePort clientServicePort) {
         this.jwtUtil = jwtUtil;
         this.clientServicePort = clientServicePort;
@@ -36,7 +41,9 @@ public class ClientController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ClientDto addClient(@RequestBody ClientDto clientDto) {
+    public ClientDto addClient(@RequestBody ClientDto clientDto, Authentication authentication) {
+        clientDto.setCreatedBy(authentication.getName());
+
         return clientServicePort.addClient(clientDto);
     }
 
@@ -67,7 +74,10 @@ public class ClientController {
                                                          @RequestParam(name = "search", required = false) String search,
                                                          @RequestParam(name = "sortBy", defaultValue = "clientName", required = false) String sortBy,
                                                          @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
-                                                         HttpServletRequest request) {
+                                                         HttpServletRequest request,
+                                                         Authentication authentication) {
+
+        logger.info("Authentication: {}", authentication.getAuthorities());
 
         Claims claims = jwtUtil.resolveClaims(request);
 

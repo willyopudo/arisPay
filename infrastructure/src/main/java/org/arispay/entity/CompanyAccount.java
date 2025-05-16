@@ -34,11 +34,12 @@ public class CompanyAccount extends AuditableEntity {
 	@Column(nullable = false)
 	private String accountName;
 
-	@Column(nullable = false)
-	private String bankCode;
+	private String currency;
 
-	@Column(nullable = false)
-	private String bankName;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "bank_id", nullable = false)
+	@JsonIgnore
+	private Bank bank;
 
 	@Column(nullable = false)
 	private Float balance;

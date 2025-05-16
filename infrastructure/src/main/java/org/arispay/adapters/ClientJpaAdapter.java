@@ -47,7 +47,7 @@ public class ClientJpaAdapter implements ClientPersistencePort {
                  client.getIdentifierType().name(),
                 client.getClientPhone(),
                  (byte) client.getRecordStatus().ordinal(),
-                 "admin",
+                 client.getCreatedBy(),
                  client.getCompany().getId().intValue()
              //"" // OUT parameter placeholder
          );

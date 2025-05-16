@@ -71,15 +71,15 @@ public class UserController {
     }
     // Fetch list of users
     @GetMapping
-    public ResponseEntity<Pair<Page<UserDto>, IUserSummary>> getAllUsers(@RequestParam(defaultValue = "0") int page,
-                                                                        @RequestParam(defaultValue = "5") int itemsPerPage,
-                                                                        @RequestParam(name = "status", required = false) String status,
-                                                                        @RequestParam(name = "role", required = false) String role,
-                                                                        @RequestParam(name = "plan", required = false) String currentPlan,
-                                                                        @RequestParam(name = "sortBy", defaultValue = "firstName", required = false) String sortBy,
-                                                                        @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
-                                                                        @RequestParam(name = "search", required = false) String search,
-                                                                         HttpServletRequest request) {
+    public ResponseEntity<Pair<Page<UserDto>, ISummary>> getAllUsers(@RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "5") int itemsPerPage,
+                                                                     @RequestParam(name = "status", required = false) String status,
+                                                                     @RequestParam(name = "role", required = false) String role,
+                                                                     @RequestParam(name = "plan", required = false) String currentPlan,
+                                                                     @RequestParam(name = "sortBy", defaultValue = "firstName", required = false) String sortBy,
+                                                                     @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
+                                                                     @RequestParam(name = "search", required = false) String search,
+                                                                     HttpServletRequest request) {
         Random rn = new Random();
 
         List<Sort.Order> orders = new ArrayList<>();
@@ -117,7 +117,7 @@ public class UserController {
         Claims claims = jwtUtil.resolveClaims(request);
 
         Long companyId = claims.get("companyId", Long.class);
-        IUserSummary userSummary = userRepository.getUserSummaries(companyId).orElse(null);
+        ISummary userSummary = userRepository.getUserSummaries(companyId).orElse(null);
         return ResponseEntity.ok(new Pair<>(users, userSummary));
     }
 

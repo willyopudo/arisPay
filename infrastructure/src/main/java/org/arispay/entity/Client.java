@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.arispay.enums.ClientIdentifierType;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.type.descriptor.jdbc.SmallIntJdbcType;
 
 @Data
 @AllArgsConstructor
@@ -16,14 +17,14 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "client")
 @NamedStoredProcedureQuery(
         name = "insert_client",
-        procedureName = "arispay_db.insert_client",
+        procedureName = "insert_client",
         parameters = {
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_client_name", type = String.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_client_id_in", type = String.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_client_email", type = String.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_identifier_type", type = String.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_client_phone", type = String.class),
-                @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_status", type = Integer.class),
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_status", type = SmallIntJdbcType.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_created_by", type = String.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_company_id", type = Integer.class),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "p_client_id", type = String.class)
