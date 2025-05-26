@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Payload {
+public class ConfirmationPayload {
 
     @JsonProperty("customer_id")
     private String customerId;

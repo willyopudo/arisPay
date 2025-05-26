@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class ValidationRequest {
 
     private String action;
-    private Payload payload;
+    private ValidationPayload payload;
 }

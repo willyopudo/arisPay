@@ -58,7 +58,7 @@ public abstract class TransactionRejectedMapper {
 
     @Named("idToCompany")
     public Company idToCompany(Long id) {
-        return companyRepository.findById(id).orElse(null);
+        return id != null ? companyRepository.findById(id).orElse(null) : null;
     }
 
     @Named("companyToId")

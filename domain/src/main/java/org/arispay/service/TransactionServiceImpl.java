@@ -2,9 +2,12 @@ package org.arispay.service;
 
 import java.util.List;
 
+import org.arispay.data.GenericFilterDto;
 import org.arispay.data.TransactionDto;
 import org.arispay.ports.api.TransactionServicePort;
 import org.arispay.ports.spi.TransactionPersistencePort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public class TransactionServiceImpl implements TransactionServicePort {
 
@@ -30,8 +33,8 @@ public class TransactionServiceImpl implements TransactionServicePort {
     }
 
     @Override
-    public List<TransactionDto> getTransactions() {
-        return transactionPersistencePort.getTransactions();
+    public Page<TransactionDto> getTransactions(Long companyId, Pageable pageable, GenericFilterDto filter) {
+        return transactionPersistencePort.getTransactions(companyId, pageable, filter);
     }
 
     @Override

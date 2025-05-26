@@ -104,8 +104,11 @@ public class CollectionsController {
     }
 
     @PostMapping("/confirmation")
-    public ResponseEntity<?> validateClient(@RequestBody ConfirmationRequest confirmationRequest) {
+    public ResponseEntity<?> confirmTransaction(@RequestBody ConfirmationRequest confirmationRequest) {
         ConfirmationResponse confirmationResponse = new ConfirmationResponse();
+        confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
+
+        HttpStatus resStatus = HttpStatus.OK;
         try {
             LocalDateTime dateTime = LocalDateTime.parse(confirmationRequest.getPayload().getDateTime(), formatter);
 
@@ -133,12 +136,19 @@ public class CollectionsController {
                     : confirmationResponse.getStatusDescription());
 
             TransactionDto transaction = new TransactionDto(
+                    0L,
                     confirmationRequest.getPayload().getTxnReference(), null,
                     confirmationRequest.getPayload().getTxnAmount(),
-                    collectionAccount, fetchedAccount != null ? fetchedAccount.getCompanyId() : null,
-                    customerId, confirmationRequest.getPayload().getPayerName(),
-                    confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
-                    confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
+                    collectionAccount,
+                    "070",
+                    fetchedAccount != null ? fetchedAccount.getCompanyId() : null,
+                    customerId,
+                    confirmationRequest.getPayload().getPayerName(),
+                    confirmationRequest.getPayload().getPayerPhone(),
+                    confirmationRequest.getPayload().getPaymentMode(),
+                    confirmationRequest.getPayload().getTxnNarration(),
+                    "/api/v1/fbl/confirmation", dateTime,
+                    "C");
 
             if (fetchedAccount == null || fetchedClient == null) {
                 transaction = transactionRejectedServicePort.addTransaction(transaction);
@@ -147,26 +157,25 @@ public class CollectionsController {
             }
 
             confirmationResponse.setPaymentRef(transaction.getArisTranRef());
-            confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
         } catch (DataIntegrityViolationException ex) {
             logger.error(ex.getMessage(), "Error Message: " + ex);
-            GenericHttpResponse<?> httpResponse = new GenericHttpResponse<>();
-            httpResponse.setHttpStatus(HttpStatus.CONFLICT);
+
             if (ex.getMessage().toLowerCase().contains("duplicate")) {
-                httpResponse.setMessage("Duplicate request for transaction reference: "
+                resStatus = HttpStatus.CONFLICT;
+                confirmationResponse.setStatusCode("PAYMENT_RJCT");
+                confirmationResponse.setStatusDescription("Duplicate request for transaction reference: "
                         + confirmationRequest.getPayload().getTxnReference());
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(httpResponse);
+
             }
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            GenericHttpResponse<?> httpResponse = new GenericHttpResponse<>();
-            httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            httpResponse.setMessage("An error occurred while processing Collections Confirmation request");
-            return ResponseEntity.internalServerError().body(httpResponse);
+            resStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            confirmationResponse.setStatusCode("PAYMENT_RJCT");
+            confirmationResponse.setStatusDescription("An error occurred while processing Collections Confirmation request");
         }
 
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(resStatus)
                 .body(confirmationResponse);
     }
 }
