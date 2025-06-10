@@ -117,7 +117,8 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
                     bulkTransactionRepository.markPostingStage(bulkTransaction.getId(), "S");
                     for (Detail detail : bulkTransaction.getDtl()) {
                         Transaction transaction = new Transaction();
-                        transaction.setBankAccount(bulkTransaction.getAccountDr());
+                        //Todo : Consider building the transaction object using a mapper
+                        //transaction.setBankAccount(bulkTransaction.getAccountDr());
                         transaction.setBankTranRef(detail.getCbsRef());
                         transaction.setNarration(detail.getRemarks());
                         transaction.setPayerName(detail.getSenderDetails());

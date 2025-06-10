@@ -15,6 +15,6 @@ import java.util.Optional;
 public interface CompanyAccountRepository extends JpaRepository<CompanyAccount, Long>, JpaSpecificationExecutor<CompanyAccount> {
     Optional<CompanyAccount> findByAccountNumber(String accountNumber);
 
-    @Query(nativeQuery = true, value="SELECT  COUNT(ca.id) AS total , SUM(CASE WHEN ca.record_status = 0 then 1 else 0 END) AS active, SUM(CASE WHEN ca.record_status = 2 then 1 else 0 END) AS pending, SUM(CASE WHEN ca.record_status = 1 then 1 else 0 END) AS inactive FROM public.company_accounts ca where ca.company_id = :companyId")
+    @Query(nativeQuery = true, value="SELECT  COUNT(ca.id) AS total , SUM(CASE WHEN ca.record_status = 0 then 1 else 0 END) AS active, SUM(CASE WHEN ca.record_status = 2 then 1 else 0 END) AS pending, SUM(CASE WHEN ca.record_status = 1 then 1 else 0 END) AS inactive FROM company_accounts ca where ca.company_id = :companyId")
     Optional<ISummary> getCompanyAccountSummaries(@Param("companyId") Long companyId);
 }

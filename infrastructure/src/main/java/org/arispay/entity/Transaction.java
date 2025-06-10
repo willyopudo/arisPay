@@ -28,17 +28,16 @@ public class Transaction extends AuditableEntity{
 	@Column(nullable = false)
 	private Double tranAmount;
 
-	@Column(nullable = false)
-	private String bankAccount;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "company_account_id", nullable = false)
+	private CompanyAccount companyAccount;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "company_id", nullable = false)
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Company company;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "client_id")
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Client client;
 
 	private String payerName;

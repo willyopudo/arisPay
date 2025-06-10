@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ConfirmationRequest {
     private String action;
-    private Payload payload;
+    private ConfirmationPayload payload;
 }

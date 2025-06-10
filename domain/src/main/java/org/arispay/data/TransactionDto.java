@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class TransactionDto {
-
+	private Long id;
 	private String bankTranRef;
 
 	private String arisTranRef;
@@ -20,6 +20,8 @@ public class TransactionDto {
 	private Double tranAmount;
 
 	private String bankAccount;
+
+	private String bank;
 
 	private Long companyId;
 

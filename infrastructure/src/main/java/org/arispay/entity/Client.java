@@ -38,7 +38,7 @@ public class Client extends AuditableEntity {
 
     private String clientName;
 
-    @Column(unique = true)
+    //@Column(unique = true)
     private String clientId;
 
     @Enumerated(EnumType.STRING)
