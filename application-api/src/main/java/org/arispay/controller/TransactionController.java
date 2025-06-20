@@ -1,5 +1,7 @@
 package org.arispay.controller;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.jsonwebtoken.Claims;
@@ -8,10 +10,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
+import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.GenericFilterDto;
+import org.arispay.data.SelectDto;
 import org.arispay.data.TransactionDto;
+import org.arispay.ports.api.BankServicePort;
+import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.ports.api.TransactionServicePort;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,15 +33,19 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "http://localhost:3000")
 public class TransactionController {
 
-    private TransactionServicePort transactionServicePort;
+    private final TransactionServicePort transactionServicePort;
+    private final BankServicePort bankService;
+    private final CompanyAccountServicePort<CompanyAccountDto> companyAccountService;
 
     private final JwtUtil jwtUtil;
 
     private static final Logger logger = LogManager.getLogger(TransactionController.class);
 
-    public TransactionController(JwtUtil jwtUtil, TransactionServicePort transactionServicePort) {
+    public TransactionController(JwtUtil jwtUtil, TransactionServicePort transactionServicePort, BankServicePort bankService, CompanyAccountServicePort<CompanyAccountDto> companyAccountService) {
         this.jwtUtil = jwtUtil;
         this.transactionServicePort = transactionServicePort;
+        this.bankService = bankService;
+        this.companyAccountService = companyAccountService;
     }
 
     @PostMapping
@@ -55,14 +65,19 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<TransactionDto>> getAllTransactions(@RequestParam(defaultValue = "0") int page,
-                                                                   @RequestParam(defaultValue = "5") int itemsPerPage,
-                                                                   @RequestParam(name = "clientId", required = false, defaultValue = "") String clientId,
-                                                                   @RequestParam(name = "transDateRange", required = false, defaultValue = "") String transDateRange,
-                                                                   @RequestParam(name = "sortBy", defaultValue = "transDate", required = false) String sortBy,
-                                                                   @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
-                                                                   HttpServletRequest request,
-                                                                   Authentication authentication) {
+    // Retrieves all transactions with optional filters and pagination
+    //Returns a paginated list of transactions along with a list of banks for selection and a list of company accounts for selection
+    public ResponseEntity<Pair<Page<TransactionDto>, List<List<SelectDto>>>> getAllTransactions(@RequestParam(defaultValue = "0") int page,
+                                                                                    @RequestParam(defaultValue = "5") int itemsPerPage,
+                                                                                    @RequestParam(name = "bank", required = false, defaultValue = "") String bank,
+                                                                                    @RequestParam(name = "account", required = false, defaultValue = "") String account,
+                                                                                    @RequestParam(name = "crDrInd", required = false, defaultValue = "") String crDrInd,
+                                                                                    @RequestParam(name = "dateRange", required = false) List<LocalDate> dateRange,
+                                                                                    @RequestParam(name = "search", required = false, defaultValue = "") String search,
+                                                                                    @RequestParam(name = "sortBy", defaultValue = "transDate", required = false) String sortBy,
+                                                                                    @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
+                                                                                    HttpServletRequest request,
+                                                                                    Authentication authentication) {
         logger.info("Authentication: {}", authentication.getAuthorities());
 
         Claims claims = jwtUtil.resolveClaims(request);
@@ -70,18 +85,24 @@ public class TransactionController {
         // Determine sort direction
         Sort.Direction direction = "desc".equalsIgnoreCase(orderBy)
                 ? Sort.Direction.DESC : Sort.Direction.ASC;
-
+        logger.info("Date range submitted: {}", dateRange);
         GenericFilterDto filterDto = new GenericFilterDto(
-                List.of( clientId, transDateRange),
-                null,
+                List.of( bank, dateRange == null ? "" : dateRange, account, crDrInd),
+                search,
                 direction,
                 sortBy
         );
 
         Long companyId = claims.get("companyId", Long.class);
 
+        List<List<SelectDto>> selectOptions = new ArrayList<>();
+        List<SelectDto> banks = bankService.getBanks();
+        List<SelectDto> companyAccounts = companyAccountService.getAccountsSelectList(companyId);
+        selectOptions.add(banks);
+        selectOptions.add(companyAccounts);
+
         Pageable pageable = PageRequest.of(page-1, itemsPerPage);
-        return ResponseEntity.ok(transactionServicePort.getTransactions(companyId, pageable, filterDto));
+        return ResponseEntity.ok(new Pair<> (transactionServicePort.getTransactions(companyId, pageable, filterDto), selectOptions));
     }
 
     @DeleteMapping("/{id}")

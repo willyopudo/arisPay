@@ -1,6 +1,7 @@
 package org.arispay.ports.api;
 
 import org.arispay.data.GenericFilterDto;
+import org.arispay.data.SelectDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,4 +11,5 @@ public interface CompanyAccountServicePort<T> extends GenericServicePort<T> {
     T getByAccountNumber(String accountNumber);
 
     Page<T> getAll(Long companyId, Pageable pageable, GenericFilterDto filterDto);
+    List<SelectDto> getAccountsSelectList(Long companyId);
 }

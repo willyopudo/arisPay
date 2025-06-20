@@ -41,19 +41,19 @@ public class ClientSpecification {
             // Generic Filter Specifications
             if (filterDto != null && filterDto.getFilters() != null) {
                 // Record Status Filter
-                if (!filterDto.getFilters().isEmpty() && filterDto.getFilters().get(0) != null && !filterDto.getFilters().get(0).isEmpty()) {
+                if (!filterDto.getFilters().isEmpty() && filterDto.getFilters().get(0) != null && !filterDto.getFilters().get(0).toString().isEmpty()) {
                     try {
-                        RecordStatus status = RecordStatus.fromString(filterDto.getFilters().get(0));
+                        RecordStatus status = RecordStatus.fromString(filterDto.getFilters().getFirst().toString());
                         predicates.add(criteriaBuilder.equal(root.get("recordStatus"), status));
                     } catch (IllegalArgumentException e) {
-                        logger.info("Invalid status: {}. Error message: {}", filterDto.getFilters().get(0), e.getMessage());
+                        logger.info("Invalid status: {}. Error message: {}", filterDto.getFilters().getFirst(), e.getMessage());
                     }
                 }
 
                 // Client Identifier Type Filter
-                if (filterDto.getFilters().size() > 1 && filterDto.getFilters().get(1) != null && !filterDto.getFilters().get(1).isEmpty()) {
+                if (filterDto.getFilters().size() > 1 && filterDto.getFilters().get(1) != null && !filterDto.getFilters().get(1).toString().isEmpty()) {
                     try {
-                        ClientIdentifierType identifierType = ClientIdentifierType.valueOf(filterDto.getFilters().get(1));
+                        ClientIdentifierType identifierType = ClientIdentifierType.valueOf(filterDto.getFilters().get(1).toString());
                         predicates.add(criteriaBuilder.equal(root.get("identifierType"), identifierType));
                     } catch (IllegalArgumentException e) {
                         logger.info("Invalid identifier type: {}. Error message: {}", filterDto.getFilters().get(1), e.getMessage());
