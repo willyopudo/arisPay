@@ -36,12 +36,12 @@ public class CompanyAccountSpecification {
             // Generic Filter Specifications
             if (filterDto != null && filterDto.getFilters() != null) {
                 // Record Status Filter
-                if (!filterDto.getFilters().isEmpty() && filterDto.getFilters().get(0) != null && !filterDto.getFilters().get(0).isEmpty()) {
+                if (!filterDto.getFilters().isEmpty() && filterDto.getFilters().getFirst() != null && !filterDto.getFilters().getFirst().toString().isEmpty()) {
                     try {
-                        RecordStatus status = RecordStatus.fromString(filterDto.getFilters().get(0));
+                        RecordStatus status = RecordStatus.fromString(filterDto.getFilters().getFirst().toString());
                         predicates.add(criteriaBuilder.equal(root.get("recordStatus"), status));
                     } catch (IllegalArgumentException e) {
-                        logger.info("Invalid status: {}. Error message: {}", filterDto.getFilters().get(0), e.getMessage());
+                        logger.info("Invalid status: {}. Error message: {}", filterDto.getFilters().getFirst(), e.getMessage());
                     }
                 }
 

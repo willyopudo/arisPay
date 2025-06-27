@@ -2,6 +2,7 @@ package org.arispay.service;
 
 import lombok.RequiredArgsConstructor;
 import org.arispay.data.GenericFilterDto;
+import org.arispay.data.SelectDto;
 import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.ports.spi.CompanyAccountPersistencePort;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,11 @@ public class CompanyAccountServiceImpl<T>  implements CompanyAccountServicePort<
     @Override
     public Page<T> getAll(Long companyId, Pageable pageable, GenericFilterDto filterDto) {
         return companyAccountPersistencePort.getAll(companyId, pageable, filterDto);
+    }
+
+    @Override
+    public List<SelectDto> getAccountsSelectList(Long companyId) {
+        return companyAccountPersistencePort.getAccountsSelectList(companyId);
     }
 
     @Override

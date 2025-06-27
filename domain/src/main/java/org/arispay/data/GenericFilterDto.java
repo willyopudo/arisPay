@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GenericFilterDto {
-    private List<String> filters;
+    private List<?> filters;
     private String search;
     private Sort.Direction direction = Sort.Direction.ASC;
     private String sortBy;

@@ -1,11 +1,13 @@
 package org.arispay.adapters;
 
 import org.arispay.data.GenericFilterDto;
+import org.arispay.data.ISummary;
 import org.arispay.data.TransactionDto;
 import org.arispay.entity.Client;
 import org.arispay.entity.Transaction;
 import org.arispay.mappers.TransactionMapper;
 import org.arispay.ports.spi.TransactionPersistencePort;
+import org.arispay.repository.QueryTransactionRepository;
 import org.arispay.repository.TransactionRepository;
 import org.arispay.specifications.ClientSpecification;
 import org.arispay.specifications.TransactionSpecification;
@@ -24,6 +26,9 @@ import java.util.Optional;
 public class TransactionJpaAdapter implements TransactionPersistencePort {
 	@Autowired
 	private TransactionRepository transactionRepository;
+
+	@Autowired
+	private QueryTransactionRepository queryTransactionRepository;
 
 	@Autowired
 	private TransactionMapper transactionMapper;
@@ -47,7 +52,7 @@ public class TransactionJpaAdapter implements TransactionPersistencePort {
 	@Override
 	public Page<TransactionDto> getTransactions(Long companyId, Pageable pageable, GenericFilterDto filter) {
 
-		Specification<Transaction> transactionSpecification = TransactionSpecification.buildComplexSpecification(companyId, null, filter);
+		//Specification<Transaction> transactionSpecification = TransactionSpecification.buildComplexSpecification(companyId, null, filter);
 
 		// Create sort for standard fields if specified
 		if (filter.getSortBy() != null && filter.getDirection() != null) {
@@ -58,7 +63,7 @@ public class TransactionJpaAdapter implements TransactionPersistencePort {
 					sort
 			);
 		}
-		Page<Transaction> transactionList = transactionRepository.findAll(transactionSpecification, pageable);
+		Page<Transaction> transactionList = queryTransactionRepository.searchWithFullText(companyId, pageable, filter);
 		return transactionMapper.transactionsPagetoTransactionsDtoPage(transactionList);
 
 	}
@@ -68,6 +73,11 @@ public class TransactionJpaAdapter implements TransactionPersistencePort {
 		Optional<Transaction> transaction = transactionRepository.findById(id);
 
 		return transaction.map(transactionMapper::transactionToTransactionDto).orElse(null);
+	}
+
+	@Override
+	public Optional<ISummary> getTransactionSummaries(Long companyId) {
+		return transactionRepository.getTransactionSummaries(companyId);
 	}
 
 }

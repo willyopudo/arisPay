@@ -2,15 +2,12 @@ package org.arispay.adapters;
 
 import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.GenericFilterDto;
-import org.arispay.entity.Client;
+import org.arispay.data.SelectDto;
 import org.arispay.entity.CompanyAccount;
 import org.arispay.mappers.CompanyAccountMapper;
 import org.arispay.ports.spi.CompanyAccountPersistencePort;
-import org.arispay.ports.spi.GenericPersistencePort;
 import org.arispay.repository.CompanyAccountRepository;
-import org.arispay.specifications.ClientSpecification;
 import org.arispay.specifications.CompanyAccountSpecification;
-import org.arispay.utils.ObjectMapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -87,6 +84,15 @@ public class CompanyAccountJpaAdapter implements CompanyAccountPersistencePort<C
 
 		Page<CompanyAccount> accountList = companyAccountRepository.findAll(companyAccountSpecification, pageable);
 		return companyAccountMapper.accountsPagetoAccountsDtoPage(accountList);
+	}
+
+	//Gets a list of accounts for a company to be used in select dropdowns
+	@Override
+	public List<SelectDto> getAccountsSelectList(Long companyId){
+		List<CompanyAccount> companyAccountList = companyAccountRepository.findAll(CompanyAccountSpecification.buildComplexSpecification(companyId, null));
+		return companyAccountList.stream()
+				.map(account -> new SelectDto(account.getAccountNumber(), account.getId().toString()))
+				.toList();
 	}
 
 	@Override

@@ -1,8 +1,9 @@
 package org.arispay.data;
 
 public interface ISummary {
-     Long getTotal();
-     Long getActive();
-     Long getPending();
-     Long getInactive();
+     Long getFirst();
+     Long getSecond();
+     Long getThird();
+     Long getFourth();
+     Long getFifth();
 }
