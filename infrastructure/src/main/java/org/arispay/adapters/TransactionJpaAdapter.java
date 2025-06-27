@@ -1,6 +1,7 @@
 package org.arispay.adapters;
 
 import org.arispay.data.GenericFilterDto;
+import org.arispay.data.ISummary;
 import org.arispay.data.TransactionDto;
 import org.arispay.entity.Client;
 import org.arispay.entity.Transaction;
@@ -72,6 +73,11 @@ public class TransactionJpaAdapter implements TransactionPersistencePort {
 		Optional<Transaction> transaction = transactionRepository.findById(id);
 
 		return transaction.map(transactionMapper::transactionToTransactionDto).orElse(null);
+	}
+
+	@Override
+	public Optional<ISummary> getTransactionSummaries(Long companyId) {
+		return transactionRepository.getTransactionSummaries(companyId);
 	}
 
 }

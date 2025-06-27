@@ -3,6 +3,7 @@ package org.arispay.controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -10,14 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
-import org.arispay.data.CompanyAccountDto;
-import org.arispay.data.GenericFilterDto;
-import org.arispay.data.SelectDto;
-import org.arispay.data.TransactionDto;
+import org.arispay.data.*;
 import org.arispay.ports.api.BankServicePort;
 import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.ports.api.TransactionServicePort;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -67,17 +66,17 @@ public class TransactionController {
     @GetMapping
     // Retrieves all transactions with optional filters and pagination
     //Returns a paginated list of transactions along with a list of banks for selection and a list of company accounts for selection
-    public ResponseEntity<Pair<Page<TransactionDto>, List<List<SelectDto>>>> getAllTransactions(@RequestParam(defaultValue = "0") int page,
-                                                                                    @RequestParam(defaultValue = "5") int itemsPerPage,
-                                                                                    @RequestParam(name = "bank", required = false, defaultValue = "") String bank,
-                                                                                    @RequestParam(name = "account", required = false, defaultValue = "") String account,
-                                                                                    @RequestParam(name = "crDrInd", required = false, defaultValue = "") String crDrInd,
-                                                                                    @RequestParam(name = "dateRange", required = false) List<LocalDate> dateRange,
-                                                                                    @RequestParam(name = "search", required = false, defaultValue = "") String search,
-                                                                                    @RequestParam(name = "sortBy", defaultValue = "transDate", required = false) String sortBy,
-                                                                                    @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
-                                                                                    HttpServletRequest request,
-                                                                                    Authentication authentication) {
+    public ResponseEntity<Triplet<Page<TransactionDto>, List<List<SelectDto>>, ISummary>> getAllTransactions(@RequestParam(defaultValue = "0") int page,
+                                                                                                             @RequestParam(defaultValue = "5") int itemsPerPage,
+                                                                                                             @RequestParam(name = "bank", required = false, defaultValue = "") String bank,
+                                                                                                             @RequestParam(name = "account", required = false, defaultValue = "") String account,
+                                                                                                             @RequestParam(name = "crDrInd", required = false, defaultValue = "") String crDrInd,
+                                                                                                             @RequestParam(name = "dateRange", required = false) List<LocalDate> dateRange,
+                                                                                                             @RequestParam(name = "search", required = false, defaultValue = "") String search,
+                                                                                                             @RequestParam(name = "sortBy", defaultValue = "transDate", required = false) String sortBy,
+                                                                                                             @RequestParam(name = "orderBy", defaultValue = "asc", required = false) String orderBy,
+                                                                                                             HttpServletRequest request,
+                                                                                                             Authentication authentication) {
         logger.info("Authentication: {}", authentication.getAuthorities());
 
         Claims claims = jwtUtil.resolveClaims(request);
@@ -101,8 +100,10 @@ public class TransactionController {
         selectOptions.add(banks);
         selectOptions.add(companyAccounts);
 
+        ISummary transactionSummary = transactionServicePort.getTransactionSummaries(companyId).orElse(null);
+
         Pageable pageable = PageRequest.of(page-1, itemsPerPage);
-        return ResponseEntity.ok(new Pair<> (transactionServicePort.getTransactions(companyId, pageable, filterDto), selectOptions));
+        return ResponseEntity.ok(new Triplet<> (transactionServicePort.getTransactions(companyId, pageable, filterDto), selectOptions, transactionSummary));
     }
 
     @DeleteMapping("/{id}")

@@ -1,8 +1,10 @@
 package org.arispay.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.arispay.data.GenericFilterDto;
+import org.arispay.data.ISummary;
 import org.arispay.data.TransactionDto;
 import org.arispay.ports.api.TransactionServicePort;
 import org.arispay.ports.spi.TransactionPersistencePort;
@@ -40,5 +42,10 @@ public class TransactionServiceImpl implements TransactionServicePort {
     @Override
     public TransactionDto getTransactionById(Long id) {
         return transactionPersistencePort.getTransactionById(id);
+    }
+
+    @Override
+    public Optional<ISummary> getTransactionSummaries(Long companyId) {
+        return transactionPersistencePort.getTransactionSummaries(companyId);
     }
 }
