@@ -32,12 +32,15 @@ public class TransactionRejected extends AuditableEntity{
 	private String bankAccount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "company_account_id")
+	private CompanyAccount companyAccount;
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company_id")
 	private Company company;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "client_id")
-	private Client client;
+	@Column(name = "client_id")
+	private String client;
 
 	private String payerName;
 
