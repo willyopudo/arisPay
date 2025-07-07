@@ -24,7 +24,7 @@ public class QueryTransactionRejectedRepository {
     private EntityManager em;
     private static final Logger logger = LogManager.getLogger(QueryTransactionRejectedRepository.class);
     public Page<TransactionRejected> searchWithFullText(Long companyId, Pageable pageable, GenericFilterDto filters) {
-        String bankJoin = "",
+        String
                bankWhere = "",
                companyAccountWhere = "",
                crDrIndWhere = "",
@@ -53,8 +53,8 @@ public class QueryTransactionRejectedRepository {
 
             // Bank  Filter
             if (!filters.getFilters().isEmpty() && filters.getFilters().get(0) != null && !filters.getFilters().get(0).toString().isEmpty()) {
-                bankJoin = " JOIN company_accounts ca ON t.company_account_id =  ca.id JOIN bank b ON ca.bank_id = b.id ";
-                bankWhere = " b.bank_code = :bankCode ";
+//
+                bankWhere = " t.bank_code = :bankCode ";
             }
 
             //Company Account Filter
@@ -77,7 +77,7 @@ public class QueryTransactionRejectedRepository {
                 searchWhere = "t.search_vector @@ plainto_tsquery('english', :text)";
 
         }
-        baseQuery.append(bankJoin);
+
         baseQuery.append( " WHERE ");
         baseQuery.append(searchWhere).append(searchWhere.isEmpty() ? " " : " AND ")
                 .append(bankWhere).append(bankWhere.isEmpty() ? " " : " AND ")
@@ -88,7 +88,7 @@ public class QueryTransactionRejectedRepository {
 
         // Fetch paginated results
         String selectQuery = "SELECT t.* " + baseQuery;
-        Query emQuery = em.createNativeQuery(selectQuery, Transaction.class);
+        Query emQuery = em.createNativeQuery(selectQuery, TransactionRejected.class);
         if(!searchWhere.isEmpty())
             emQuery.setParameter( "text", filters.getSearch());
         if(!bankWhere.isEmpty())

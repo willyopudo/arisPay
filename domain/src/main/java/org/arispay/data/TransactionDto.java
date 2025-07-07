@@ -41,4 +41,6 @@ public class TransactionDto {
 	private LocalDateTime transDate;
 
 	private String crDrInd;
+
+	private String reasonRejected;
 }

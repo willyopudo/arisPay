@@ -28,6 +28,8 @@ public class TransactionRejected extends AuditableEntity{
 	@Column(nullable = false)
 	private Double tranAmount;
 
+	private String apiChannel;
+
 	@Column(nullable = false)
 	private String bankAccount;
 
@@ -39,9 +41,6 @@ public class TransactionRejected extends AuditableEntity{
 	@JoinColumn(name = "company_id")
 	private Company company;
 
-	@Column(name = "client_id")
-	private String client;
-
 	private String payerName;
 
 	private String payerPhone;
@@ -50,10 +49,17 @@ public class TransactionRejected extends AuditableEntity{
 
 	private String narration;
 
-	private String apiChannel;
+
+	@Column(name = "client_id")
+	private String client;
+
 
 	@Column(nullable = false)
 	private LocalDateTime transDate;
 
 	private String crDrInd;
+
+	private String reasonRejected;
+
+	private String bankCode;
 }

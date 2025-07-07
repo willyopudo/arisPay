@@ -3,10 +3,8 @@ package org.arispay.mappers;
 import java.util.List;
 
 import org.arispay.data.TransactionDto;
-import org.arispay.entity.Company;
-import org.arispay.entity.CompanyAccount;
-import org.arispay.entity.Transaction;
-import org.arispay.entity.TransactionRejected;
+import org.arispay.entity.*;
+import org.arispay.repository.BankRepository;
 import org.arispay.repository.ClientRepository;
 import org.arispay.repository.CompanyAccountRepository;
 import org.arispay.repository.CompanyRepository;
@@ -27,8 +25,12 @@ public abstract class TransactionRejectedMapper {
     @Autowired
     private CompanyAccountRepository companyAccountRepository;
 
+    @Autowired
+    private BankRepository bankRepository;
+
     @Mapping(source = "company", target = "companyId", qualifiedByName = "companyToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
+    @Mapping(source = "bankCode", target = "bank", qualifiedByName = "bankCodeToBank")
     public abstract TransactionDto transactionRejectedToTransactionDto(TransactionRejected transaction);
 
 
@@ -43,6 +45,7 @@ public abstract class TransactionRejectedMapper {
 
     @Mapping(source = "company", target = "companyId", qualifiedByName = "companyToId")
     @Mapping(source = "id", target = "arisTranRef", qualifiedByName = "tranIdToArisTranRef")
+    @Mapping(source = "bankCode", target = "bank", qualifiedByName = "bankCodeToBank")
     public abstract List<TransactionDto> transactionRejectedListToTransactionDtoList(
             List<TransactionRejected> transactionRejecteds);
 
@@ -71,6 +74,15 @@ public abstract class TransactionRejectedMapper {
     @Named("bankAccountToCompanyAccount")
     public CompanyAccount idToCompanyAccount(String comapnyAccount) {
         return comapnyAccount != null ? companyAccountRepository.findByAccountNumber(comapnyAccount).orElse(null) : null;
+    }
+
+    @Named("bankCodeToBank")
+    public String bankCodeToBank(String bankCode) {
+        Bank bank = bankRepository.findByBankCode(bankCode).orElse(null);
+        if (bank == null) {
+            return null;
+        }
+        return bank.getBankCode() + " " + bank.getBankName() ;
     }
 
 }

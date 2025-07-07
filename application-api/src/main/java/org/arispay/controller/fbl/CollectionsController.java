@@ -109,6 +109,7 @@ public class CollectionsController {
         confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
 
         HttpStatus resStatus = HttpStatus.OK;
+        String reasonRejected = null;
         try {
             LocalDateTime dateTime = LocalDateTime.parse(confirmationRequest.getPayload().getDateTime(), formatter);
 
@@ -117,8 +118,9 @@ public class CollectionsController {
 
             CompanyAccountDto fetchedAccount = companyAccountServicePort.getByAccountNumber(collectionAccount);
             if (fetchedAccount == null) {
+                reasonRejected = "collection_account is not correct";
                 confirmationResponse.setStatusDescription(
-                        "Payment Transaction Rejected. Note: collection_account is not correct");
+                        "Payment Transaction Rejected. Note: " + reasonRejected);
                 confirmationResponse.setStatusCode("PAYMENT_RJCT");
             }
 
@@ -126,8 +128,9 @@ public class CollectionsController {
             if (fetchedAccount != null) {
                 fetchedClient = clientServicePort.getClientByIdAndCompany(fetchedAccount.getCompanyId(), customerId);
                 if (fetchedClient == null) {
+                    reasonRejected = "client_id is not correct";
                     confirmationResponse.setStatusDescription(
-                            "Payment Transaction Rejected. Note: customer_id is not correct");
+                            "Payment Transaction Rejected. Note: "+ reasonRejected);
                     confirmationResponse.setStatusCode("PAYMENT_RJCT");
                 }
             }
@@ -151,7 +154,8 @@ public class CollectionsController {
                     confirmationRequest.getPayload().getTxnNarration(),
                     "/api/v1/fbl/confirmation",
                     dateTime,
-                    "C");
+                    "C",
+                    reasonRejected);
 
             if (fetchedAccount == null || fetchedClient == null) {
                 transaction = transactionRejectedServicePort.addTransaction(transaction);
