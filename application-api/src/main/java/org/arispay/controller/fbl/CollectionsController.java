@@ -109,6 +109,7 @@ public class CollectionsController {
         confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
 
         HttpStatus resStatus = HttpStatus.OK;
+        String reasonRejected = null;
         try {
             LocalDateTime dateTime = LocalDateTime.parse(confirmationRequest.getPayload().getDateTime(), formatter);
 
@@ -117,23 +118,27 @@ public class CollectionsController {
 
             CompanyAccountDto fetchedAccount = companyAccountServicePort.getByAccountNumber(collectionAccount);
             if (fetchedAccount == null) {
+                reasonRejected = "collection_account is not correct";
                 confirmationResponse.setStatusDescription(
-                        "Payment Transaction Received Successfully. Note: collection_account is not correct");
+                        "Payment Transaction Rejected. Note: " + reasonRejected);
+                confirmationResponse.setStatusCode("PAYMENT_RJCT");
             }
 
             ClientDto fetchedClient = null;
             if (fetchedAccount != null) {
                 fetchedClient = clientServicePort.getClientByIdAndCompany(fetchedAccount.getCompanyId(), customerId);
                 if (fetchedClient == null) {
+                    reasonRejected = "client_id is not correct";
                     confirmationResponse.setStatusDescription(
-                            "Payment Transaction Received Successfully. Note: customer_id is not correct");
+                            "Payment Transaction Rejected. Note: "+ reasonRejected);
+                    confirmationResponse.setStatusCode("PAYMENT_RJCT");
                 }
             }
 
-            confirmationResponse.setStatusCode("PAYMENT_ACK");
-            confirmationResponse.setStatusDescription(confirmationResponse.getStatusDescription() == null
-                    ? "Payment Transaction Received Successfully."
-                    : confirmationResponse.getStatusDescription());
+            if(confirmationResponse.getStatusDescription() == null) {
+                confirmationResponse.setStatusCode("PAYMENT_ACK");
+                confirmationResponse.setStatusDescription("Payment Transaction Received Successfully.");
+            }
 
             TransactionDto transaction = new TransactionDto(
                     0L,
@@ -147,8 +152,10 @@ public class CollectionsController {
                     confirmationRequest.getPayload().getPayerPhone(),
                     confirmationRequest.getPayload().getPaymentMode(),
                     confirmationRequest.getPayload().getTxnNarration(),
-                    "/api/v1/fbl/confirmation", dateTime,
-                    "C");
+                    "/api/v1/fbl/confirmation",
+                    dateTime,
+                    "C",
+                    reasonRejected);
 
             if (fetchedAccount == null || fetchedClient == null) {
                 transaction = transactionRejectedServicePort.addTransaction(transaction);

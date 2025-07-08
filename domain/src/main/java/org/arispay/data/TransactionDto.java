@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class TransactionDto {
 	private Long id;
+
 	private String bankTranRef;
 
 	private String arisTranRef;
@@ -40,4 +41,6 @@ public class TransactionDto {
 	private LocalDateTime transDate;
 
 	private String crDrInd;
+
+	private String reasonRejected;
 }

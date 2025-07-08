@@ -28,16 +28,18 @@ public class TransactionRejected extends AuditableEntity{
 	@Column(nullable = false)
 	private Double tranAmount;
 
+	private String apiChannel;
+
 	@Column(nullable = false)
 	private String bankAccount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "company_id")
-	private Company company;
+	@JoinColumn(name = "company_account_id")
+	private CompanyAccount companyAccount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "client_id")
-	private Client client;
+	@JoinColumn(name = "company_id")
+	private Company company;
 
 	private String payerName;
 
@@ -47,10 +49,17 @@ public class TransactionRejected extends AuditableEntity{
 
 	private String narration;
 
-	private String apiChannel;
+
+	@Column(name = "client_id")
+	private String client;
+
 
 	@Column(nullable = false)
 	private LocalDateTime transDate;
 
 	private String crDrInd;
+
+	private String reasonRejected;
+
+	private String bankCode;
 }

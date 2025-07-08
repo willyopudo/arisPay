@@ -65,7 +65,8 @@ public class IpnController {
                                 null, txn.getTXN_DETAIL().getFirst().TXN_CODE,
                                 txn.getTXN_DETAIL().getFirst().TXN_NARRATION, "IPN",
                                 LocalDateTime.parse((ipnRequest.getIPN().getDATE()), formatter),
-                                txn.getTXN_DETAIL().getFirst().TXN_TYPE);
+                                txn.getTXN_DETAIL().getFirst().TXN_TYPE,
+                                null);
 
                         if (account != null) {
                             transactionDto.setCompanyId(account.getCompanyId());
