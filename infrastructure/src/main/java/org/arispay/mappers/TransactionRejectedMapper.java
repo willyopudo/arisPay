@@ -36,6 +36,7 @@ public abstract class TransactionRejectedMapper {
 
     @Mapping(source = "bankAccount", target = "companyAccount", qualifiedByName = "bankAccountToCompanyAccount")
     @Mapping(source = "companyId", target = "company", qualifiedByName = "idToCompany")
+    @Mapping(source = "bank", target = "bankCode")
     public abstract TransactionRejected transactionDtoToTransactionRejected(TransactionDto transactionDto);
 
     public Page<TransactionDto> transactionsRejectedPagetoTransactionsDtoPage(Page<TransactionRejected> transactionPage) {
@@ -52,6 +53,7 @@ public abstract class TransactionRejectedMapper {
 
     @Mapping(source = "companyId", target = "company", qualifiedByName = "idToCompany")
     @Mapping(source = "bankAccount", target = "companyAccount", qualifiedByName = "bankAccountToCompanyAccount")
+    @Mapping(source = "bank", target = "bankCode")
     public abstract List<TransactionRejected> transactionDtoListToTransactionRejectedList(
             List<TransactionDto> transactionDtos);
 
