@@ -28,6 +28,7 @@ public class TsqServiceImpl implements TsqServicePort {
             logger.warn("Tsq HTTP Client not found for Bank Code {}", bankCode);
             throw new NoSuchElementException("No transaction found for bank reference: " + bankRef);
         }
+        //Call the corresponding TSQ HTTP client adapter for selected bank to query the transaction
         TransactionDto transactionDto = tsqHttpClientPort.queryTransaction(bankRef);
         if (transactionDto == null) {
             throw new NoSuchElementException("No transaction found for bank reference: " + bankRef);

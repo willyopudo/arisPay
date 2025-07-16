@@ -131,7 +131,7 @@ public class TransactionController {
             }
             TransactionDto transactionDto = transactionServicePort.queryTransactions(companyId,filterDto);
             if (transactionDto == null) {
-                //Todo : Send TSQ request to the selected bank to try check if the transaction exists
+                //Send TSQ request to the selected bank to try check if the transaction exists
                 transactionDto = tsqService.queryTransaction(transRef, bankCode);
                 if (transactionDto == null) {
                     return ResponseEntity.notFound().build();
@@ -140,7 +140,7 @@ public class TransactionController {
             return ResponseEntity.ok(transactionDto);
         }
         catch (NoSuchElementException ex){
-            logger.error("Transaction not found: {}", ex.getMessage());
+            logger.warn("Transaction not found: {}", ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         }
         catch (Exception e) {
