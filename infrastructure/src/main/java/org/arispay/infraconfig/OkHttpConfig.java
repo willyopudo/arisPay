@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class OkHttpConfig {
 
-    @Value("${partners.timeout.connect:2000}")   // ms
+    @Value("${partners.timeout.connect:5000}")   // ms
     private int connectT;
     @Value("${partners.timeout.read:5000}")
     private int readT;

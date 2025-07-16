@@ -6,7 +6,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.arispay.data.TransactionDto;
 import org.arispay.ports.spi.httpclient.TsqHttpClientPort;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
