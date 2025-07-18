@@ -23,8 +23,8 @@ public class JwtTokenProvider {
     private volatile TokenHolder cached;            // token + expiry
 
     public JwtTokenProvider(
-            OkHttpClient authClient,
-            @Value("${partner.auth.url}") String authUrl) {
+            @Qualifier("authOkHttpClient") OkHttpClient authClient,
+            @Value("${custom.arispay.partners.family.auth.url}") String authUrl) {
         this.authClient = authClient;
         this.authUrl = authUrl;
     }

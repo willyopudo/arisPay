@@ -41,4 +41,9 @@ public class OkHttpConfig {
                 .addInterceptor(jwt)     // JWT auth interceptor
                 .build();
     }
+
+    @Bean
+    public OkHttpClient authOkHttpClient() {
+        return new OkHttpClient.Builder().build(); // No interceptors
+    }
 }
