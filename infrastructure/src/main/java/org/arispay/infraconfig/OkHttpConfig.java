@@ -3,8 +3,9 @@ package org.arispay.infraconfig;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
-import org.arispay.interceptors.JwtAuthInterceptor;
+import org.arispay.interceptors.AdaptiveAuthInterceptor;
 import org.arispay.interceptors.RetryInterceptor;
+import org.arispay.utils.AuthStrategyResolver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,7 @@ public class OkHttpConfig {
     private int writeT;
 
     @Bean
-    public OkHttpClient okHttpClient(JwtAuthInterceptor jwt) {
+    public OkHttpClient okHttpClient(AuthStrategyResolver authStrategyResolver) {
         // connection pool: 100 idle connections, keep‑alive 5 min
         ConnectionPool pool = new ConnectionPool(100, 5, TimeUnit.MINUTES);
 
@@ -38,7 +39,7 @@ public class OkHttpConfig {
                 .retryOnConnectionFailure(true)
                 .addInterceptor(new RetryInterceptor(3, 500)) // retry 3 times with exponential backoff
                 .addInterceptor(log) // logging interceptor
-                .addInterceptor(jwt)     // JWT auth interceptor
+                .addInterceptor(new AdaptiveAuthInterceptor(authStrategyResolver))     // JWT auth interceptor
                 .build();
     }
 
