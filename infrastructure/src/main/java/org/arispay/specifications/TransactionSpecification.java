@@ -49,6 +49,15 @@ public class TransactionSpecification {
                         logger.info("Invalid bank: {}. Error message: {}", filterDto.getFilters().getFirst(), e.getMessage());
                     }
                 }
+
+                // Filter for bankTranRef
+                if (!filterDto.getFilters().isEmpty() && filterDto.getFilters().get(1) != null && !filterDto.getFilters().get(1).toString().isEmpty()) {
+                    try {
+                        predicates.add(criteriaBuilder.equal(root.get("bankTranRef"), filterDto.getFilters().get(1)));
+                    } catch (IllegalArgumentException e) {
+                        logger.info("Invalid BankTranRef : {}. Error message: {}", filterDto.getFilters().get(1), e.getMessage());
+                    }
+                }
                 List<LocalDate> dateRange = (List<LocalDate>) filterDto.getFilters().get(2);
                 if (filterDto.getFilters().get(2) != null && !dateRange.isEmpty()) {
 
@@ -76,6 +85,7 @@ public class TransactionSpecification {
                         logger.info("Invalid CR DR Indicator: {}. Error message: {}", filterDto.getFilters().get(4), e.getMessage());
                     }
                 }
+
 
                 // Client Identifier Type Filter
 //                if (filterDto.getFilters().size() > 1 && filterDto.getFilters().get(1) != null && !filterDto.getFilters().get(1).isEmpty()) {

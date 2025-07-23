@@ -53,7 +53,6 @@ public class TransactionRejected extends AuditableEntity{
 	@Column(name = "client_id")
 	private String client;
 
-
 	@Column(nullable = false)
 	private LocalDateTime transDate;
 

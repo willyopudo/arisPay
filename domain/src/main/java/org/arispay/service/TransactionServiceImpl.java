@@ -40,6 +40,11 @@ public class TransactionServiceImpl implements TransactionServicePort {
     }
 
     @Override
+    public TransactionDto queryTransactions(Long companyId, GenericFilterDto filters) {
+        return transactionPersistencePort.queryTransactions(companyId, filters);
+    }
+
+    @Override
     public TransactionDto getTransactionById(Long id) {
         return transactionPersistencePort.getTransactionById(id);
     }

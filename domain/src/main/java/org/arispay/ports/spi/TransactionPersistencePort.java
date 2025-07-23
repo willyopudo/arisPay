@@ -18,6 +18,8 @@ public interface TransactionPersistencePort {
 
     Page<TransactionDto> getTransactions(Long companyId, Pageable pageable, GenericFilterDto filter);
 
+    TransactionDto queryTransactions(Long companyId, GenericFilterDto filters);
+
     TransactionDto getTransactionById(Long id);
 
     Optional<ISummary> getTransactionSummaries(Long companyId);

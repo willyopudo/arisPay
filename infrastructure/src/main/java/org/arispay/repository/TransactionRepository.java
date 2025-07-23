@@ -23,4 +23,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
      */
     @Query(nativeQuery = true, value="select SUM(CASE WHEN t.cr_dr_ind = 'C' then 1 else 0 END) AS first, SUM(CASE WHEN t.cr_dr_ind = 'D' then 1 else 0 END) AS second, SUM(CASE WHEN t.cr_dr_ind = 'C' then t.tran_amount else 0 END) AS third, SUM(CASE WHEN t.cr_dr_ind = 'D' then t.tran_amount else 0 END) AS fourth  from transactions t where t.company_id  = :companyId")
     Optional<ISummary> getTransactionSummaries(@Param("companyId") Long companyId);
+
 }

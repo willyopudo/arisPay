@@ -67,11 +67,19 @@ public class TransactionJpaAdapter implements TransactionPersistencePort {
 		return transactionMapper.transactionsPagetoTransactionsDtoPage(transactionList);
 
 	}
+	@Override
+	public TransactionDto queryTransactions(Long companyId, GenericFilterDto filters) {
+		Specification<Transaction> transactionSpecification = TransactionSpecification.buildComplexSpecification(companyId, null, filters);
+		List<Transaction> transactions = transactionRepository.findAll(transactionSpecification);
+		if (transactions.isEmpty()) {
+			return null;
+		}
+		return transactionMapper.transactionToTransactionDto(transactions.getFirst());
+	}
 
 	@Override
 	public TransactionDto getTransactionById(Long id) {
 		Optional<Transaction> transaction = transactionRepository.findById(id);
-
 		return transaction.map(transactionMapper::transactionToTransactionDto).orElse(null);
 	}
 

@@ -15,7 +15,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.io.File;
-
+//Todo: Move this to infrastructure module and clean up any dependencies which were added to domain module
 @Service
 public class EmailServiceImpl implements EmailService{
 
