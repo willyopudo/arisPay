@@ -32,6 +32,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	}
 
 	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		String path = request.getRequestURI();
+		// Skip JWT filter for WebSocket endpoints
+		return path.startsWith("/ws");
+	}
+
+	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		Map<String, Object> errorDetails = new HashMap<>();
 
