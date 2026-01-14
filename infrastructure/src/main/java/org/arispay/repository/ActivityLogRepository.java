@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 public interface ActivityLogRepository extends JpaRepository<ActivityLog, Long> {
 
-    @Query("SELECT a FROM ActivityLog a WHERE a.company.id = :companyId ORDER BY a.eventTimestamp DESC")
+    @Query("SELECT a FROM ActivityLog a LEFT JOIN FETCH a.user LEFT JOIN FETCH a.company WHERE a.company.id = :companyId ORDER BY a.eventTimestamp DESC")
     List<ActivityLog> findTopNByCompanyIdOrderByEventTimestampDesc(@Param("companyId") Long companyId, Pageable pageable);
 }

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.data.ActivityEventDto;
 import org.arispay.data.ClientDto;
+import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.TransactionDto;
 import org.arispay.ports.api.ActivityServicePort;
 import org.arispay.ports.spi.ActivityPersistencePort;
@@ -83,20 +84,58 @@ public class ActivityServiceImpl implements ActivityServicePort {
     }
 
     @Override
-    public ActivityEventDto createClientEvent(ClientDto client, String eventType, String userName, Long companyId) {
+    public ActivityEventDto clientCrudEvent(ClientDto client, String eventType, String userName) {
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("clientId", client.getId());
         metadata.put("clientName", client.getClientName());
+        metadata.put("clientIdentifier", client.getClientId());
+        metadata.put("identifierType", client.getIdentifierType());
+
+        String action = switch (eventType) {
+            case "CLIENT_CREATED" -> "created";
+            case "CLIENT_UPDATED" -> "updated";
+            case "CLIENT_DELETED" -> "deleted";
+            default -> "modified";
+        };
 
         return ActivityEventDto.builder()
                 .eventType(eventType)
                 .title(getEventTitle(eventType))
                 .description(String.format("Client '%s' has been %s",
                         client.getClientName(),
-                        eventType.contains("CREATED") ? "created" : "updated"))
+                        action))
                 .timestamp(LocalDateTime.now())
                 .userName(userName != null ? userName : "System")
-                .companyId(companyId)
+                .companyId(client.getCompany())
+                .metadata(metadata)
+                .build();
+    }
+
+    @Override
+    public ActivityEventDto companyAccountCrudEvent(CompanyAccountDto account, String eventType, String userName) {
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("accountId", account.getId());
+        metadata.put("accountNumber", account.getAccountNumber());
+        metadata.put("accountName", account.getAccountName());
+        metadata.put("bankName", account.getBankName());
+
+        String action = switch (eventType) {
+            case "ACCOUNT_CREATED" -> "created";
+            case "ACCOUNT_UPDATED" -> "updated";
+            case "ACCOUNT_DELETED" -> "deleted";
+            default -> "modified";
+        };
+
+        return ActivityEventDto.builder()
+                .eventType(eventType)
+                .title(getEventTitle(eventType))
+                .description(String.format("Account '%s' (%s) has been %s",
+                        account.getAccountName(),
+                        account.getBankName() != null ? account.getBankName() : "Unknown Bank",
+                        action))
+                .timestamp(LocalDateTime.now())
+                .userName(userName != null ? userName : "System")
+                .companyId(account.getCompanyId())
                 .metadata(metadata)
                 .build();
     }
@@ -135,8 +174,12 @@ public class ActivityServiceImpl implements ActivityServicePort {
             case "BULK_DISBURSEMENT" -> "Bulk Disbursement";
             case "CLIENT_CREATED" -> "Client Created";
             case "CLIENT_UPDATED" -> "Client Updated";
+            case "CLIENT_DELETED" -> "Client Deleted";
             case "USER_UPDATED" -> "User Updated";
             case "ACCOUNT_LINKED" -> "Account Linked";
+            case "ACCOUNT_CREATED" -> "Account Created";
+            case "ACCOUNT_UPDATED" -> "Account Updated";
+            case "ACCOUNT_DELETED" -> "Account Deleted";
             default -> "Activity";
         };
     }

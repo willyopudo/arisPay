@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +70,7 @@ public class ActivityJpaAdapter implements ActivityPersistencePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ActivityEventDto> getRecentActivities(Long companyId, int limit) {
         try {
             Pageable pageable = PageRequest.of(0, limit);
@@ -78,7 +80,7 @@ public class ActivityJpaAdapter implements ActivityPersistencePort {
                             .title(log.getTitle())
                             .description(log.getDescription())
                             .timestamp(log.getEventTimestamp())
-                            .userName(log.getUser() != null ? log.getUser().getFirstName() + " " + log.getUser().getLastName() : "System")
+                            .userName(getUserDisplayName(log.getUser()))
                             .companyId(log.getCompany().getId())
                             .metadata(parseMetadata(log.getMetadata()))
                             .build())
@@ -87,6 +89,19 @@ public class ActivityJpaAdapter implements ActivityPersistencePort {
             logger.error("Error retrieving recent activities: {}", e.getMessage(), e);
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Helper method to safely get user display name
+     */
+    private String getUserDisplayName(org.arispay.entity.User user) {
+        if (user == null) {
+            return "System";
+        }
+        String firstName = user.getFirstName() != null ? user.getFirstName() : "";
+        String lastName = user.getLastName() != null ? user.getLastName() : "";
+        String fullName = (firstName + " " + lastName).trim();
+        return fullName.isEmpty() ? "System" : fullName;
     }
 
     /**

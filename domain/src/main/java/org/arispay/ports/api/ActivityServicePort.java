@@ -2,6 +2,7 @@ package org.arispay.ports.api;
 
 import org.arispay.data.ActivityEventDto;
 import org.arispay.data.ClientDto;
+import org.arispay.data.CompanyAccountDto;
 import org.arispay.data.TransactionDto;
 
 import java.util.List;
@@ -24,9 +25,14 @@ public interface ActivityServicePort {
     ActivityEventDto createTransactionEvent(TransactionDto transaction, String eventType, String userName);
 
     /**
-     * Create client activity event
+     * Create client activity event for CRUD operations
      */
-    ActivityEventDto createClientEvent(ClientDto client, String eventType, String userName, Long companyId);
+    ActivityEventDto clientCrudEvent(ClientDto client, String eventType, String userName);
+
+    /**
+     * Create company account activity event
+     */
+    ActivityEventDto companyAccountCrudEvent(CompanyAccountDto account, String eventType, String userName);
 
     /**
      * Create bulk operation activity event

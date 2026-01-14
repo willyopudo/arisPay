@@ -38,8 +38,8 @@ public class ActivityWebSocketController {
 
             logger.info("User {} from company {} subscribing to activity feed", username, companyId);
 
-            // Send last 20 historical activities to the user
-            List<ActivityEventDto> recentActivities = activityService.getRecentActivities(companyId, 20);
+            // Send last 4 historical activities to the user
+            List<ActivityEventDto> recentActivities = activityService.getRecentActivities(companyId, 4);
 
             messagingTemplate.convertAndSendToUser(
                     username,
