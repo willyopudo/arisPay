@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
 import org.arispay.data.*;
+import org.arispay.ports.api.ActivityServicePort;
 import org.arispay.ports.api.BankServicePort;
 import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.repository.CompanyAccountRepository;
@@ -40,14 +41,26 @@ public class CompanyAccountController {
     @Autowired
     CompanyAccountRepository companyAccountRepository;
 
+    @Autowired
+    ActivityServicePort activityService;
+
     private final JwtUtil jwtUtil;
 
     private static final Logger logger = LogManager.getLogger(CompanyAccountController.class);
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CompanyAccountDto addCompanyAccount(@RequestBody CompanyAccountDto companyAccount) {
-        return companyAccountService.add(companyAccount);
+    public CompanyAccountDto addCompanyAccount(@RequestBody CompanyAccountDto companyAccount,
+                                               HttpServletRequest request) {
+        CompanyAccountDto savedAccount = companyAccountService.add(companyAccount);
+
+        // Log activity
+        Claims claims = jwtUtil.resolveClaims(request);
+        String userName = claims != null ? claims.getSubject() : "System";
+        ActivityEventDto event = activityService.companyAccountCrudEvent(savedAccount, "ACCOUNT_CREATED", userName);
+        activityService.broadcastActivityToCompany(savedAccount.getCompanyId(), event);
+
+        return savedAccount;
     }
 
     @GetMapping
@@ -94,26 +107,49 @@ public class CompanyAccountController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCompanyAccount(@RequestBody CompanyAccountDto companyAccountDto, @PathVariable long id) {
+    public ResponseEntity<?> updateCompanyAccount(@RequestBody CompanyAccountDto companyAccountDto,
+                                                  @PathVariable long id,
+                                                  HttpServletRequest request) {
         if(companyAccountDto.getId() != id) {
             return ResponseEntity.badRequest().body("Id in path and body do not match");
         }
         try{
-            CompanyAccountDto updatedClient = companyAccountService.update(companyAccountDto);
-            return ResponseEntity.ok(updatedClient);
+            CompanyAccountDto updatedAccount = companyAccountService.update(companyAccountDto);
+
+            // Log activity
+            Claims claims = jwtUtil.resolveClaims(request);
+            String userName = claims != null ? claims.getSubject() : "System";
+            ActivityEventDto event = activityService.companyAccountCrudEvent(updatedAccount, "ACCOUNT_UPDATED", userName);
+            activityService.broadcastActivityToCompany(updatedAccount.getCompanyId(), event);
+
+            return ResponseEntity.ok(updatedAccount);
         }catch (EntityNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCompanyAccountById(@PathVariable long id) {
-        try{
-        companyAccountService.deleteById(Long.valueOf(id));
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Company account deleted successfully");
-    }catch (Exception e){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    public ResponseEntity<?> deleteCompanyAccountById(@PathVariable long id,
+                                                      HttpServletRequest request) {
+        try {
+            // Get account details before deletion for activity log
+            CompanyAccountDto account = companyAccountService.getById(id);
+            if (account == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Company account not found");
+            }
+
+            Long companyId = account.getCompanyId();
+            companyAccountService.deleteById(id);
+
+            // Log activity
+            Claims claims = jwtUtil.resolveClaims(request);
+            String userName = claims != null ? claims.getSubject() : "System";
+            ActivityEventDto event = activityService.companyAccountCrudEvent(account, "ACCOUNT_DELETED", userName);
+            activityService.broadcastActivityToCompany(companyId, event);
+
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Company account deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
-}
 }
