@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class UserCompanyDto {
     private Long id;
     private Long companyId;
+    private String companyName;
     private boolean isDefault;
 }

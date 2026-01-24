@@ -1,11 +1,22 @@
 package org.arispay.adapters;
 
+import org.arispay.data.GenericFilterDto;
+import org.arispay.data.ISummary;
 import org.arispay.data.TransactionDto;
+import org.arispay.entity.Client;
 import org.arispay.entity.Transaction;
 import org.arispay.mappers.TransactionMapper;
 import org.arispay.ports.spi.TransactionPersistencePort;
+import org.arispay.repository.QueryTransactionRepository;
 import org.arispay.repository.TransactionRepository;
+import org.arispay.specifications.ClientSpecification;
+import org.arispay.specifications.TransactionSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +26,9 @@ import java.util.Optional;
 public class TransactionJpaAdapter implements TransactionPersistencePort {
 	@Autowired
 	private TransactionRepository transactionRepository;
+
+	@Autowired
+	private QueryTransactionRepository queryTransactionRepository;
 
 	@Autowired
 	private TransactionMapper transactionMapper;
@@ -36,16 +50,42 @@ public class TransactionJpaAdapter implements TransactionPersistencePort {
 	}
 
 	@Override
-	public List<TransactionDto> getTransactions() {
-		List<Transaction> transactionsList = transactionRepository.findAll();
-		return transactionMapper.transactionListToTransactionDtoList(transactionsList);
+	public Page<TransactionDto> getTransactions(Long companyId, Pageable pageable, GenericFilterDto filter) {
+
+		//Specification<Transaction> transactionSpecification = TransactionSpecification.buildComplexSpecification(companyId, null, filter);
+
+		// Create sort for standard fields if specified
+		if (filter.getSortBy() != null && filter.getDirection() != null) {
+			Sort sort = Sort.by(filter.getDirection(), filter.getSortBy());
+			pageable = PageRequest.of(
+					pageable.getPageNumber(),
+					pageable.getPageSize(),
+					sort
+			);
+		}
+		Page<Transaction> transactionList = queryTransactionRepository.searchWithFullText(companyId, pageable, filter);
+		return transactionMapper.transactionsPagetoTransactionsDtoPage(transactionList);
+
+	}
+	@Override
+	public TransactionDto queryTransactions(Long companyId, GenericFilterDto filters) {
+		Specification<Transaction> transactionSpecification = TransactionSpecification.buildComplexSpecification(companyId, null, filters);
+		List<Transaction> transactions = transactionRepository.findAll(transactionSpecification);
+		if (transactions.isEmpty()) {
+			return null;
+		}
+		return transactionMapper.transactionToTransactionDto(transactions.getFirst());
 	}
 
 	@Override
 	public TransactionDto getTransactionById(Long id) {
 		Optional<Transaction> transaction = transactionRepository.findById(id);
-
 		return transaction.map(transactionMapper::transactionToTransactionDto).orElse(null);
+	}
+
+	@Override
+	public Optional<ISummary> getTransactionSummaries(Long companyId) {
+		return transactionRepository.getTransactionSummaries(companyId);
 	}
 
 }

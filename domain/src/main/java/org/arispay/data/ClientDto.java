@@ -1,6 +1,8 @@
 package org.arispay.data;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +21,13 @@ public class ClientDto {
     private String identifierType;
     private Long company;
     private String companyName;
-    @JsonProperty("status")
-    private byte isEnabled;
+    private String clientEmail;
+    private String clientPhone;
+    @NotEmpty
+    private String status;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
+
+    private String createdBy;
 }

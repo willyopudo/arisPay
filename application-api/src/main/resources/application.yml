@@ -24,6 +24,12 @@ spring:
     view:
       suffix: html
     static-path-pattern: /resources/static/**
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      connect-timeout: 60000
 management:
   tracing:
     sampling:
@@ -37,5 +43,5 @@ custom:
       version: 1
     app:
       jwt-secret: ${JWT_SECRET}
-      jwt-expiration-minutes: 60
+      jwt-expiration-minutes: 1
       jwt-refresh-expiration-seconds: 86400

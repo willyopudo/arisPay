@@ -56,15 +56,17 @@ public class IpnController {
                         // SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-                        TransactionDto transactionDto = new TransactionDto(txn.getTXN_REF(), null,
+                        TransactionDto transactionDto = new TransactionDto(0L,txn.getTXN_REF(), null,
                                 Double.valueOf(txn.getTXN_DETAIL().getFirst().getTXN_AMT()), txn.getTXN_ACC(),
+                                "070",
                                 0L,
                                 null,
                                 null,
                                 null, txn.getTXN_DETAIL().getFirst().TXN_CODE,
                                 txn.getTXN_DETAIL().getFirst().TXN_NARRATION, "IPN",
                                 LocalDateTime.parse((ipnRequest.getIPN().getDATE()), formatter),
-                                txn.getTXN_DETAIL().getFirst().TXN_TYPE);
+                                txn.getTXN_DETAIL().getFirst().TXN_TYPE,
+                                null);
 
                         if (account != null) {
                             transactionDto.setCompanyId(account.getCompanyId());

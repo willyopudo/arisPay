@@ -4,24 +4,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum RecordStatus {
-    NEW(0), ACTIVE(1), INACTIVE(2), DELETED(3);
-    private final int statusIntValue;
-    // Reverse-lookup map for getting a day from an abbreviation
-    private static final Map<Integer, RecordStatus> lookup = new HashMap<Integer, RecordStatus>();
+    ACTIVE("active"), INACTIVE("inactive"), PENDING("pending");
+    private final String value;
 
-    static {
-        for (RecordStatus d : RecordStatus.values()) {
-            lookup.put(d.getIntValue(), d);
+    RecordStatus(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
+
+    public static RecordStatus fromString(String text) {
+        for (RecordStatus plan : RecordStatus.values()) {
+            if (plan.value.equalsIgnoreCase(text)) {
+                return plan;
+            }
         }
-    }
-    RecordStatus(int i) {
-        this.statusIntValue = i;
-    }
-
-    private int getIntValue() {
-        return statusIntValue;
-    }
-    public static RecordStatus getByIntValue(int intValue) {
-        return lookup.get(intValue);
+        throw new IllegalArgumentException("No constant with text " + text + " found");
     }
 }

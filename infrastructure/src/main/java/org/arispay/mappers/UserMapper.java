@@ -3,6 +3,8 @@ package org.arispay.mappers;
 import org.arispay.data.UserCompanyDto;
 import org.arispay.data.UserDto;
 import org.arispay.entity.*;
+import org.arispay.enums.CurrentPlan;
+import org.arispay.enums.RecordStatus;
 import org.arispay.repository.*;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -10,6 +12,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,20 +33,34 @@ public abstract class UserMapper {
 	//mock comment
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "idsToCompanies")
 	@Mapping(source = "role", target = "roles", qualifiedByName = "roleNameToRoles")
+	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "StringToCurrentPlan")
+	@Mapping(source = "status", target = "recordStatus", qualifiedByName = "StringToRecordStatus")
 	public abstract User convert(UserDto userDto);
 
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "companiesToIds")
 	@Mapping(source = "roles", target = "role", qualifiedByName = "RoleListToRoleName")
+	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "CurrentPlanToString")
+	@Mapping(source = "recordStatus", target = "status", qualifiedByName = "RecordStatusToString")
 	@InheritInverseConfiguration
 	public abstract UserDto convert(User user);
 
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "companiesToIds")
 	@Mapping(source = "roles", target = "role", qualifiedByName = "RoleListToRoleName")
+	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "CurrentPlanToString")
+	@Mapping(source = "recordStatus", target = "status", qualifiedByName = "RecordStatusToString")
 	public abstract List<UserDto> userListToUserDtoList(List<User> userList);
 
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "idsToCompanies")
 	@Mapping(source = "role", target = "roles", qualifiedByName = "roleNameToRoles")
+	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "StringToCurrentPlan")
+	@Mapping(source = "status", target = "recordStatus", qualifiedByName = "StringToRecordStatus")
 	public abstract List<User> userDtoListToUserList(List<UserDto> userDtoList);
+
+	// ✅ Manually map Page<User> to Page<UserDto>
+	public  Page<UserDto> usersPagetoUsersDtoPage(Page<User> usersPage) {
+		List<UserDto> dtoList = userListToUserDtoList(usersPage.getContent());  // Convert list
+		return new PageImpl<>(dtoList, usersPage.getPageable(), usersPage.getTotalElements());
+	}
 
 	@Named("idsToCompanies")
 	public List<UserCompany> userCompanyIdsToUserCompanies(List<UserCompanyDto> userCompanyDtos) {
@@ -66,7 +84,7 @@ public abstract class UserMapper {
 
 		List<UserCompanyDto> userCompanies = new ArrayList<>();
 		for( UserCompany company: companies ) {
-			userCompanies.add(new UserCompanyDto(company.getId(),company.getCompany().getId(), company.isDefault()));
+			userCompanies.add(new UserCompanyDto(company.getId(),company.getCompany().getId(), company.getCompany().getName(), company.isDefault()));
 		}
 
 		return userCompanies;
@@ -85,5 +103,25 @@ public abstract class UserMapper {
 	@Named("RoleListToRoleName")
 	public String RoleListToRoleName(List<Role> roles) {
 		return roles.getFirst().getName();
+	}
+
+	@Named("CurrentPlanToString")
+	public String CurrentPlanToString(CurrentPlan currentPlan) {
+		return currentPlan.toString();
+	}
+
+	@Named("StringToCurrentPlan")
+	public CurrentPlan StringToCurrentPlan(String currentPlan) {
+		return CurrentPlan.fromString(currentPlan);
+	}
+
+	@Named("StringToRecordStatus")
+	public RecordStatus StringToRecordStatus(String recordStatus) {
+		return RecordStatus.fromString(recordStatus);
+	}
+
+	@Named("RecordStatusToString")
+	public String RecordStatusToString(RecordStatus recordStatus) {
+		return recordStatus.toString();
 	}
 }

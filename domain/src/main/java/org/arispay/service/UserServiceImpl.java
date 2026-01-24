@@ -1,8 +1,11 @@
 package org.arispay.service;
 
 import org.arispay.data.UserDto;
+import org.arispay.data.UserFilterDto;
 import org.arispay.ports.api.UserServicePort;
 import org.arispay.ports.spi.UserPersistencePort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,8 +50,8 @@ public class UserServiceImpl implements UserServicePort {
 	}
 
 	@Override
-	public List<UserDto> findAllUsers() {
-		List<UserDto> users = userPersistencePort.findAllUsers();
+	public Page<UserDto> findAllUsers(Pageable pageable, UserFilterDto filterDto) {
+		Page<UserDto> users = userPersistencePort.findAllUsers(pageable, filterDto);
 //		return users.stream()
 //				.map(this::mapToUserDto)
 //				.collect(Collectors.toList());
@@ -56,7 +59,19 @@ public class UserServiceImpl implements UserServicePort {
 	}
 
 	@Override
+	public UserDto findUserByToken(String token) {
+		return userPersistencePort.findUserByToken(token);
+	}
+
+	@Override
+	public UserDto setPassword(String token, String password) {
+		return userPersistencePort.setPassword(token, password);
+	}
+
+	@Override
 	public void deleteUserCompanyById(Long userId, Long companyId) {
 		userPersistencePort.deleteUserCompanyById(userId, companyId);
 	}
+
+
 }

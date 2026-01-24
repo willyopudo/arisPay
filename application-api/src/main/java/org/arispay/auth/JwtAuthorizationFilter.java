@@ -6,9 +6,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.arispay.security.CustomUserDetails;
+import org.arispay.security.CustomUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -24,11 +27,21 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	private final HandlerExceptionResolver handlerExceptionResolver;
 	private final JwtUtil jwtUtil;
 	private final ObjectMapper mapper;
+	private final CustomUserDetailsService userDetailsService;
 
-	public JwtAuthorizationFilter(HandlerExceptionResolver handlerExceptionResolver, JwtUtil jwtUtil, ObjectMapper mapper) {
+	public JwtAuthorizationFilter(HandlerExceptionResolver handlerExceptionResolver, JwtUtil jwtUtil,
+								   ObjectMapper mapper, CustomUserDetailsService userDetailsService) {
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.jwtUtil = jwtUtil;
 		this.mapper = mapper;
+		this.userDetailsService = userDetailsService;
+	}
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		String path = request.getRequestURI();
+		// Skip JWT filter for WebSocket endpoints
+		return path.startsWith("/ws");
 	}
 
 	@Override
@@ -47,8 +60,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			if (claims != null & jwtUtil.validateClaims(claims)) {
 				String username = claims.getSubject();
 				System.out.println("username : " + username);
+
+				// Load full user details from database to get user ID and roles
+				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
 				Authentication authentication =
-						new UsernamePasswordAuthenticationToken(username, "", new ArrayList<>());
+						new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 

@@ -1,8 +1,11 @@
 package org.arispay.ports.api;
+import java.util.Optional;
 
-import java.util.List;
-
+import org.arispay.data.GenericFilterDto;
+import org.arispay.data.ISummary;
 import org.arispay.data.TransactionDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TransactionServicePort {
     TransactionDto addTransaction(TransactionDto transactionDto);
@@ -11,7 +14,11 @@ public interface TransactionServicePort {
 
     TransactionDto updateTransaction(TransactionDto transactionDto);
 
-    List<TransactionDto> getTransactions();
+    Page<TransactionDto> getTransactions(Long companyId, Pageable pageable, GenericFilterDto filter);
+
+    TransactionDto queryTransactions(Long companyId, GenericFilterDto filters);
 
     TransactionDto getTransactionById(Long id);
+
+    Optional<ISummary> getTransactionSummaries(Long companyId);
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Payload {
+public class ValidationPayload {
     private String identifier;
     @JsonProperty("identifier_type")
     private String identifierType;

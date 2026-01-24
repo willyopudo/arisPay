@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+//Todo: Move this to infrastructure module
 @Service
 @Component
 public class BulkPostingService {

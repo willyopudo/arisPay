@@ -1,6 +1,9 @@
 package org.arispay.ports.spi;
 
 import org.arispay.data.ClientDto;
+import org.arispay.data.GenericFilterDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -11,7 +14,8 @@ public interface ClientPersistencePort {
 
     ClientDto updateClient(ClientDto clientDto);
 
-    List<ClientDto> getClients();
+
+    Page<ClientDto> getClients(Long companyId, Pageable pageable, GenericFilterDto filterDto);
 
     ClientDto getClientById(String clientId);
 

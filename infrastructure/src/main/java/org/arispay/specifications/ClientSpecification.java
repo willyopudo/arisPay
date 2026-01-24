@@ -1,21 +1,76 @@
 package org.arispay.specifications;
 
+import jakarta.persistence.criteria.Predicate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.arispay.data.GenericFilterDto;
 import org.arispay.entity.Client;
 import org.arispay.entity.Company;
+import org.arispay.enums.ClientIdentifierType;
+import org.arispay.enums.RecordStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClientSpecification {
 
-    public static Specification<Client> hasCompanyWithId(Long companyId) {
-        return (root, query, criteriaBuilder) -> {
-            Join<Company, Client> companyClient = root.join("company");
-            return criteriaBuilder.equal(companyClient.get("id"), companyId);
-        };
-    }
+    private static final Logger logger = LogManager.getLogger(ClientSpecification.class);
 
-    public static Specification<Client> hasClientId(String clientId) {
-        return (root, query, cb) -> cb.equal(root.<String>get("clientId"), clientId);
+    public static Specification<Client> buildComplexSpecification(
+            Long companyId,
+            String clientId,
+            GenericFilterDto filterDto) {
+
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Company ID Specification
+            if (companyId != null) {
+                Join<Company, Client> companyClient = root.join("company");
+                predicates.add(criteriaBuilder.equal(companyClient.get("id"), companyId));
+            }
+
+            // Client ID Specification
+            if (clientId != null && !clientId.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("clientId"), clientId));
+            }
+
+            // Generic Filter Specifications
+            if (filterDto != null && filterDto.getFilters() != null) {
+                // Record Status Filter
+                if (!filterDto.getFilters().isEmpty() && filterDto.getFilters().get(0) != null && !filterDto.getFilters().get(0).toString().isEmpty()) {
+                    try {
+                        RecordStatus status = RecordStatus.fromString(filterDto.getFilters().getFirst().toString());
+                        predicates.add(criteriaBuilder.equal(root.get("recordStatus"), status));
+                    } catch (IllegalArgumentException e) {
+                        logger.info("Invalid status: {}. Error message: {}", filterDto.getFilters().getFirst(), e.getMessage());
+                    }
+                }
+
+                // Client Identifier Type Filter
+                if (filterDto.getFilters().size() > 1 && filterDto.getFilters().get(1) != null && !filterDto.getFilters().get(1).toString().isEmpty()) {
+                    try {
+                        ClientIdentifierType identifierType = ClientIdentifierType.valueOf(filterDto.getFilters().get(1).toString());
+                        predicates.add(criteriaBuilder.equal(root.get("identifierType"), identifierType));
+                    } catch (IllegalArgumentException e) {
+                        logger.info("Invalid identifier type: {}. Error message: {}", filterDto.getFilters().get(1), e.getMessage());
+                    }
+                }
+
+                if (filterDto.getSearch() != null) {
+                    predicates.add(criteriaBuilder.or(
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("clientName")), "%" + filterDto.getSearch().toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("clientId")), "%" + filterDto.getSearch().toLowerCase() + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("clientEmail")), "%" + filterDto.getSearch().toLowerCase() + "%")));
+//                        criteriaBuilder.like(criteriaBuilder.lower(root.get("currentPlan").as(String.class)), "%" + filterDto.getSearch().toLowerCase() + "%")));
+                }
+            }
+
+            // Combine all predicates
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
     }
 }

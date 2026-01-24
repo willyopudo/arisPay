@@ -62,7 +62,9 @@ public class CollectionsController {
 
             // Finally, fetch the client by company ID and customer ID
             CompanyAccountDto fetchedAccount = companyAccountServicePort.getByAccountNumber(collectionAccount);
-
+            if (fetchedAccount == null) {
+                return buildNotFoundResponse("ACCOUNT_NOT_FOUND", "COLLECTION ACCOUNT IS NOT VALID");
+            }
             fetchedClient = clientServicePort.getClientByIdAndCompany(fetchedAccount.getCompanyId(), customerId);
             if (fetchedClient == null) {
                 return buildNotFoundResponse("ACCOUNT_NOT_FOUND", "COLLECTION ACCOUNT IS NOT VALID");
@@ -102,8 +104,12 @@ public class CollectionsController {
     }
 
     @PostMapping("/confirmation")
-    public ResponseEntity<?> validateClient(@RequestBody ConfirmationRequest confirmationRequest) {
+    public ResponseEntity<?> confirmTransaction(@RequestBody ConfirmationRequest confirmationRequest) {
         ConfirmationResponse confirmationResponse = new ConfirmationResponse();
+        confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
+
+        HttpStatus resStatus = HttpStatus.OK;
+        String reasonRejected = null;
         try {
             LocalDateTime dateTime = LocalDateTime.parse(confirmationRequest.getPayload().getDateTime(), formatter);
 
@@ -112,31 +118,44 @@ public class CollectionsController {
 
             CompanyAccountDto fetchedAccount = companyAccountServicePort.getByAccountNumber(collectionAccount);
             if (fetchedAccount == null) {
+                reasonRejected = "collection_account is not correct";
                 confirmationResponse.setStatusDescription(
-                        "Payment Transaction Received Successfully. Note: collection_account is not correct");
+                        "Payment Transaction Rejected. Note: " + reasonRejected);
+                confirmationResponse.setStatusCode("PAYMENT_RJCT");
             }
 
             ClientDto fetchedClient = null;
             if (fetchedAccount != null) {
                 fetchedClient = clientServicePort.getClientByIdAndCompany(fetchedAccount.getCompanyId(), customerId);
                 if (fetchedClient == null) {
+                    reasonRejected = "client_id is not correct";
                     confirmationResponse.setStatusDescription(
-                            "Payment Transaction Received Successfully. Note: customer_id is not correct");
+                            "Payment Transaction Rejected. Note: "+ reasonRejected);
+                    confirmationResponse.setStatusCode("PAYMENT_RJCT");
                 }
             }
 
-            confirmationResponse.setStatusCode("PAYMENT_ACK");
-            confirmationResponse.setStatusDescription(confirmationResponse.getStatusDescription() == null
-                    ? "Payment Transaction Received Successfully."
-                    : confirmationResponse.getStatusDescription());
+            if(confirmationResponse.getStatusDescription() == null) {
+                confirmationResponse.setStatusCode("PAYMENT_ACK");
+                confirmationResponse.setStatusDescription("Payment Transaction Received Successfully.");
+            }
 
             TransactionDto transaction = new TransactionDto(
+                    0L,
                     confirmationRequest.getPayload().getTxnReference(), null,
                     confirmationRequest.getPayload().getTxnAmount(),
-                    collectionAccount, fetchedAccount != null ? fetchedAccount.getCompanyId() : null,
-                    customerId, confirmationRequest.getPayload().getPayerName(),
-                    confirmationRequest.getPayload().getPayerPhone(), confirmationRequest.getPayload().getPaymentMode(),
-                    confirmationRequest.getPayload().getTxnNarration(), "/api/v1/fbl/confirmation", dateTime, "C");
+                    collectionAccount,
+                    "070",
+                    fetchedAccount != null ? fetchedAccount.getCompanyId() : null,
+                    customerId,
+                    confirmationRequest.getPayload().getPayerName(),
+                    confirmationRequest.getPayload().getPayerPhone(),
+                    confirmationRequest.getPayload().getPaymentMode(),
+                    confirmationRequest.getPayload().getTxnNarration(),
+                    "/api/v1/fbl/confirmation",
+                    dateTime,
+                    "C",
+                    reasonRejected);
 
             if (fetchedAccount == null || fetchedClient == null) {
                 transaction = transactionRejectedServicePort.addTransaction(transaction);
@@ -145,26 +164,25 @@ public class CollectionsController {
             }
 
             confirmationResponse.setPaymentRef(transaction.getArisTranRef());
-            confirmationResponse.setDateTime(LocalDateTime.now().format(formatter));
         } catch (DataIntegrityViolationException ex) {
             logger.error(ex.getMessage(), "Error Message: " + ex);
-            GenericHttpResponse<?> httpResponse = new GenericHttpResponse<>();
-            httpResponse.setHttpStatus(HttpStatus.CONFLICT);
+
             if (ex.getMessage().toLowerCase().contains("duplicate")) {
-                httpResponse.setMessage("Duplicate request for transaction reference: "
+                resStatus = HttpStatus.CONFLICT;
+                confirmationResponse.setStatusCode("PAYMENT_RJCT");
+                confirmationResponse.setStatusDescription("Duplicate request for transaction reference: "
                         + confirmationRequest.getPayload().getTxnReference());
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(httpResponse);
+
             }
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            GenericHttpResponse<?> httpResponse = new GenericHttpResponse<>();
-            httpResponse.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            httpResponse.setMessage("An error occurred while processing Collections Confirmation request");
-            return ResponseEntity.internalServerError().body(httpResponse);
+            resStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            confirmationResponse.setStatusCode("PAYMENT_RJCT");
+            confirmationResponse.setStatusDescription("An error occurred while processing Collections Confirmation request");
         }
 
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(resStatus)
                 .body(confirmationResponse);
     }
 }

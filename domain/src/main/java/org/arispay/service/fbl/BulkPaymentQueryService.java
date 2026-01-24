@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+//Todo: Move this to infrastructure module
 @Service
 @Component
 public class BulkPaymentQueryService {
@@ -43,7 +43,7 @@ public class BulkPaymentQueryService {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<?> httpEntity = new HttpEntity<>(headers);
 
-                String uri = "https://openbaknk.bakabc.com/api/v1/Transaction";
+                String uri = "https://openbank.bankabc.com/api/v1/Transaction";
 
                 String urlTemplate = UriComponentsBuilder.fromHttpUrl(uri)
                         .queryParam("BatchREF", "{BatchREF}")

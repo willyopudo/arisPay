@@ -13,7 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+//Todo: Move this to infrastructure module
 @Service
 public class BulkPaymentService {
 
@@ -30,7 +30,7 @@ public class BulkPaymentService {
         try {
             bulkTransactionRequest = bulkTransactionPersistencePort.addBulkTransaction(bulkTransactionRequest);
 
-            URI uri = new URI("https://openbaknk.bakabc.com/api/v1/Transaction");
+            URI uri = new URI("https://openbank.bankabc.com/api/v1/Transaction");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Accept", "*/*");
             headers.add("Authorization", "Bearer " + tokenService.getAccessToken());

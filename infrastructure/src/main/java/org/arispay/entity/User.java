@@ -5,9 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.arispay.data.UserSummary;
+import org.arispay.enums.CurrentPlan;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -15,6 +18,18 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@SqlResultSetMapping(
+		name = "UserSummaryMapping",
+		classes = @ConstructorResult(
+				targetClass = UserSummary.class,
+				columns = {
+						@ColumnResult(name = "totalUsers", type = Long.class),
+						@ColumnResult(name = "activeUsers", type = Long.class),
+						@ColumnResult(name = "pendingUsers", type = Long.class),
+						@ColumnResult(name = "inactiveUsers", type = Long.class)
+				}
+		)
+)
 @Table(name = "users")
 public class User extends AuditableEntity implements Serializable {
 	@Serial
@@ -59,6 +74,12 @@ public class User extends AuditableEntity implements Serializable {
 			joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},
 			inverseJoinColumns = {@JoinColumn(name = "ROLE_ID", referencedColumnName = "ID")})
 	private List<Role> roles = new ArrayList<>();
+
+	private String token;
+
+	private LocalDateTime tokenExpiration;
+
+	private CurrentPlan currentPlan;
 
 //	public void addCompany(Company company) {
 //		UserCompany userCompany = new UserCompany(this, company,false);

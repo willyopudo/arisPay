@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <CustomLevels>
+        <CustomLevel name="DB" intLevel="410" />
+    </CustomLevels>
+    <Properties>
+        <Property name="LOG_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${hostName} --- [%15.15t] %-40.40c{1.} : %m%n%ex
+        </Property>
+    </Properties>
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${hostName} --- [%15.15t] %-40.40c{1.} : %m%n%ex"/>
+        </Console>
+        <!-- Rolling File Appender -->
+        <RollingFile name="FileAppender" fileName="/home/wouma/IdeaProjects/logs/ArisPay/arispay-api.log"
+                     filePattern="/home/wouma/IdeaProjects/logs/ArisPay/arispay-api-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <!--            <SizeBasedTriggeringPolicy size="10MB"/>-->
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        <JDBC name="DBLogsStore" tableName="arispay_logs">
+            <ConnectionFactory 
+                class="org.arispay.configuration.ConnectionFactory" 
+                method="getDatabaseConnection" />
+            <Column name="log_at" isEventTimestamp="true" />
+            <Column name="loglevel" pattern="%level" isUnicode="false"/>
+            <Column name="logger" pattern="%logger" isUnicode="false"/>
+            <Column name="message" pattern="%message" isUnicode="false"/>
+            <Column name="exception" pattern="%ex{full}" isUnicode="false"/>
+            
+            <Filters>
+                <!-- First deny warn, error and fatal messages -->
+                <!--<ThresholdFilter level="debug"  onMatch="DENY" onMismatch="NEUTRAL"/>-->
+                <!--<ThresholdFilter level="trace"  onMatch="DENY" onMismatch="NEUTRAL"/>-->
+                <!--<ThresholdFilter level="warn"  onMatch="DENY" onMismatch="NEUTRAL"/>-->
+                <!--<ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>-->
+                <!--<ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL"/>-->
+
+                <!--Then accept info, warn, error, fatal and deny debug/trace--> 
+                <ThresholdFilter level="info"  onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="db"  onMatch="ACCEPT" onMismatch="ACCEPT"/>
+            </Filters>
+        </JDBC>
+
+    </Appenders>
+
+    <Loggers>
+        <AsyncLogger name="org.arispay" level="debug" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="DBLogsStore"/>
+        </AsyncLogger>
+        <!--        <logger name="logging.level.org.hibernate.orm.jdbc.bind" level="TRACE" />-->
+        <!--        <Logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false">-->
+        <!--            <AppenderRef ref="ConsoleAppender"/>-->
+        <!--            <AppenderRef ref="FileAppender"/>-->
+        <!--        </Logger>-->
+        <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="DEBUG">
+<!--            <AppenderRef ref="ConsoleAppender"/>-->
+<!--            <AppenderRef ref="FileAppender"/>-->
+        </logger>
+        <Root level="info">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="DBLogsStore"/>
+        </Root>
+    </Loggers>
+</Configuration>
