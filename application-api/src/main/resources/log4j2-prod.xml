@@ -16,7 +16,7 @@
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${hostName} --- [%15.15t] %-40.40c{1.} : %m%n%ex</Pattern>
             </PatternLayout>
-            <Policies>
+            <Policies>Q
                 <!--            <SizeBasedTriggeringPolicy size="10MB"/>-->
                 <TimeBasedTriggeringPolicy interval="1"/>
             </Policies>
@@ -29,11 +29,6 @@
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>
         </AsyncLogger>
-        <!--        <Logger name="org.arispay" level="debug" additivity="false">-->
-        <!--            <AppenderRef ref="ConsoleAppender"/>-->
-        <!--            <AppenderRef ref="FileAppender"/>-->
-        <!--        </Logger>-->
-
         <Root level="info">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>

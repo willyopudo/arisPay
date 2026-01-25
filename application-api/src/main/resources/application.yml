@@ -24,12 +24,6 @@ spring:
     view:
       suffix: html
     static-path-pattern: /resources/static/**
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: 6379
-      password: ${REDIS_PASSWORD}
-      connect-timeout: 60000
 management:
   tracing:
     sampling:
