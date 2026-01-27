@@ -32,7 +32,7 @@ import java.util.*;
 
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
 @CrossOrigin(origins = "http://localhost:3000")

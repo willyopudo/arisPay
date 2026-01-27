@@ -100,6 +100,9 @@ public class UserPreferencesServiceImpl implements UserPreferencesServicePort {
         // The adapter will handle the update with the DTO
         preferencesDto.setId(existing.getId());
         preferencesDto.setUserId(userId);
+        if( preferencesDto.getThemeCustomizations() == null) {
+            preferencesDto.setThemeCustomizations(existing.getThemeCustomizations());
+        }
 
         var updated = persistencePort.update(userId, preferencesDto);
         return convertToDto(updated);
