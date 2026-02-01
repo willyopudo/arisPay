@@ -105,4 +105,20 @@ public class ArisPayApiConfig {
 		return new ActivityServiceImpl(activityPersistence(), messagingTemplate);
 	}
 
+	//Notification Config
+	@Bean
+	public NotificationPersistencePort notificationPersistence() {
+		return new NotificationJpaAdapter();
+	}
+
+	@Bean
+	public NotificationBroadcastPort notificationBroadcast(org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate) {
+		return new WebSocketNotificationBroadcaster(messagingTemplate);
+	}
+
+	@Bean
+	public NotificationServicePort notificationService(NotificationBroadcastPort notificationBroadcastPort) {
+		return new NotificationServiceImpl(notificationPersistence(), notificationBroadcastPort);
+	}
+
 }

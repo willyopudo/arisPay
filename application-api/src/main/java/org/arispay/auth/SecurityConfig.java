@@ -59,7 +59,7 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-		http.csrf().disable()
+		http.cors().and().csrf().disable()
 				.authorizeHttpRequests((authorize) ->
 						authorize.requestMatchers(antMatcher("/api/v1/auth/**")).permitAll()
 								.requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
@@ -104,20 +104,21 @@ public class SecurityConfig {
 		};
 	}
 
-//	@Bean
-//	CorsConfigurationSource corsConfigurationSource() {
-//		CorsConfiguration configuration = new CorsConfiguration();
-//
-//		configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-//		configuration.setAllowedMethods(List.of("GET","POST"));
-//		configuration.setAllowedHeaders(List.of("Authorization","Content-Type", "Accept"));
-//
-//		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//
-//		source.registerCorsConfiguration("/**",configuration);
-//
-//		return source;
-//	}
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+
+		configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+		configuration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+		source.registerCorsConfiguration("/**", configuration);
+
+		return source;
+	}
 
 //	@Autowired
 //	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

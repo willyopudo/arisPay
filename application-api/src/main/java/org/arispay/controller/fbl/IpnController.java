@@ -12,6 +12,7 @@ import org.arispay.data.fbl.dtorequest.ipn.FblIpnDto;
 import org.arispay.data.fbl.dtorequest.ipn.TXN;
 import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.ports.api.TransactionRejectedServicePort;
+import org.arispay.ports.api.NotificationServicePort;
 import org.arispay.ports.api.TransactionServicePort;
 import org.arispay.utils.GlobalHelpers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ public class IpnController {
     private TransactionServicePort transactionServicePort;
     @Autowired
     private TransactionRejectedServicePort transactionRejectedServicePort;
+    @Autowired
+    private NotificationServicePort notificationService;
     private static final Logger logger = LogManager.getLogger(IpnController.class);
     @Autowired
     GlobalHelpers globalHelpers;
@@ -77,6 +80,8 @@ public class IpnController {
 
                             TransactionDto savedTrans = transactionServicePort.addTransaction(transactionDto);
                             logger.info("Transaction record added success : {}", savedTrans.toString());
+
+                            notificationService.createPaymentReceivedNotification(savedTrans);
 
                         } else {
                             logger.info("Account number was not found {}",
