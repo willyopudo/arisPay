@@ -3,11 +3,15 @@ import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.ConstraintViolation;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.arispay.auth.JwtUtil;
 import org.arispay.data.*;
+import org.arispay.data.validation.OnAdminUpdate;
+import org.arispay.data.validation.OnUserUpdate;
 import org.arispay.globconfig.security.ApplicationUserRole;
 import org.arispay.helpers.AuthUtil;
 import org.arispay.ports.api.CompanyServicePort;
@@ -29,13 +33,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     @Autowired
     private final UserServicePort userServicePort;
@@ -50,6 +54,9 @@ public class UserController {
 
     @Autowired
     private final JwtUtil jwtUtil;
+
+    @Autowired
+    private final Validator validator;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -134,37 +141,90 @@ public class UserController {
 
     //Modify User
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody UserDto userDto) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody UserDto userDto, HttpServletRequest request) {
         GenericHttpResponse<UserDto> response = new GenericHttpResponse<>();
+
+        // Check if the requesting user is an admin FIRST (before validation)
+        Claims claims = jwtUtil.resolveClaims(request);
+        String userRole = claims.get("role", String.class);
+        boolean isAdmin = userRole != null && userRole.equals(ApplicationUserRole.ADMIN.name());
+
+        // Perform validation based on user role using validation groups
+        Set<ConstraintViolation<UserDto>> violations;
+        if (isAdmin) {
+            // Validate with admin group - all fields including role, status, etc.
+            violations = validator.validate(userDto, OnAdminUpdate.class);
+        } else {
+            // Validate with user group - only basic profile fields
+            violations = validator.validate(userDto, OnUserUpdate.class);
+        }
+
+        // Check for validation errors
+        if (!violations.isEmpty()) {
+            logger.error("Validation errors: {}", violations);
+            String errorMessage = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .collect(Collectors.joining("; "));
+            response.setHttpStatus(HttpStatus.BAD_REQUEST);
+            response.setMessage("Validation failed: " + errorMessage);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        // Log incoming data for debugging
+        logger.debug("Update user request - ID: {}, LastName: '{}', LastName length: {}",
+            id, userDto.getLastName(), userDto.getLastName() != null ? userDto.getLastName().length() : "null");
+
         UserDto existingUser = userServicePort.findUserById(Math.toIntExact(id));
         if (existingUser != null) {
-            existingUser.setAvatar(userDto.getAddress());
-            existingUser.setPhoneNumber(userDto.getPhoneNumber());
-            //existingUser.setEmail(userDto.getEmail());
-            //existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
-            //existingUser.setRole(userDto.getRole());
-            existingUser.setCurrentPlan(userDto.getCurrentPlan());
-            existingUser.setStatus(userDto.getStatus());
-            existingUser.setFirstName(userDto.getFirstName());
-            existingUser.setLastName(userDto.getLastName());
 
-            for(UserCompanyDto ucDto : userDto.getUserCompanies()){
-                CompanyDto companyDto = companyServicePort.getCompanyById(ucDto.getCompanyId());
-                UserCompanyDto uc = new UserCompanyDto(ucDto.getId(), companyDto.getId(), ucDto.getCompanyName(), ucDto.isDefault());
+            // Non-admin users can only update these fields:
+            // firstName, lastName, email, phoneNumber, address, town, zipCode
+            if (!isAdmin) {
+                // Only allow non-admin users to update specific fields
+                existingUser.setFirstName(userDto.getFirstName());
+                existingUser.setLastName(userDto.getLastName());
+                existingUser.setEmail(userDto.getEmail());
+                existingUser.setPhoneNumber(userDto.getPhoneNumber());
+                existingUser.setAddress(userDto.getAddress());
+                existingUser.setTown(userDto.getTown());
+                existingUser.setZipCode(userDto.getZipCode());
+                // All other fields remain unchanged
+            } else {
+                // Admin users can update all fields
+                existingUser.setAvatar(userDto.getAddress());
+                existingUser.setPhoneNumber(userDto.getPhoneNumber());
+                existingUser.setEmail(userDto.getEmail());
+                existingUser.setCurrentPlan(userDto.getCurrentPlan());
+                existingUser.setStatus(userDto.getStatus());
+                existingUser.setFirstName(userDto.getFirstName());
+                existingUser.setLastName(userDto.getLastName());
+                existingUser.setAddress(userDto.getAddress());
+                existingUser.setTown(userDto.getTown());
+                existingUser.setZipCode(userDto.getZipCode());
 
-                //Check if company in this iteration is not already related to the user we are updating
-                if(existingUser.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())))
-                    existingUser.getUserCompanies().add(uc);
-                else{
-                    //If the company exists for the user, we'll update only 'isDefault' field and persist later
-                    UserCompanyDto existingUc = existingUser.getUserCompanies().stream().filter((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())).findFirst().get();
-                    existingUc.setDefault(ucDto.isDefault());
+                // Update user companies only for admins
+                if (userDto.getUserCompanies() != null && !userDto.getUserCompanies().isEmpty()) {
+                    for(UserCompanyDto ucDto : userDto.getUserCompanies()){
+                        CompanyDto companyDto = companyServicePort.getCompanyById(ucDto.getCompanyId());
+                        UserCompanyDto uc = new UserCompanyDto(ucDto.getId(), companyDto.getId(), ucDto.getCompanyName(), ucDto.isDefault());
+
+                        //Check if company in this iteration is not already related to the user we are updating
+                        if(existingUser.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())))
+                            existingUser.getUserCompanies().add(uc);
+                        else{
+                            //If the company exists for the user, we'll update only 'isDefault' field and persist later
+                            UserCompanyDto existingUc = existingUser.getUserCompanies().stream().filter((e) -> Objects.equals(e.getCompanyId(), ucDto.getCompanyId())).findFirst().orElse(null);
+                            if (existingUc != null) {
+                                existingUc.setDefault(ucDto.isDefault());
+                            }
+                        }
+                    }
+
+                    //Let's iterate over the UserCompanies for the user we want to update
+                    //If a company is not in the list submitted in the Dto, we remove the association and persist change
+                    existingUser.getUserCompanies().removeIf(uc -> userDto.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), uc.getCompanyId())));
                 }
             }
-
-            //Let's iterate over the UserCompanies for the user we want to update
-            //If a company is not in the list submitted in the Dto, we remove the association and persist change
-            existingUser.getUserCompanies().removeIf(uc -> userDto.getUserCompanies().stream().noneMatch((e) -> Objects.equals(e.getCompanyId(), uc.getCompanyId())));
 
             UserDto updatedUser = userServicePort.saveUser(existingUser);
             updatedUser.setPassword(null);
