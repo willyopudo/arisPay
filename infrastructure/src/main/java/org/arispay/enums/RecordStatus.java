@@ -3,7 +3,8 @@ package org.arispay.enums;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum RecordStatus {
+public enum
+RecordStatus {
     ACTIVE("active"), INACTIVE("inactive"), PENDING("pending");
     private final String value;
 

@@ -1,5 +1,6 @@
 package org.arispay.adapters.fbl;
 
+import org.arispay.data.fbl.BulkPostingResult;
 import org.arispay.data.fbl.dtorequest.masspayments.BulkTransactionRequest;
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
 import org.arispay.entity.Transaction;
@@ -13,6 +14,7 @@ import org.arispay.repository.fbl.DetailRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -109,7 +111,8 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
     }
 
     @Override
-    public void postTransactions() {
+    public List<BulkPostingResult> postTransactions() {
+        List<BulkPostingResult> postedResults = new ArrayList<>();
         try {
             List<BulkTransaction> unpostedTransactions = bulkTransactionRepository.findUnpostedTransactions();
             for (BulkTransaction bulkTransaction : unpostedTransactions) {
@@ -133,6 +136,12 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
 
                     }
                     bulkTransactionRepository.markPostingStageFinal(bulkTransaction.getId(), "P", LocalDateTime.now(), bulkTransaction.getPostingTryCount() + 1);
+
+                    postedResults.add(BulkPostingResult.builder()
+                            .accountDr(bulkTransaction.getAccountDr())
+                            .detailCount(bulkTransaction.getDtl() != null ? bulkTransaction.getDtl().size() : 0)
+                            .totalAmount(bulkTransaction.getTotalAmount())
+                            .build());
                 } catch (Exception e) {
                     e.printStackTrace();
                     bulkTransactionRepository.markPostingStageFinal(bulkTransaction.getId(), "X", LocalDateTime.now(), bulkTransaction.getPostingTryCount() + 1);
@@ -142,6 +151,7 @@ public class BulkTransactionJpaAdapter implements BulkTransactionPersistencePort
         catch (Exception e) {
             e.printStackTrace();
         }
+        return postedResults;
     }
 
 }

@@ -1,8 +1,8 @@
 package org.arispay.ports.spi.fbl;
 
+import org.arispay.data.fbl.BulkPostingResult;
 import org.arispay.data.fbl.dtorequest.masspayments.BulkTransactionRequest;
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +19,7 @@ public interface BulkTransactionPersistencePort {
     List<String> queryBulkTransactions(LocalDateTime nowTime, int timeInterval);
 
     void markProcessingStage(Long id, String processFlg);
-    
-    void postTransactions();
+
+    List<BulkPostingResult> postTransactions();
 
 }
