@@ -16,6 +16,7 @@ import org.arispay.mappers.UserMapper;
 import org.arispay.ports.api.CompanyAccountServicePort;
 import org.arispay.ports.api.CompanyServicePort;
 import org.arispay.ports.api.UserServicePort;
+import org.arispay.ports.api.UserPreferencesServicePort;
 import org.arispay.security.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -59,9 +60,12 @@ public class AuthController {
 
 	private final UserMapper userMapper;
 
+	private final UserPreferencesServicePort userPreferencesServicePort;
+
 
 	public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, PasswordEncoder passwordEncoder, UserServicePort userServicePort,
-						  CompanyServicePort companyServicePort, CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort, UserMapper userMapper) {
+						  CompanyServicePort companyServicePort, CompanyAccountServicePort<CompanyAccountDto> companyAccountServicePort, UserMapper userMapper,
+						  UserPreferencesServicePort userPreferencesServicePort) {
 		this.authenticationManager = authenticationManager;
 		this.jwtUtil = jwtUtil;
 		this.passwordEncoder = passwordEncoder;
@@ -69,6 +73,7 @@ public class AuthController {
 		this.companyServicePort = companyServicePort;
 		this.companyAccountServicePort = companyAccountServicePort;
 		this.userMapper = userMapper;
+		this.userPreferencesServicePort = userPreferencesServicePort;
 	}
 
 	// Register new user
@@ -103,7 +108,20 @@ public class AuthController {
 
 			//Build UserDetails object
 			UserLoginRespDto userDetail = new UserLoginRespDto(userDetails.getId(), userDetails.getUsername(), userDetails.getFullName(), userDetails.getEmail(), userDetails.getId() + ".png", userDetails.getAuthoritiesList(), userDetails.getAuthoritiesList().getFirst().substring(5),
-					userCompany.getCompany().getId(), userCompany.getCompany().getName());
+					userCompany.getCompany().getId(), userCompany.getCompany().getName(), null);
+
+			// Fetch or create user preferences (with caching)
+			try {
+				var preferences = userPreferencesServicePort.getUserPreferences(userDetails.getId())
+						.orElseGet(() -> {
+							logger.info("Creating default preferences for user: {}", userDetails.getId());
+							return userPreferencesServicePort.createDefaultPreferences(userDetails.getId());
+						});
+				userDetail.setPreferences(preferences);
+			} catch (Exception e) {
+				logger.error("Error fetching preferences for user: {}", userDetails.getId(), e);
+				// Continue with login even if preferences fail
+			}
 
 			//Generate refresh token
 			RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
@@ -113,8 +131,8 @@ public class AuthController {
 
 			//Login response for non web requests
 			JwtLoginResp loginRes = new JwtLoginResp(token,3600, "Bearer");
-
-            logger.info("Token issued success for user: {} , Token : {}", username, token);
+			String tokenSubstring = token.length() > 20 ? token.substring(0, 20) + "..." : token;
+            logger.info("Token issued success for user: {} , Token : {}", username, tokenSubstring);
 			if(loginReq.getScope() != null && loginReq.getScope().equals("web")) {
 				return ResponseEntity.ok(webLoginResp);
 			}
