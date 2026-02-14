@@ -2,6 +2,7 @@ package org.arispay.configuration;
 
 import org.arispay.adapters.*;
 import org.arispay.data.CompanyAccountDto;
+import org.arispay.data.MediaDto;
 import org.arispay.ports.api.*;
 import org.arispay.ports.spi.*;
 import org.arispay.service.*;
@@ -47,8 +48,13 @@ public class ArisPayApiConfig {
 	}
 
 	@Bean
-	public UserServicePort userService() {
-		return new UserServiceImpl(userPersistence());
+	public FileStorageServicePort fileStorageService(FileStorageIOPort fileStorageIO) {
+		return new FileStorageServiceImpl(fileStorageIO);
+	}
+
+	@Bean
+	public UserServicePort userService(FileStorageServicePort fileStorageService, GenericServicePort<MediaDto> mediaService) {
+		return new UserServiceImpl(userPersistence(), fileStorageService, mediaService);
 	}
 
 	//Transaction Config

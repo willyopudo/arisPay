@@ -18,8 +18,8 @@ spring:
       enabled: false
   servlet:
     multipart:
-      max-file-size: 4MB
-      max-request-size: 50MB
+      max-file-size: 5MB
+      max-request-size: 5MB
   mvc:
     view:
       suffix: html
@@ -39,3 +39,10 @@ custom:
       jwt-secret: ${JWT_SECRET}
       jwt-expiration-minutes: 1
       jwt-refresh-expiration-seconds: 86400
+
+# File Upload Configuration
+file:
+  upload:
+    path: ${FILE_UPLOAD_PATH:/opt/arispay/media}
+
+

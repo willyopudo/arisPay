@@ -107,7 +107,7 @@ public class AuthController {
 			UserCompany userCompany = userCompanies.stream().findFirst().get();
 
 			//Build UserDetails object
-			UserLoginRespDto userDetail = new UserLoginRespDto(userDetails.getId(), userDetails.getUsername(), userDetails.getFullName(), userDetails.getEmail(), userDetails.getId() + ".png", userDetails.getAuthoritiesList(), userDetails.getAuthoritiesList().getFirst().substring(5),
+			UserLoginRespDto userDetail = new UserLoginRespDto(userDetails.getId(), userDetails.getUsername(), userDetails.getFullName(), userDetails.getEmail(), userDetails.getAuthoritiesList(), userDetails.getAuthoritiesList().getFirst().substring(5),
 					userCompany.getCompany().getId(), userCompany.getCompany().getName(), null);
 
 			// Fetch or create user preferences (with caching)

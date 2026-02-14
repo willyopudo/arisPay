@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,11 +54,13 @@ public class TransactionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public TransactionDto addTransaction(@RequestBody TransactionDto transactionDto) {
         return transactionServicePort.addTransaction(transactionDto);
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public TransactionDto updateTransaction(@RequestBody TransactionDto transactionDto) {
         return transactionServicePort.updateTransaction(transactionDto);
     }
@@ -150,6 +153,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteTransactionByID(@PathVariable long id) {
         transactionServicePort.deleteTransactionById(id);
     }

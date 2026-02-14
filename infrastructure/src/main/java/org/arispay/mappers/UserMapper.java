@@ -26,6 +26,8 @@ public abstract class UserMapper {
 	private RoleRepository roleRepository;
 	@Autowired
 	private UserCompanyRepository userCompanyRepository;
+	@Autowired
+	private MediaRepository mediaRepository;
 
 //	@Autowired
 //	private UserRepository userRepository;
@@ -35,12 +37,15 @@ public abstract class UserMapper {
 	@Mapping(source = "role", target = "roles", qualifiedByName = "roleNameToRoles")
 	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "StringToCurrentPlan")
 	@Mapping(source = "status", target = "recordStatus", qualifiedByName = "StringToRecordStatus")
+	@Mapping(source = "imageId", target = "profileImage", qualifiedByName = "imageIdToMedia")
 	public abstract User convert(UserDto userDto);
 
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "companiesToIds")
 	@Mapping(source = "roles", target = "role", qualifiedByName = "RoleListToRoleName")
 	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "CurrentPlanToString")
 	@Mapping(source = "recordStatus", target = "status", qualifiedByName = "RecordStatusToString")
+	@Mapping(source = "profileImage.id", target = "imageId")
+	@Mapping(source = "profileImage", target = "imageMetadata", qualifiedByName = "mediaToMediaDto")
 	@InheritInverseConfiguration
 	public abstract UserDto convert(User user);
 
@@ -48,6 +53,8 @@ public abstract class UserMapper {
 	@Mapping(source = "roles", target = "role", qualifiedByName = "RoleListToRoleName")
 	@Mapping(source = "currentPlan", target = "currentPlan", qualifiedByName = "CurrentPlanToString")
 	@Mapping(source = "recordStatus", target = "status", qualifiedByName = "RecordStatusToString")
+	@Mapping(source = "profileImage.id", target = "imageId")
+	@Mapping(source = "profileImage", target = "imageMetadata", qualifiedByName = "mediaToMediaDto")
 	public abstract List<UserDto> userListToUserDtoList(List<User> userList);
 
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "idsToCompanies")
@@ -123,5 +130,21 @@ public abstract class UserMapper {
 	@Named("RecordStatusToString")
 	public String RecordStatusToString(RecordStatus recordStatus) {
 		return recordStatus.toString();
+	}
+
+	@Named("imageIdToMedia")
+	public Media imageIdToMedia(Long imageId) {
+		if (imageId == null) {
+			return null;
+		}
+		return mediaRepository.findById(imageId).orElse(null);
+	}
+
+	@Named("mediaToMediaDto")
+	public org.arispay.data.MediaDto mediaToMediaDto(Media media) {
+		if (media == null) {
+			return null;
+		}
+		return org.arispay.utils.ObjectMapperUtils.map(media, org.arispay.data.MediaDto.class);
 	}
 }

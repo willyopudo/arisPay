@@ -9,6 +9,7 @@ import org.arispay.ports.api.CompanyServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,11 +23,13 @@ public class CompanyController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
 	public CompanyDto addCompany(@RequestBody CompanyDto companyDto) {
 		return companyServicePort.addCompany(companyDto);
 	}
 
 	@PutMapping
+	@PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
 	public CompanyDto updateCompany(@RequestBody CompanyDto companyDto) {
 		return companyServicePort.updateCompany(companyDto);
 	}
@@ -37,11 +40,13 @@ public class CompanyController {
 	}
 
 	@GetMapping
+	@PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
 	public ResponseEntity<List<CompanyDto>> getAllCompanies() {
 		return ResponseEntity.ok(companyServicePort.getCompanies());
 	}
 
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
 	public void deleteCompanyByID(@PathVariable long id) {
 		companyServicePort.deleteCompanyById(id);
 	}
