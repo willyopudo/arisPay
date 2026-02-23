@@ -4,9 +4,12 @@ import org.arispay.adapters.*;
 import org.arispay.data.CompanyAccountDto;
 import org.arispay.ports.api.*;
 import org.arispay.ports.spi.*;
+import org.arispay.ports.spi.fbl.BulkTransactionPersistencePort;
 import org.arispay.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class ArisPayApiConfig {
@@ -119,6 +122,13 @@ public class ArisPayApiConfig {
 	@Bean
 	public NotificationServicePort notificationService(NotificationBroadcastPort notificationBroadcastPort) {
 		return new NotificationServiceImpl(notificationPersistence(), notificationBroadcastPort);
+	}
+
+	//Bulk Disbursement Config
+	@Bean
+	public BulkDisbursementService bulkDisbursementService(List<BankDisbursementServicePort> bankDisbursementServices,
+														   BulkTransactionPersistencePort bulkTransactionPersistencePort) {
+		return new BulkDisbursementService(bankDisbursementServices, bulkTransactionPersistencePort);
 	}
 
 }
