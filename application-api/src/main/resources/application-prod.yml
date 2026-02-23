@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: arisPayApi
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      jdbc:
+        time_zone: UTC
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: false
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      connect-timeout: 60000
+
+logging:
+  config: application-api/src/main/resources/log4j2-prod.xml
+  level:
+    root: INFO
+    org.arispay: INFO
+
+custom:
+  arispay:
+    openapi:
+      dev-url: ${OPENAPI_DEV_URL}
+      prod-url: ${OPENAPI_PROD_URL}
+    api:
+      version: 1
+    app:
+      jwt-secret: ${JWT_SECRET}
+      jwt-expiration-minutes: 60
+      jwt-refresh-expiration-seconds: 86400
+    partners:
+      auth:
+        configs:
+          - name: "family"
+            url-pattern: ${PARTNER_FAMILY_URL_PATTERN}
+            auth-url: ${PARTNER_FAMILY_AUTH_URL}
+            strategy: "OAUTH2_CLIENT_CREDENTIALS"
+            oauth2:
+              client-id: ${PARTNER_FAMILY_CLIENT_ID}
+              client-secret: ${PARTNER_FAMILY_CLIENT_SECRET}
+              scope: "api.read api.write"
+              token-cache-duration: 3300
+
+# File Upload Configuration
+file:
+  upload:
+    path: ${FILE_UPLOAD_PATH:/opt/arispay/media}

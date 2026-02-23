@@ -20,6 +20,15 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
 	User findByUsername(String username);
 
+	@Query("SELECT u FROM User u LEFT JOIN FETCH u.userCompanies uc LEFT JOIN FETCH uc.company WHERE u.username = :username")
+	User findByUsernameWithCompanies(@Param("username") String username);
+
+	@Query("SELECT u FROM User u LEFT JOIN FETCH u.userCompanies uc LEFT JOIN FETCH uc.company WHERE u.email = :email")
+	User findByEmailWithCompanies(@Param("email") String email);
+
+	@Query("SELECT u FROM User u LEFT JOIN FETCH u.userCompanies uc LEFT JOIN FETCH uc.company WHERE u.id = :id")
+	User findByIdWithCompanies(@Param("id") int id);
+
 	Optional<User> findByToken(String token);
 
 	/**

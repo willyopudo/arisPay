@@ -1,18 +1,16 @@
 package org.arispay.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.arispay.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -23,7 +21,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +29,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
 	private final CustomUserDetailsService userDetailsService;
@@ -57,10 +55,11 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
 
-		http.cors().and().csrf().disable()
-				.authorizeHttpRequests((authorize) ->
+		http.cors(cors -> cors.configurationSource(corsConfigurationSource))
+				.csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(authorize ->
 						authorize.requestMatchers(antMatcher("/api/v1/auth/**")).permitAll()
 								.requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
 								.requestMatchers(antMatcher("/v2/api-docs/**")).permitAll()
@@ -72,8 +71,8 @@ public class SecurityConfig {
 						.authenticationEntryPoint(authenticationEntryPoint())
 				)
 				.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-				.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				.sessionManagement(session -> session
+						.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 
 		return http.build();
@@ -105,26 +104,28 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	CorsConfigurationSource corsConfigurationSource() {
+	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 
+		// Allow specific origins (adjust as needed for your environment)
 		configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+
+		// Allow all HTTP methods
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+
+		// Allow all headers
+		configuration.setAllowedHeaders(List.of("*"));
+
+		// Allow credentials (cookies, authorization headers, etc.)
 		configuration.setAllowCredentials(true);
 
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		// Cache preflight requests for 1 hour
+		configuration.setMaxAge(3600L);
 
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 
 		return source;
 	}
-
-//	@Autowired
-//	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//		auth
-//				.userDetailsService(userDetailsService)
-//				.passwordEncoder(passwordEncoder());
-//	}
 
 }

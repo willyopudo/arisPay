@@ -58,7 +58,7 @@ public class MediaJpaAdapter implements GenericServicePort<MediaDto> {
 	public MediaDto getById(Long id) {
 		Optional<Media> media = mediaRepository.findById(id);
 		if (media.isPresent()) {
-			return ObjectMapperUtils.map(media, MediaDto.class);
+			return ObjectMapperUtils.map(media.get(), MediaDto.class);
 		} else
 			return null;
 	}
@@ -71,7 +71,9 @@ public class MediaJpaAdapter implements GenericServicePort<MediaDto> {
 
 	public MediaDto findByName(String name) {
 		Media media = mediaRepository.findByName(name);
-		return ObjectMapperUtils.map(media, MediaDto.class);
-
+		if (media != null) {
+			return ObjectMapperUtils.map(media, MediaDto.class);
+		}
+		return null;
 	}
 }

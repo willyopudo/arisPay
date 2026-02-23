@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +51,7 @@ public class CompanyAccountController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
     public CompanyAccountDto addCompanyAccount(@RequestBody CompanyAccountDto companyAccount,
                                                HttpServletRequest request) {
         CompanyAccountDto savedAccount = companyAccountService.add(companyAccount);
@@ -107,6 +109,7 @@ public class CompanyAccountController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
     public ResponseEntity<?> updateCompanyAccount(@RequestBody CompanyAccountDto companyAccountDto,
                                                   @PathVariable long id,
                                                   HttpServletRequest request) {
@@ -129,6 +132,7 @@ public class CompanyAccountController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
     public ResponseEntity<?> deleteCompanyAccountById(@PathVariable long id,
                                                       HttpServletRequest request) {
         try {

@@ -5,14 +5,11 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.arispay.data.CompanyDto;
-import org.arispay.data.UserCompanyDto;
 import org.arispay.data.UserDto;
 import org.arispay.data.UserFilterDto;
 import org.arispay.entity.Role;
 import org.arispay.entity.User;
 import org.arispay.entity.UserCompany;
-import org.arispay.entity.UserCompanyId;
 import org.arispay.mappers.UserMapper;
 import org.arispay.ports.spi.UserPersistencePort;
 import org.arispay.repository.CompanyRepository;
@@ -25,6 +22,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -84,28 +82,33 @@ public class UserJpaAdapter implements UserPersistencePort {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public UserDto findUserByEmail(String email) {
-		return userMapper.convert(userRepository.findByEmail(email));
+		return userMapper.convert(userRepository.findByEmailWithCompanies(email));
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public UserDto findUserById(int id) {
-		User user = userRepository.findById(id);
+		User user = userRepository.findByIdWithCompanies(id);
 		return userMapper.convert(user);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public UserDto findUserByUserName(String username) {
-		User user = userRepository.findByUsername(username);
+		User user = userRepository.findByUsernameWithCompanies(username);
 		return userMapper.convert(user);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public UserDto findUserByUserName2(String username) {
-		return userMapper.convert(userRepository.findByUsername(username));
+		return userMapper.convert(userRepository.findByUsernameWithCompanies(username));
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<UserDto> findAllUsers(Pageable pageable, UserFilterDto filterDto) {
 		// Check if we need to sort by role name
 		if (filterDto.getSortBy() != null && "roleName".equals(filterDto.getSortBy())) {
@@ -129,9 +132,9 @@ public class UserJpaAdapter implements UserPersistencePort {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public UserDto findUserByToken(String token) {
-		UserDto convert = userMapper.convert(userRepository.findByToken(token).get());
-		return convert;
+        return userMapper.convert(userRepository.findByToken(token).get());
 	}
 
 	private Role checkRoleExist(String roleName) {
@@ -165,7 +168,8 @@ public class UserJpaAdapter implements UserPersistencePort {
 
 	}
 
-	private Page<UserDto> findUsersWithRoleSorting(Pageable pageable, UserFilterDto filterDto) {
+	@Transactional(readOnly = true)
+	protected Page<UserDto> findUsersWithRoleSorting(Pageable pageable, UserFilterDto filterDto) {
 		// For PostgreSQL, we need to change our approach to handle DISTINCT with ORDER BY
 
 		// First, get user IDs with role names for sorting

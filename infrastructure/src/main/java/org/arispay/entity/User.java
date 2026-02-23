@@ -81,6 +81,10 @@ public class User extends AuditableEntity implements Serializable {
 
 	private CurrentPlan currentPlan;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "image_id", referencedColumnName = "id")
+	private Media profileImage;
+
 //	public void addCompany(Company company) {
 //		UserCompany userCompany = new UserCompany(this, company,false);
 //		companies.add(userCompany);

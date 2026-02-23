@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.arispay.data.UserCompanyDto;
+import org.arispay.data.UserPreferencesDto;
 
 import java.util.List;
 
@@ -24,9 +25,6 @@ public class UserLoginRespDto {
     @JsonProperty("email")
     private String email;
 
-    @JsonProperty("avatar")
-    private String avatar;
-
     @JsonProperty("roles")
     private List<String> authorities;
 
@@ -36,5 +34,8 @@ public class UserLoginRespDto {
     private Long companyId;
 
     private String companyName;
+
+    @JsonProperty("preferences")
+    private UserPreferencesDto preferences;
 
 }
