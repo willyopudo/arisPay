@@ -2,9 +2,12 @@ package org.arispay.ports.api;
 
 import org.arispay.data.UserDto;
 import org.arispay.data.UserFilterDto;
+import org.arispay.data.UserImageDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserServicePort {
@@ -29,4 +32,8 @@ public interface UserServicePort {
 	//public void findUserCompanyByUserIdAndCompanyId(Long userId, Long companyId);
 
 	public void deleteUserCompanyById(Long userId, Long companyId);
+
+	UserDto uploadProfilePicture(Long userId, MultipartFile file) throws IOException;
+
+	UserImageDto getUserImage(Long userId) throws IOException;
 }

@@ -25,9 +25,6 @@ public class UserLoginRespDto {
     @JsonProperty("email")
     private String email;
 
-    @JsonProperty("avatar")
-    private String avatar;
-
     @JsonProperty("roles")
     private List<String> authorities;
 

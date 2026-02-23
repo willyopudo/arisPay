@@ -1,5 +1,10 @@
 package org.arispay.controller;
 import io.jsonwebtoken.Claims;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,10 +31,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.*;
@@ -78,6 +85,7 @@ public class UserController {
     }
     // Fetch list of users
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<Pair<Page<UserDto>, ISummary>> getAllUsers(@RequestParam(defaultValue = "0") int page,
                                                                      @RequestParam(defaultValue = "5") int itemsPerPage,
                                                                      @RequestParam(name = "status", required = false) String status,
@@ -141,6 +149,7 @@ public class UserController {
 
     //Modify User
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody UserDto userDto, HttpServletRequest request) {
         GenericHttpResponse<UserDto> response = new GenericHttpResponse<>();
 
@@ -241,6 +250,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN')")
     public ResponseEntity<GenericHttpResponse<?>> deleteUser(@PathVariable int id)  {
         GenericHttpResponse<?> response = new GenericHttpResponse<>();
         UserDto user = userServicePort.findUserById(id);
@@ -271,5 +281,175 @@ public class UserController {
             case "status" -> "isEnabled";
             default -> "firstName";
         };
+    }
+
+    // Upload profile picture
+    @Operation(summary = "Upload user profile picture", description = "Upload a profile picture for a specific user. Returns the uploaded image with metadata and base64 encoded data.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Profile picture uploaded successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserImageDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid file (empty, wrong type, or too large)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = GenericHttpResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - User can only update their own profile picture",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = GenericHttpResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = GenericHttpResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = GenericHttpResponse.class)
+                    )
+            )
+    })
+    @PostMapping("/{id}/profile-picture")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPANY_ADMIN') or hasRole('COMPANY_USER')")
+    public ResponseEntity<GenericHttpResponse<UserImageDto>> uploadProfilePicture(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
+
+        GenericHttpResponse<UserImageDto> response = new GenericHttpResponse<>();
+
+        try {
+            // Validate file
+            if (file.isEmpty()) {
+                response.setHttpStatus(HttpStatus.BAD_REQUEST);
+                response.setMessage("Please select a file to upload");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            // Check file type (only images)
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                response.setHttpStatus(HttpStatus.BAD_REQUEST);
+                response.setMessage("Only image files are allowed");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            // Check file size (max 5MB)
+            if (file.getSize() > 5 * 1024 * 1024) {
+                response.setHttpStatus(HttpStatus.BAD_REQUEST);
+                response.setMessage("File size must be less than 5MB");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            // Check authorization - users can only update their own profile
+            Claims claims = jwtUtil.resolveClaims(request);
+            String userRole = claims.get("role", String.class);
+            String username = claims.getSubject();
+            UserDto currentUser = userServicePort.findUserByUsername(username);
+
+            boolean isAdmin = userRole != null && userRole.equals(ApplicationUserRole.ADMIN.name());
+            if (!isAdmin && !currentUser.getId().equals(id)) {
+                response.setHttpStatus(HttpStatus.FORBIDDEN);
+                response.setMessage("You can only update your own profile picture");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+
+            // Upload the profile picture
+            userServicePort.uploadProfilePicture(id, file);
+
+            // Get the uploaded image with metadata and base64 data
+            UserImageDto userImage = userServicePort.getUserImage(id);
+
+            response.setHttpStatus(HttpStatus.OK);
+            response.setMessage("Profile picture uploaded successfully");
+            response.setData(userImage);
+
+            logger.info("Profile picture uploaded for user ID: {}", id);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (IllegalArgumentException e) {
+            response.setHttpStatus(HttpStatus.NOT_FOUND);
+            response.setMessage(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            logger.error("Error uploading profile picture for user ID: {}", id, e);
+            response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setMessage("Error uploading profile picture: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Get user profile picture
+    @Operation(summary = "Get user profile picture", description = "Retrieves the profile picture for a specific user as base64 encoded image with metadata")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Profile picture retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserImageDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found or no profile picture available",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = GenericHttpResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = GenericHttpResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/{id}/profile-picture")
+    public ResponseEntity<?> getUserProfilePicture(@PathVariable Long id) {
+        try {
+            UserImageDto userImage = userServicePort.getUserImage(id);
+
+            if (userImage == null) {
+                GenericHttpResponse<?> response = new GenericHttpResponse<>();
+                response.setHttpStatus(HttpStatus.NOT_FOUND);
+                response.setMessage("No profile picture found for this user");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+
+            return ResponseEntity.ok(userImage);
+
+        } catch (IllegalArgumentException e) {
+            GenericHttpResponse<?> response = new GenericHttpResponse<>();
+            response.setHttpStatus(HttpStatus.NOT_FOUND);
+            response.setMessage(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            logger.error("Error retrieving profile picture for user ID: {}", id, e);
+            GenericHttpResponse<?> response = new GenericHttpResponse<>();
+            response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setMessage("Error retrieving profile picture: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

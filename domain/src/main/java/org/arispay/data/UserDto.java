@@ -66,4 +66,8 @@ public class UserDto {
 	private String token;
 
 	private LocalDateTime tokenExpiration;
+
+	private Long imageId;
+
+	private MediaDto imageMetadata;
 }

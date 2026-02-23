@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +45,7 @@ public class ClientController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
     public ClientDto addClient(@RequestBody ClientDto clientDto, Authentication authentication) {
         clientDto.setCreatedBy(authentication.getName());
         ClientDto savedClient = clientServicePort.addClient(clientDto);
@@ -57,6 +59,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
     public ResponseEntity<?> updateClient(@RequestBody ClientDto clientDto,
                                           @PathVariable long id,
                                           Authentication authentication) {
@@ -115,6 +118,7 @@ public class ClientController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('COMPANY_USER') or hasRole('ADMIN')")
     public ResponseEntity<?> deleteClientById(@PathVariable long id, Authentication authentication) {
         try {
             // Get client details before deletion for activity log
