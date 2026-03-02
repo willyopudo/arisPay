@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.arispay.data.fbl.dtorequest.masspayments.BulkTransactionRequest;
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
 import org.arispay.ports.api.BankDisbursementServicePort;
+import org.arispay.ports.spi.BankEndpointPersistencePort;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +15,16 @@ import org.springframework.stereotype.Service;
 public class FamilyBankDisbursementAdapter implements BankDisbursementServicePort {
 
     private static final Logger logger = LogManager.getLogger(FamilyBankDisbursementAdapter.class);
-    private static final String BANK_CODE = "FBL";
-    private static final String BULK_PAY_URL = "https://openbank.bankabc.com/api/v1/Transaction";
+    private static final String BANK_CODE = "070";
 
     private final OkHttpClient httpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final BankEndpointPersistencePort bankEndpointPersistencePort;
 
-    public FamilyBankDisbursementAdapter(@Qualifier("okHttpClient") OkHttpClient httpClient) {
+    public FamilyBankDisbursementAdapter(@Qualifier("okHttpClient") OkHttpClient httpClient,
+                                         BankEndpointPersistencePort bankEndpointPersistencePort) {
         this.httpClient = httpClient;
+        this.bankEndpointPersistencePort = bankEndpointPersistencePort;
     }
 
     @Override
@@ -31,13 +34,14 @@ public class FamilyBankDisbursementAdapter implements BankDisbursementServicePor
 
     @Override
     public BulkTransactionResponse processBulkDisbursement(BulkTransactionRequest request) {
+        String disbursementUrl = bankEndpointPersistencePort.getEndpointUrl(BANK_CODE, "DISBURSEMENT_URL");
         try {
             String jsonBody = objectMapper.writeValueAsString(request);
 
             RequestBody body = RequestBody.create(jsonBody, MediaType.parse("application/json"));
 
             Request httpRequest = new Request.Builder()
-                    .url(BULK_PAY_URL)
+                    .url(disbursementUrl)
                     .post(body)
                     .build();
 

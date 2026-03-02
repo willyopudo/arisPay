@@ -39,7 +39,7 @@ public class BulkTransactionResponse {
     private String status;
 
     @JsonProperty("statusdescription")
-    private double statusDescription;
+    private String statusDescription;
 
     @JsonProperty("dtl")
     private List<DetailResponse> dtl;

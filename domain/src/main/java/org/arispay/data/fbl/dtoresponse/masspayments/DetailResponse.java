@@ -37,5 +37,5 @@ public class DetailResponse {
     private String status;
 
     @JsonProperty("statusdescription")
-    private double statusDescription;
+    private String statusDescription;
 }
