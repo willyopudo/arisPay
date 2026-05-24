@@ -42,6 +42,11 @@ build/
 log4j2-dev.xml
 application-dev.yml
 .env
+
+### Secrets — never commit these ###
+docker/vault-init.sh
+.vault-keys
+*.vault-token
 /tmpclaude-9be6-cwd
 /tmpclaude-57c9-cwd
 /tmpclaude-18fa-cwd

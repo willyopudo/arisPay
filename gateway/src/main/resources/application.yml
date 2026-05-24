@@ -2,4 +2,51 @@ spring:
   application:
     name: gateway
   config:
-    import: optional:configserver:http://localhost:8888
+    # Import configuration from the Config Server.
+    # Credentials match CONFIG_SERVER_USERNAME / CONFIG_SERVER_PASSWORD on the server.
+    # Format: optional:configserver:<scheme>://<user>:<password>@<host>:<port>
+    import: optional:configserver:http://admin:admin123@localhost:8888
+  cloud:
+    config:
+      # Profile label to request from config server (aligns with the 'label' column in DB)
+      label: main
+      # Fail fast so startup fails immediately if config server is unreachable
+      fail-fast: false
+      retry:
+        max-attempts: 3
+        initial-interval: 1000
+        max-interval: 2000
+        multiplier: 1.1
+    gateway:
+      discovery:
+        locator:
+          enabled: false  # disable Eureka-based route discovery
+
+# ── Eureka – disabled when running standalone (no discovery server) ────────────
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+# ── Tracing – disable Zipkin export when running standalone ───────────────────
+management:
+  tracing:
+    enabled: false
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  # ── Actuator – expose /actuator/refresh so properties can be reloaded live ───
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh,env
+  endpoint:
+    health:
+      show-details: always
+
+# ── Logging – suppress MacOS Netty DNS native lib warning ─────────────────────
+logging:
+  level:
+    io.netty.resolver.dns.macos: ERROR
+

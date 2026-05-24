@@ -66,6 +66,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <jvmArguments>
+                        <!-- Force Netty to use Java DNS resolver instead of native macOS resolver -->
+                        -Dio.netty.resolver.dns.macos.disabled=true
+                    </jvmArguments>
+                </configuration>
             </plugin>
         </plugins>
     </build>

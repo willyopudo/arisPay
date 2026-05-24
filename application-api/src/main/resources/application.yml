@@ -1,8 +1,3 @@
-#spring:
-#  application:
-#    name: arisPay
-#  config:
-#    import: optional:configserver:http://localhost:8888/
 server:
   port: 8082
   error:
@@ -13,9 +8,22 @@ spring:
     active: "dev"
   application:
     name: arisPayApi
+  config:
+    # Config server is resolved early (before profile files load).
+    # optional: = app still starts if config server is unreachable; local configs act as fallback.
+    import: optional:configserver:http://admin:admin123@localhost:8888
   cloud:
     config:
-      enabled: false
+      enabled: true
+      label: main
+      profile: ${spring.profiles.active:default}   # resolved early; matches active Spring profile
+      fail-fast: true
+      retry:
+        max-attempts: 3
+        initial-interval: 1000
+        max-interval: 2000
+        multiplier: 1.1
+      # profile is set per environment in application-{profile}.yml
   servlet:
     multipart:
       max-file-size: 5MB
@@ -28,6 +36,10 @@ management:
   tracing:
     sampling:
       probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh,env
 custom:
   arispay:
     openapi:

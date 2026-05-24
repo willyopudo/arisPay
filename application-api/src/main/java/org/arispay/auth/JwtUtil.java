@@ -37,6 +37,7 @@ public class JwtUtil {
 	}
 
 	public String createToken(User user) {
+		logger.info("Access token validity : " + accessTokenValidity);
 		Claims claims = Jwts.claims().setSubject(user.getUsername());
 
 		claims.put("companyId", user.getUserCompanies().stream()

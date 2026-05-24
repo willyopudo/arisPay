@@ -1,0 +1,169 @@
+# =============================================================================
+# ArisPay Infrastructure Stack
+# Spins up: Vault → Config Server → Discovery → Gateway
+#
+# Usage:
+#   docker compose -f docker-compose.infra.yml up -d
+#   docker compose -f docker-compose.infra.yml down
+#   docker compose -f docker-compose.infra.yml logs -f
+#
+# Prerequisites (running standalone on host):
+#   - PostgreSQL (arispay_config_db) on port 5432
+#   - arispay application-api       on port 8082  (optional, can start after)
+#
+# After first startup, seed Vault secrets (only needed once per fresh Vault):
+#   docker compose -f docker-compose.infra.yml run --rm vault-init
+# =============================================================================
+
+services:
+
+  # ── HashiCorp Vault (dev mode) ──────────────────────────────────────────────
+  vault:
+    container_name: arispay-vault
+    image: hashicorp/vault:latest
+    # Dev mode: auto-unseals, fixed root token, KV-v2 mounted at secret/
+    command: vault server -dev -dev-root-token-id=arispay-dev-token -dev-listen-address=0.0.0.0:8200
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: arispay-dev-token
+      VAULT_ADDR: http://0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "8200:8200"
+    networks:
+      - arispay-net
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://localhost:8200"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+
+  # ── Vault Init (seeds secrets — runs once and exits) ────────────────────────
+  vault-init:
+    container_name: arispay-vault-init
+    image: hashicorp/vault:latest
+    depends_on:
+      vault:
+        condition: service_healthy
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: arispay-dev-token
+    volumes:
+      - ./docker/vault-init.sh:/vault-init.sh:ro
+    command: sh /vault-init.sh
+    networks:
+      - arispay-net
+    restart: "no"   # one-shot: runs once, exits
+
+  # ── Config Server (port 8888) ───────────────────────────────────────────────
+  config-server:
+    container_name: arispay-config-server
+    build:
+      context: ./config-server
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_PROFILES_ACTIVE: jdbc,vault,dev
+      # ── Vault backend ──
+      VAULT_HOST: vault
+      VAULT_PORT: 8200
+      VAULT_TOKEN: arispay-dev-token
+      # ── Config DB (PostgreSQL running on host) ──
+      # host.docker.internal resolves to the host machine on Docker Desktop (Mac/Win)
+      # On Linux, add --add-host=host.docker.internal:host-gateway in extra_hosts
+      DB_HOST: host.docker.internal
+      DB_PORT: 5432
+      DB_NAME: arispay_config_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      # ── Security ──
+      CONFIG_SERVER_USERNAME: admin
+      CONFIG_SERVER_PASSWORD: admin123
+      # ── Eureka registration ──
+      EUREKA_HOST: discovery
+      EUREKA_PORT: 8761
+    depends_on:
+      vault:
+        condition: service_healthy
+      vault-init:
+        condition: service_completed_successfully
+    networks:
+      - arispay-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # Linux compatibility
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-u", "admin:admin123", "http://localhost:8888/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
+    restart: unless-stopped
+
+  # ── Discovery / Eureka Server (port 8761) ───────────────────────────────────
+  discovery:
+    container_name: arispay-discovery
+    build:
+      context: ./discovery
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      # Override config server URL (localhost → container name)
+      SPRING_CONFIG_IMPORT: optional:configserver:http://admin:admin123@config-server:8888
+    depends_on:
+      config-server:
+        condition: service_healthy
+    networks:
+      - arispay-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+    restart: unless-stopped
+
+  # ── API Gateway (port 8222) ─────────────────────────────────────────────────
+  gateway:
+    container_name: arispay-gateway
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8222:8222"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      # Override config server URL (localhost → container name)
+      SPRING_CONFIG_IMPORT: optional:configserver:http://admin:admin123@config-server:8888
+      # Enable Eureka (disabled by default in application.yml for standalone mode)
+      EUREKA_CLIENT_ENABLED: "true"
+      EUREKA_CLIENT_REGISTERWITHEUREKA: "true"
+      EUREKA_CLIENT_FETCHREGISTRY: "true"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      # Zipkin disabled until added to stack
+      MANAGEMENT_TRACING_ENABLED: "false"
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+    networks:
+      - arispay-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8222/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+    restart: unless-stopped
+
+networks:
+  arispay-net:
+    driver: bridge
+    name: arispay-net
+

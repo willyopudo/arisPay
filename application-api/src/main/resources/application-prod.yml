@@ -1,9 +1,6 @@
 spring:
   application:
     name: arisPayApi
-  cloud:
-    config:
-      enabled: false
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DATABASE_URL}

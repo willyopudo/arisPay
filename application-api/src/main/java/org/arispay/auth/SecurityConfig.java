@@ -65,6 +65,7 @@ public class SecurityConfig {
 								.requestMatchers(antMatcher("/v2/api-docs/**")).permitAll()
 								.requestMatchers(antMatcher("/v3/api-docs/**")).permitAll()
 								.requestMatchers(antMatcher("/swagger-resources/**")).permitAll()
+								.requestMatchers(antMatcher("/actuator/**")).permitAll() // Actuator endpoints
 								.requestMatchers(antMatcher("/ws/**")).permitAll() // WebSocket endpoint
 								.anyRequest().authenticated())
 				.exceptionHandling(exceptions -> exceptions
