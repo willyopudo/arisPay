@@ -1,5 +1,7 @@
 package org.arispay.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.arispay.data.MediaDto;
 import org.arispay.data.UserDto;
 import org.arispay.data.UserFilterDto;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserServicePort {
 	private final UserPersistencePort userPersistencePort;
 	private FileStorageServicePort fileStorageServicePort;
 	private GenericServicePort<MediaDto> mediaServicePort;
+	private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
 	public UserServiceImpl(UserPersistencePort userPersistencePort) {
 		this.userPersistencePort = userPersistencePort;
@@ -116,6 +119,7 @@ public class UserServiceImpl implements UserServicePort {
 
 		// Delete old profile picture if exists
 		if (userDto.getImageId() != null) {
+			logger.debug("User {} already has a profile picture with media ID {}. Deleting old picture.", userId, userDto.getImageId());
 			try {
 				MediaDto oldMedia = mediaServicePort.getById(userDto.getImageId());
 				if (oldMedia != null) {
