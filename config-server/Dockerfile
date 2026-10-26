@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
@@ -5,11 +7,13 @@ WORKDIR /app
 # Copy Maven wrapper first (layer cache: only re-downloads deps if pom.xml changes)
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
-RUN ./mvnw dependency:go-offline -q
+RUN --mount=type=cache,target=/root/.m2,id=arispay-maven-cache \
+  ./mvnw dependency:go-offline -q
 
 # Copy source and build
 COPY src src
-RUN ./mvnw clean package -DskipTests -q
+RUN --mount=type=cache,target=/root/.m2,id=arispay-maven-cache \
+  ./mvnw clean package -DskipTests -q
 
 # ── Stage 2: Runtime ───────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-jammy
@@ -30,4 +34,3 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=5 \
 
 ENV JAVA_OPTS="-Xmx256m -Xms128m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
-

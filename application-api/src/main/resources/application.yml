@@ -11,7 +11,7 @@ spring:
   config:
     # Config server is resolved early (before profile files load).
     # optional: = app still starts if config server is unreachable; local configs act as fallback.
-    import: optional:configserver:http://admin:admin123@localhost:8888
+    import: optional:configserver:http://${CONFIG_SERVER_USERNAME:admin}:${CONFIG_SERVER_PASSWORD:admin123}@${CONFIG_SERVER_HOST:localhost}:${CONFIG_SERVER_PORT:8888}
   cloud:
     config:
       enabled: true
@@ -56,5 +56,3 @@ custom:
 file:
   upload:
     path: ${FILE_UPLOAD_PATH:/opt/arispay/media}
-
-

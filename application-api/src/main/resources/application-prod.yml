@@ -33,7 +33,7 @@ spring:
       connect-timeout: 60000
 
 logging:
-  config: application-api/src/main/resources/log4j2-prod.xml
+  config: classpath:log4j2-prod.xml
   level:
     root: INFO
     org.arispay: INFO

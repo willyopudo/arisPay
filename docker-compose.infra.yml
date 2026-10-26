@@ -1,18 +1,18 @@
 # =============================================================================
 # ArisPay Infrastructure Stack
-# Spins up: Vault → Config Server → Discovery → Gateway
+# Spins up: Vault → Config Server → Discovery → Gateway → Redis → Application API
 #
 # Usage:
-#   docker compose -f docker-compose.infra.yml up -d
-#   docker compose -f docker-compose.infra.yml down
-#   docker compose -f docker-compose.infra.yml logs -f
+#   docker compose --env-file .env.infra -f docker-compose.infra.yml up -d
+#   docker compose --env-file .env.infra -f docker-compose.infra.yml down
+#   docker compose --env-file .env.infra -f docker-compose.infra.yml logs -f
 #
 # Prerequisites (running standalone on host):
 #   - PostgreSQL (arispay_config_db) on port 5432
-#   - arispay application-api       on port 8082  (optional, can start after)
+#   - PostgreSQL (arispay_db) for application-api on port 5432
 #
 # After first startup, seed Vault secrets (only needed once per fresh Vault):
-#   docker compose -f docker-compose.infra.yml run --rm vault-init
+#   docker compose --env-file .env.infra -f docker-compose.infra.yml run --rm vault-init
 # =============================================================================
 
 services:
@@ -21,11 +21,11 @@ services:
   vault:
     container_name: arispay-vault
     image: hashicorp/vault:latest
-    # Dev mode: auto-unseals, fixed root token, KV-v2 mounted at secret/
-    command: vault server -dev -dev-root-token-id=arispay-dev-token -dev-listen-address=0.0.0.0:8200
+    command: vault server -dev -dev-root-token-id=${VAULT_DEV_ROOT_TOKEN_ID:?Set VAULT_DEV_ROOT_TOKEN_ID} -dev-listen-address=0.0.0.0:8200
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: arispay-dev-token
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID:?Set VAULT_DEV_ROOT_TOKEN_ID}
       VAULT_ADDR: http://0.0.0.0:8200
+      SKIP_SETCAP: "true"
     cap_add:
       - IPC_LOCK
     ports:
@@ -49,13 +49,25 @@ services:
         condition: service_healthy
     environment:
       VAULT_ADDR: http://vault:8200
-      VAULT_TOKEN: arispay-dev-token
+      VAULT_TOKEN: ${VAULT_DEV_ROOT_TOKEN_ID:?Set VAULT_DEV_ROOT_TOKEN_ID}
+      ARISPAY_DB_PASSWORD: ${ARISPAY_DB_PASSWORD:?Set ARISPAY_DB_PASSWORD}
+      ARISPAY_DB_PASSWORD_PROD: ${ARISPAY_DB_PASSWORD_PROD:?Set ARISPAY_DB_PASSWORD_PROD}
+      ARISPAY_JWT_SECRET: ${ARISPAY_JWT_SECRET:?Set ARISPAY_JWT_SECRET}
+      ARISPAY_JWT_SECRET_PROD: ${ARISPAY_JWT_SECRET_PROD:?Set ARISPAY_JWT_SECRET_PROD}
+      ARISPAY_REDIS_PASSWORD: ${ARISPAY_REDIS_PASSWORD:?Set ARISPAY_REDIS_PASSWORD}
+      ARISPAY_REDIS_PASSWORD_PROD: ${ARISPAY_REDIS_PASSWORD_PROD:?Set ARISPAY_REDIS_PASSWORD_PROD}
+      EUREKA_SHARED_SECRET_DEV: ${EUREKA_SHARED_SECRET_DEV:?Set EUREKA_SHARED_SECRET_DEV}
+      EUREKA_SHARED_SECRET_PROD: ${EUREKA_SHARED_SECRET_PROD:?Set EUREKA_SHARED_SECRET_PROD}
+      ZIPKIN_TOKEN_DEV: ${ZIPKIN_TOKEN_DEV:?Set ZIPKIN_TOKEN_DEV}
+      ZIPKIN_TOKEN_PROD: ${ZIPKIN_TOKEN_PROD:?Set ZIPKIN_TOKEN_PROD}
+      PAYMENT_GATEWAY_API_KEY_DEV: ${PAYMENT_GATEWAY_API_KEY_DEV:?Set PAYMENT_GATEWAY_API_KEY_DEV}
+      PAYMENT_GATEWAY_API_KEY_PROD: ${PAYMENT_GATEWAY_API_KEY_PROD:?Set PAYMENT_GATEWAY_API_KEY_PROD}
     volumes:
       - ./docker/vault-init.sh:/vault-init.sh:ro
     command: sh /vault-init.sh
     networks:
       - arispay-net
-    restart: "no"   # one-shot: runs once, exits
+    restart: "no"
 
   # ── Config Server (port 8888) ───────────────────────────────────────────────
   config-server:
@@ -67,22 +79,16 @@ services:
       - "8888:8888"
     environment:
       SPRING_PROFILES_ACTIVE: jdbc,vault,dev
-      # ── Vault backend ──
       VAULT_HOST: vault
       VAULT_PORT: 8200
-      VAULT_TOKEN: arispay-dev-token
-      # ── Config DB (PostgreSQL running on host) ──
-      # host.docker.internal resolves to the host machine on Docker Desktop (Mac/Win)
-      # On Linux, add --add-host=host.docker.internal:host-gateway in extra_hosts
+      VAULT_TOKEN: ${VAULT_DEV_ROOT_TOKEN_ID:?Set VAULT_DEV_ROOT_TOKEN_ID}
       DB_HOST: host.docker.internal
       DB_PORT: 5432
       DB_NAME: arispay_config_db
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      # ── Security ──
-      CONFIG_SERVER_USERNAME: admin
-      CONFIG_SERVER_PASSWORD: admin123
-      # ── Eureka registration ──
+      DB_USERNAME: ${CONFIG_DB_USERNAME:-postgres}
+      DB_PASSWORD: ${CONFIG_DB_PASSWORD:?Set CONFIG_DB_PASSWORD}
+      CONFIG_SERVER_USERNAME: ${CONFIG_SERVER_USERNAME:?Set CONFIG_SERVER_USERNAME}
+      CONFIG_SERVER_PASSWORD: ${CONFIG_SERVER_PASSWORD:?Set CONFIG_SERVER_PASSWORD}
       EUREKA_HOST: discovery
       EUREKA_PORT: 8761
     depends_on:
@@ -93,9 +99,9 @@ services:
     networks:
       - arispay-net
     extra_hosts:
-      - "host.docker.internal:host-gateway"   # Linux compatibility
+      - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD", "curl", "-f", "-u", "admin:admin123", "http://localhost:8888/actuator/health"]
+      test: ["CMD-SHELL", "curl -f -u \"$${CONFIG_SERVER_USERNAME}:$${CONFIG_SERVER_PASSWORD}\" http://localhost:8888/actuator/health"]
       interval: 15s
       timeout: 5s
       retries: 6
@@ -112,8 +118,7 @@ services:
       - "8761:8761"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      # Override config server URL (localhost → container name)
-      SPRING_CONFIG_IMPORT: optional:configserver:http://admin:admin123@config-server:8888
+      SPRING_CONFIG_IMPORT: optional:configserver:http://${CONFIG_SERVER_USERNAME:?Set CONFIG_SERVER_USERNAME}:${CONFIG_SERVER_PASSWORD:?Set CONFIG_SERVER_PASSWORD}@config-server:8888
     depends_on:
       config-server:
         condition: service_healthy
@@ -137,14 +142,10 @@ services:
       - "8222:8222"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      # Override config server URL (localhost → container name)
-      SPRING_CONFIG_IMPORT: optional:configserver:http://admin:admin123@config-server:8888
-      # Enable Eureka (disabled by default in application.yml for standalone mode)
+      SPRING_CONFIG_IMPORT: optional:configserver:http://${CONFIG_SERVER_USERNAME:?Set CONFIG_SERVER_USERNAME}:${CONFIG_SERVER_PASSWORD:?Set CONFIG_SERVER_PASSWORD}@config-server:8888
       EUREKA_CLIENT_ENABLED: "true"
       EUREKA_CLIENT_REGISTERWITHEUREKA: "true"
       EUREKA_CLIENT_FETCHREGISTRY: "true"
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
-      # Zipkin disabled until added to stack
       MANAGEMENT_TRACING_ENABLED: "false"
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
@@ -162,8 +163,73 @@ services:
       start_period: 45s
     restart: unless-stopped
 
+  # ── Redis (for application-api cache/token storage) ─────────────────────────
+  redis:
+    container_name: arispay-redis
+    image: redis:7-alpine
+    command:
+      - sh
+      - -c
+      - exec redis-server --appendonly yes --requirepass "$${ARISPAY_REDIS_PASSWORD}"
+    environment:
+      ARISPAY_REDIS_PASSWORD: ${ARISPAY_REDIS_PASSWORD:?Set ARISPAY_REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    networks:
+      - arispay-net
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$${ARISPAY_REDIS_PASSWORD}\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  # ── Application API (port 8082) ─────────────────────────────────────────────
+  application-api:
+    container_name: arispay-application-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      CONFIG_SERVER_HOST: config-server
+      CONFIG_SERVER_PORT: 8888
+      CONFIG_SERVER_USERNAME: ${CONFIG_SERVER_USERNAME:?Set CONFIG_SERVER_USERNAME}
+      CONFIG_SERVER_PASSWORD: ${CONFIG_SERVER_PASSWORD:?Set CONFIG_SERVER_PASSWORD}
+      ARISPAY_DB_HOST: ${ARISPAY_DB_HOST:-host.docker.internal}
+      ARISPAY_DB_PORT: ${ARISPAY_DB_PORT:-5432}
+      ARISPAY_DB_NAME: ${ARISPAY_DB_NAME:-arispay_db}
+      ARISPAY_DB_USERNAME: ${ARISPAY_DB_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${ARISPAY_DB_PASSWORD:?Set ARISPAY_DB_PASSWORD}
+      ARISPAY_REDIS_HOST: redis
+      ARISPAY_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: ${ARISPAY_REDIS_PASSWORD:?Set ARISPAY_REDIS_PASSWORD}
+      ARISPAY_OPENAPI_DEV_URL: ${ARISPAY_OPENAPI_DEV_URL:-http://localhost:8082}
+      ARISPAY_OPENAPI_PROD_URL: ${ARISPAY_OPENAPI_PROD_URL:-https://arispay.com}
+      FILE_UPLOAD_PATH: /app/media
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - arispay-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 90s
+    restart: unless-stopped
+
 networks:
   arispay-net:
     driver: bridge
     name: arispay-net
-

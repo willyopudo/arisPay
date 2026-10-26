@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 # Use Eclipse Temurin JDK 21 as the base image
 FROM eclipse-temurin:21-jdk-jammy
 
@@ -12,7 +14,9 @@ COPY infrastructure/pom.xml infrastructure/pom.xml
 COPY application-api/pom.xml application-api/pom.xml
 
 # Download dependencies (this layer will be cached if pom.xml doesn't change)
-RUN ./mvnw dependency:go-offline -B
+RUN chmod +x ./mvnw
+RUN --mount=type=cache,target=/root/.m2,id=arispay-maven-cache \
+    ./mvnw dependency:go-offline -B
 
 # Copy source code
 COPY domain/src domain/src
@@ -20,7 +24,8 @@ COPY infrastructure/src infrastructure/src
 COPY application-api/src application-api/src
 
 # Build the application
-RUN ./mvnw clean package -DskipTests -B
+RUN --mount=type=cache,target=/root/.m2,id=arispay-maven-cache \
+    ./mvnw clean package -DskipTests -B
 
 # Create a new stage for the runtime image (multi-stage build for smaller image)
 FROM eclipse-temurin:21-jre-jammy
@@ -37,8 +42,8 @@ WORKDIR /app
 # Copy the built JAR from the build stage
 COPY --from=0 /app/application-api/target/application-api-1.0-SNAPSHOT.jar ArisPay.jar
 
-# Change ownership to app user
-RUN chown appuser:appuser ArisPay.jar
+# Prepare writable app paths and ownership for non-root runtime
+RUN mkdir -p /app/media && chown -R appuser:appuser /app
 
 # Switch to non-root user
 USER appuser
