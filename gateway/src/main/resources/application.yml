@@ -28,6 +28,8 @@ eureka:
     enabled: false
     register-with-eureka: false
     fetch-registry: false
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
 
 # ── Tracing – disable Zipkin export when running standalone ───────────────────
 management:

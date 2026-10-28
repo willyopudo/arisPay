@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.arispay.data.fbl.dtorequest.masspayments.BulkTransactionRequest;
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
+import org.arispay.ports.spi.BankEndpointPersistencePort;
 import org.arispay.ports.spi.fbl.BulkTransactionPersistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -22,15 +23,19 @@ public class BulkPaymentService {
 
     @Autowired
     private BulkTransactionPersistencePort bulkTransactionPersistencePort;
-    
+
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private BankEndpointPersistencePort bankEndpointPersistencePort;
 
     public BulkTransactionResponse initiateBulkTransactionRequest(BulkTransactionRequest bulkTransactionRequest) {
         try {
             bulkTransactionRequest = bulkTransactionPersistencePort.addBulkTransaction(bulkTransactionRequest);
 
-            URI uri = new URI("https://openbank.bankabc.com/api/v1/Transaction");
+            String disbursementUrl = bankEndpointPersistencePort.getEndpointUrl("070", "DISBURSEMENT_URL");
+            URI uri = new URI(disbursementUrl);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Accept", "*/*");
             headers.add("Authorization", "Bearer " + tokenService.getAccessToken());

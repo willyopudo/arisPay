@@ -37,7 +37,7 @@ public class CustomUserDetails implements UserDetails {
 	}
 
 	public String getFullName() {
-		return this.user.getName();
+		return this.user.getFirstName()  + " " + this.user.getLastName();
 	}
 
 	@Override
@@ -57,6 +57,6 @@ public class CustomUserDetails implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return user.getStatus() == 1;
+		return user.getIsEnabled() == 1;
 	}
 }

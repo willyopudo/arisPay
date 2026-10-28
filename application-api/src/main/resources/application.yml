@@ -32,6 +32,10 @@ spring:
     view:
       suffix: html
     static-path-pattern: /resources/static/**
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
 management:
   tracing:
     sampling:

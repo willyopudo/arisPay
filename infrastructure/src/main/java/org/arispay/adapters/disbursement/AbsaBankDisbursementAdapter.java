@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class AbsaBankDisbursementAdapter implements BankDisbursementServicePort {
 
     private static final Logger logger = LogManager.getLogger(AbsaBankDisbursementAdapter.class);
-    private static final String BANK_CODE = "ABSA";
+    private static final String BANK_CODE = "003";
 
     @Override
     public String getBankCode() {

@@ -5,6 +5,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.arispay.data.dtoauth.JwtLoginReq;
 import org.arispay.data.dtoauth.JwtLoginResp;
+import org.arispay.ports.spi.BankEndpointPersistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
@@ -23,6 +24,9 @@ public class TokenService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private BankEndpointPersistencePort bankEndpointPersistencePort;
 
     public String getAccessToken() {
         String FBL_ACCESS_TOKEN = "FBL_ACCESS_TOKEN";
@@ -49,8 +53,9 @@ public class TokenService {
 
     private String generateNewToken() {
         try {
-            URI uri = new URI("https://openbaknk.bakabc.com/connect/token");
-            JwtLoginReq tokenRequest = new JwtLoginReq("client@sandbox.bankabc", "#secret123$",
+            String tokenUrl = bankEndpointPersistencePort.getEndpointUrl("070", "TOKEN_URL");
+            URI uri = new URI(tokenUrl);
+            JwtLoginReq tokenRequest = new JwtLoginReq("client@sandbox.familybank.co.ke", "#secret123$",
                 "client_credentials", "OB_BULK_PAY");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Accept", "*/*");

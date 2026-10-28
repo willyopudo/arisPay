@@ -67,22 +67,41 @@ public class OAuth2TokenService {
 
     private String fetchOAuth2Token(PartnerAuthProperties.PartnerConfig config) throws IOException {
         PartnerAuthProperties.PartnerConfig.OAuth2Config oauth2Config = config.getOauth2();
+        String bodyFormat = oauth2Config.getBodyFormat();
 
-        FormBody.Builder formBuilder = new FormBody.Builder()
-                .add("grant_type", "client_credentials")
-                .add("client_id", oauth2Config.getClientId())
-                .add("client_secret", oauth2Config.getClientSecret());
+        RequestBody requestBody;
+        String contentType;
 
-        if (oauth2Config.getScope() != null && !oauth2Config.getScope().isEmpty()) {
-            formBuilder.add("scope", oauth2Config.getScope());
+        if ("JSON".equalsIgnoreCase(bodyFormat)) {
+            // Send as JSON body
+            Map<String, String> jsonMap = new HashMap<>();
+            jsonMap.put("grant_type", "client_credentials");
+            jsonMap.put("client_id", oauth2Config.getClientId());
+            jsonMap.put("client_secret", oauth2Config.getClientSecret());
+            if (oauth2Config.getScope() != null && !oauth2Config.getScope().isEmpty()) {
+                jsonMap.put("scope", oauth2Config.getScope());
+            }
+            String jsonBody = objectMapper.writeValueAsString(jsonMap);
+            requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+            contentType = "application/json";
+        } else {
+            // Default: send as form-urlencoded
+            FormBody.Builder formBuilder = new FormBody.Builder()
+                    .add("grant_type", "client_credentials")
+                    .add("client_id", oauth2Config.getClientId())
+                    .add("client_secret", oauth2Config.getClientSecret());
+
+            if (oauth2Config.getScope() != null && !oauth2Config.getScope().isEmpty()) {
+                formBuilder.add("scope", oauth2Config.getScope());
+            }
+            requestBody = formBuilder.build();
+            contentType = "application/x-www-form-urlencoded";
         }
-
-        RequestBody formBody = formBuilder.build();
 
         Request request = new Request.Builder()
                 .url(config.getAuthUrl())
-                .post(formBody)
-                .header("Content-Type", "application/x-www-form-urlencoded")
+                .post(requestBody)
+                .header("Content-Type", contentType)
                 .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
@@ -98,20 +117,35 @@ public class OAuth2TokenService {
     }
 
     private String fetchOpenIdToken(PartnerAuthProperties.PartnerConfig config) throws IOException {
-        // Similar to OAuth2 but might include additional OpenID specific parameters
         PartnerAuthProperties.PartnerConfig.OpenIdConfig openidConfig = config.getOpenid();
+        String bodyFormat = openidConfig.getBodyFormat();
 
-        FormBody formBody = new FormBody.Builder()
-                .add("grant_type", "client_credentials")
-                .add("client_id", openidConfig.getClientId())
-                .add("client_secret", openidConfig.getClientSecret())
-                .add("scope", openidConfig.getScope())
-                .build();
+        RequestBody requestBody;
+        String contentType;
+
+        if ("JSON".equalsIgnoreCase(bodyFormat)) {
+            Map<String, String> jsonMap = new HashMap<>();
+            jsonMap.put("grant_type", "client_credentials");
+            jsonMap.put("client_id", openidConfig.getClientId());
+            jsonMap.put("client_secret", openidConfig.getClientSecret());
+            jsonMap.put("scope", openidConfig.getScope());
+            String jsonBody = objectMapper.writeValueAsString(jsonMap);
+            requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+            contentType = "application/json";
+        } else {
+            requestBody = new FormBody.Builder()
+                    .add("grant_type", "client_credentials")
+                    .add("client_id", openidConfig.getClientId())
+                    .add("client_secret", openidConfig.getClientSecret())
+                    .add("scope", openidConfig.getScope())
+                    .build();
+            contentType = "application/x-www-form-urlencoded";
+        }
 
         Request request = new Request.Builder()
                 .url(config.getAuthUrl())
-                .post(formBody)
-                .header("Content-Type", "application/x-www-form-urlencoded")
+                .post(requestBody)
+                .header("Content-Type", contentType)
                 .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
@@ -177,4 +211,3 @@ public class OAuth2TokenService {
         logger.info("Cleared all token cache");
     }
 }
-

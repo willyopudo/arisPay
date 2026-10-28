@@ -70,7 +70,7 @@ public class BulkDisbursementService {
         request.setAccountDr(uploadDto.getAccountDr());
         request.setNarration(uploadDto.getNarration());
         request.setCurrency(uploadDto.getCurrency() != null ? uploadDto.getCurrency() : "KES");
-        request.setValueDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        request.setValueDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
         request.setTotalAmount(totalAmount);
         request.setDtl(details);
 

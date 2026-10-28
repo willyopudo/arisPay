@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 // PartnerAuthProperties.java
-@ConfigurationProperties(prefix = "partners.auth")
+@ConfigurationProperties(prefix = "custom.arispay.partners.auth")
 @Component
 @Data
 public class PartnerAuthProperties {
@@ -53,6 +53,7 @@ public class PartnerAuthProperties {
             private String clientId;
             private String clientSecret;
             private String scope;
+            private String bodyFormat = "FORM"; // "FORM" or "JSON"
             private long tokenCacheDuration = 3300; // 55 minutes default
         }
 
@@ -61,6 +62,7 @@ public class PartnerAuthProperties {
             private String clientId;
             private String clientSecret;
             private String scope;
+            private String bodyFormat = "FORM"; // "FORM" or "JSON"
             private long tokenCacheDuration = 3300;
         }
 

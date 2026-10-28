@@ -1,6 +1,7 @@
 package org.arispay.service.fbl;
 
 import org.arispay.data.fbl.dtoresponse.masspayments.BulkTransactionResponse;
+import org.arispay.ports.spi.BankEndpointPersistencePort;
 import org.arispay.ports.spi.fbl.BulkTransactionPersistencePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -11,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +28,9 @@ public class BulkPaymentQueryService {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private BankEndpointPersistencePort bankEndpointPersistencePort;
+
     @Scheduled(cron = "*/5 * * * * *")
     private void queryBulkTransactionStatus() {
         try {
@@ -43,7 +46,7 @@ public class BulkPaymentQueryService {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<?> httpEntity = new HttpEntity<>(headers);
 
-                String uri = "https://openbank.bankabc.com/api/v1/Transaction";
+                String uri = bankEndpointPersistencePort.getEndpointUrl("070", "DISBURSEMENT_QUERY_URL");
 
                 String urlTemplate = UriComponentsBuilder.fromHttpUrl(uri)
                         .queryParam("BatchREF", "{BatchREF}")

@@ -4,33 +4,31 @@
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 
-# Copy Maven wrapper first (layer cache: only re-downloads deps if pom.xml changes)
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
-RUN --mount=type=cache,target=/root/.m2,id=arispay-maven-cache \
-  ./mvnw dependency:go-offline -q
+# Normalize CRLF and set the exec bit (survives Windows checkouts)
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 
-# Copy source and build
+RUN --mount=type=cache,target=/root/.m2,id=arispay-maven-cache,sharing=locked \
+    ./mvnw dependency:go-offline -q
+
 COPY src src
-RUN --mount=type=cache,target=/root/.m2,id=arispay-maven-cache \
-  ./mvnw clean package -DskipTests -q
+RUN --mount=type=cache,target=/root/.m2,id=arispay-maven-cache,sharing=locked \
+    ./mvnw clean package -DskipTests -q
 
-# ── Stage 2: Runtime ───────────────────────────────────────────────────────────
+# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-jammy
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd -r appuser && useradd -r -g appuser appuser
+
 WORKDIR /app
-
-COPY --from=build /app/target/config-server-0.0.1-SNAPSHOT.jar app.jar
-RUN chown appuser:appuser app.jar
+COPY --from=build --chown=appuser:appuser /app/target/*.jar app.jar
 USER appuser
 
 EXPOSE 8888
 
-HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=5 \
-  CMD curl -f -u "${CONFIG_SERVER_USERNAME:-admin}:${CONFIG_SERVER_PASSWORD:-admin123}" \
-      http://localhost:8888/actuator/health || exit 1
-
-ENV JAVA_OPTS="-Xmx256m -Xms128m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
