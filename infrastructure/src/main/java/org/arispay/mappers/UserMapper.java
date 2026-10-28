@@ -11,7 +11,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
@@ -28,9 +27,6 @@ public abstract class UserMapper {
 	private UserCompanyRepository userCompanyRepository;
 	@Autowired
 	private MediaRepository mediaRepository;
-
-//	@Autowired
-//	private UserRepository userRepository;
 
 	//mock comment
 	@Mapping(source = "userCompanies", target = "userCompanies", qualifiedByName = "idsToCompanies")
